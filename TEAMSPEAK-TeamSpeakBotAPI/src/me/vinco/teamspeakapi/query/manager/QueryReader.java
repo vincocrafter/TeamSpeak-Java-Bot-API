@@ -37,7 +37,7 @@ public class QueryReader {
 	 */
 
 	public void start() {
-
+		
 	}
 	
 	public boolean isError(String rs) {

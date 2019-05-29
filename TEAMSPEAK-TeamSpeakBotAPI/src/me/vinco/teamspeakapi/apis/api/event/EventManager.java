@@ -181,5 +181,9 @@ public class EventManager {
 			throw new UnknownEventException("Event that is called is not found : " + eventName);
 		}
 	}
-
+	
+	public void startListening() {
+		
+	}
+	 
 }
