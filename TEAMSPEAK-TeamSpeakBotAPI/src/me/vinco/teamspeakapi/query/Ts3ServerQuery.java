@@ -55,11 +55,10 @@ public class Ts3ServerQuery {
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
 		config = new QueryConfig(this);
-		
-		
+			
 		login(username, password);
 	}
-
+	
 	/**
 	 * @param username
 	 * @param password

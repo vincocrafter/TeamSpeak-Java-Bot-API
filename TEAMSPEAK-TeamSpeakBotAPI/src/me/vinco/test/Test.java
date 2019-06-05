@@ -25,6 +25,7 @@ public class Test {
 			query.connect("", 10011, "", "", 1, "", 1);
 		} catch (IOException | QueryLoginException e) {
 			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
 		
