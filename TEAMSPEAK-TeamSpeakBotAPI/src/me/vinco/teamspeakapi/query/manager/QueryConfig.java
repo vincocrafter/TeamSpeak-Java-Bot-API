@@ -17,9 +17,9 @@ public class QueryConfig {
 	
 private Ts3ServerQuery query;
 		
-	private boolean debug;
-	private boolean eventDebug;
-	private boolean keepAliveDebug;
+	private boolean debug = false;
+	private boolean eventDebug = false;
+	private boolean keepAliveDebug = false;
 	
 	
 	public QueryConfig(Ts3ServerQuery query) {

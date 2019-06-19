@@ -34,8 +34,7 @@ public class QueryWriter {
 		try {
 			this.outputStream = socket.getOutputStream();
 		} catch (IOException e) {
-			if (query.getConfig().isDebug())
-				e.printStackTrace();
+			e.printStackTrace();
 		}
 		writer = new PrintWriter(new OutputStreamWriter(this.outputStream));
 	}
@@ -60,7 +59,7 @@ public class QueryWriter {
 	public OutputStream getOutputStream() {
 		return outputStream;
 	}
-	
+
 	/**
 	 * @return the writer
 	 */
@@ -69,8 +68,8 @@ public class QueryWriter {
 	}
 
 	public void executeCommand(String command) {
-		if(query.getConfig().isDebug())
-			Logger.log(Logger.INFO, "Executing Command> " + command);
+		query.getLogger().log(Logger.INFO, "Executing Command > (" + command + ")");
 		writer.println(command);
+		writer.flush();
 	}
 }

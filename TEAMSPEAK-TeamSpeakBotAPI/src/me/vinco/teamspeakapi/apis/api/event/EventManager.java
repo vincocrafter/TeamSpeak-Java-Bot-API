@@ -26,7 +26,6 @@ import me.vinco.teamspeakapi.apis.api.events.PrivilegeKeyUsedEvent;
 import me.vinco.teamspeakapi.apis.api.events.ServerEditedEvent;
 import me.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
 import me.vinco.teamspeakapi.apis.api.exception.wrapper.UnknownEventException;
-import me.vinco.teamspeakapi.apis.api.util.Logger;
 import me.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class EventManager {
@@ -48,7 +47,7 @@ public class EventManager {
 			throw new UnknownEventException();
 		} else {
 			if (query.getConfig().isEventDebug()) {
-				Logger.log(5, "Registering Event : " + event.getClass().getName());
+				query.getLogger().log(5, "Registering Event : " + event.getClass().getName());
 			}
 			events.add(event);
 		}
@@ -57,7 +56,7 @@ public class EventManager {
 	public void addTs3Listener(TsEvent event) {
 		if (event != null) {
 			if (query.getConfig().isEventDebug()) {
-				Logger.log(5, "Registering Event : " + event.getClass().getName());
+				query.getLogger().log(5, "Registering Event : " + event.getClass().getName());
 			}
 			events.add(event);
 		}
@@ -69,12 +68,12 @@ public class EventManager {
 		} else {
 			if (events.contains(event)) {
 				if (query.getConfig().isEventDebug()) {
-					Logger.log(5, "Unregistering Event : " + event.getClass().getName());
+					query.getLogger().log(5, "Unregistering Event : " + event.getClass().getName());
 				}
 
 				events.remove(event);
 			} else if (query.getConfig().isEventDebug()) {
-				Logger.log(5, "Event was not found");
+				query.getLogger().log(5, "Event was not found");
 			}
 
 		}
@@ -82,7 +81,7 @@ public class EventManager {
 
 	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
 		if (query.getConfig().isEventDebug()) {
-			Logger.log(5, eventName + " was called!");
+			query.getLogger().log(5, eventName + " was called!");
 		}
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
@@ -181,9 +180,9 @@ public class EventManager {
 			throw new UnknownEventException("Event that is called is not found : " + eventName);
 		}
 	}
-	
+
 	public void startListening() {
-		
+
 	}
-	 
+
 }

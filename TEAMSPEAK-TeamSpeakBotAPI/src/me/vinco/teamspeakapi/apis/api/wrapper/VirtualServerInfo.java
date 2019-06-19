@@ -8,15 +8,6 @@ public class VirtualServerInfo extends _DefaultInfo {
       super(infos);
    }
 
-   public void printInfos() {
-      int i = 0;
-      for(String s : getInfos()) {
-         System.out.println(i + " : " + s);
-         ++i;
-      }
-
-   }
-
    public String getServerUUID() {
       return this.get(0);
    }

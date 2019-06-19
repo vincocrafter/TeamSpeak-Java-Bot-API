@@ -12,6 +12,8 @@
 package me.vinco.teamspeakapi.query;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.Socket;
@@ -20,6 +22,7 @@ import java.util.Date;
 
 import me.vinco.teamspeakapi.apis.api.event.EventManager;
 import me.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
+import me.vinco.teamspeakapi.apis.api.util.Logger;
 import me.vinco.teamspeakapi.apis.async.Ts3AnsycAPI;
 import me.vinco.teamspeakapi.apis.sync.Ts3SyncAPI;
 import me.vinco.teamspeakapi.query.manager.QueryConfig;
@@ -28,17 +31,20 @@ import me.vinco.teamspeakapi.query.manager.QueryWriter;
 
 public class Ts3ServerQuery {
 
-	Socket socket;
+	private Socket socket;
 
-	QueryReader reader;
-	QueryWriter writer;
-	QueryConfig config;
+	private QueryReader reader;
+	private QueryWriter writer;
+	private QueryConfig config = new QueryConfig(this);
 
-	Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
-	Ts3AnsycAPI ansycAPI = new Ts3AnsycAPI(this);
-	EventManager eventManager = new EventManager(this);
-
+	private Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
+	private Ts3AnsycAPI ansycAPI = new Ts3AnsycAPI(this);
+	private EventManager eventManager = new EventManager(this);
+	private Logger logger = new Logger(this);
+	
 	/**
+	 * Connect's the Socket to the Server
+	 * 
 	 * @param host
 	 * @param port
 	 * @param username
@@ -54,12 +60,15 @@ public class Ts3ServerQuery {
 		socket = new Socket(host, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
-		config = new QueryConfig(this);
-			
 		login(username, password);
+		syncAPI.connectTeamSpeakQuery(virtualServerID);
+		syncAPI.goToChannel(defaultchannelID);
+		socket.setKeepAlive(true);
 	}
 	
 	/**
+	 * Log in the Client to the Server using :
+	 * 
 	 * @param username
 	 * @param password
 	 */
@@ -70,9 +79,28 @@ public class Ts3ServerQuery {
 		if (s != null && s.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
 			throw new QueryLoginException();
 		}
-
 	}
-
+	
+	public void stopQuery() {
+		writer.executeCommand("quit");
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Read all Incoming start Messages
+	 */
+	public void readAllMessages() {
+		if(!syncAPI.isConnected()) {
+			
+		}
+	}
+	
+	
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */
@@ -116,6 +144,20 @@ public class Ts3ServerQuery {
 	public Ts3AnsycAPI getAnsycAPI() {
 		return ansycAPI;
 	}
+	
+	/**
+	 * @return the eventManager
+	 */
+	public EventManager getEventManager() {
+		return eventManager;
+	}
+	
+	/**
+	 * @return the logger
+	 */
+	public Logger getLogger() {
+		return logger;
+	}
 
 	public String getTime() {
 		SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm:ss");
@@ -128,4 +170,8 @@ public class Ts3ServerQuery {
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
+
+	
+
+	
 }

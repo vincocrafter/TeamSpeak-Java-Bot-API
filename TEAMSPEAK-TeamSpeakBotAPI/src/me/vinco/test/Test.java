@@ -21,13 +21,12 @@ public class Test {
 	static Ts3ServerQuery query = new Ts3ServerQuery();
 	
 	public static void main(String[] args) {
+		query.getConfig().setDebug(true);
 		try {
-			query.connect("", 10011, "", "", 1, "", 1);
+			query.connect("94.16.119.194", 10011, "Query", "ICfw8Joz", 1, "Ts³-Bot", 1);
 		} catch (IOException | QueryLoginException e) {
-			// TODO Auto-generated catch block
 		
 			e.printStackTrace();
 		}
-		
 	}
 }

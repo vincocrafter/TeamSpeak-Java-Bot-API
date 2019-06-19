@@ -26,7 +26,7 @@ public class KeepAliveThread extends Thread{
 	public void run() {
 		while (!this.isInterrupted()) {
 			if (this.query.getConfig().isKeepAliveDebug()) {
-				Logger.log(6, "KeepAliveMessage has been sent");
+				query.getLogger().log(1, "KeepAliveMessage has been sent");
 			}
 
 			query.getWriter().executeCommand("version");
@@ -41,7 +41,7 @@ public class KeepAliveThread extends Thread{
 	}
 	
 	public void interrupt() {
-		Logger.log(2, "KeepAliveThread has been stopped");
+		query.getLogger().log(2, "KeepAliveThread has been stopped");
 		super.interrupt();
 	}
 

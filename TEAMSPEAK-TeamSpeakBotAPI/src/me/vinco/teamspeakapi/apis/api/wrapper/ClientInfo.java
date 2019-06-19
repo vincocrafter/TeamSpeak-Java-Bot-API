@@ -8,7 +8,6 @@ public class ClientInfo extends _DefaultInfo {
 
 	int id;
 	
-
 	public ClientInfo(String[] infos, int id) {
 		super(infos);
 		this.id = id;

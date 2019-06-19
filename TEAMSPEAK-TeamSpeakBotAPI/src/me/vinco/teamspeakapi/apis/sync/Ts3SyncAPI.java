@@ -11,11 +11,14 @@
  */
 package me.vinco.teamspeakapi.apis.sync;
 
+import me.vinco.teamspeakapi.apis.api.event.TsEvent;
 import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+
 
 public class Ts3SyncAPI {
 	
 	private Ts3ServerQuery query;
+	private boolean connected = false;
 	
 	/**
 	 * @param query
@@ -31,6 +34,56 @@ public class Ts3SyncAPI {
 		return query;
 	}
 	
+	/*
+	 * 
+	 * 
+	 */
 	
+	public void connectTeamSpeakQuery(int serverID) {
+		if (!this.isConnected()) {
+			selectVirtualServer(serverID);
+			if (query.getConfig().isDebug()) {
+				query.getLogger().log(1, "Query is sucessfully connceted");
+			}
+
+			setConnected(true);
+			query.readAllMessages();
+		} else {
+			query.getLogger().log(3, "Query is already conncted");
+		}
+
+	}
+
+	/**
+	 * @param serverid
+	 */
+	public void selectVirtualServer(int serverid) {
+		query.getWriter().executeCommand("use " + serverid);
+	}
+	
+	public void addTs3Listener(TsEvent event) {
+		this.query.getEventManager().addTs3Listener(event);
+	}
+
+	/**
+	 * @param channelID
+	 */
+	public void goToChannel(int channelID) {
+		
+	}
+	
+	/**
+	 * @return the connected
+	 */
+	public boolean isConnected() {
+		return connected;
+	}
+	
+	/**
+	 * @param connected the connected to set
+	 */
+	private void setConnected(boolean connected) {
+		this.connected = connected;
+	}
 	
 }
