@@ -28,6 +28,6 @@ public class Test {
 		
 			e.printStackTrace();
 		}
-		System.out.println("Program Finished");
+		
 	}
 }
