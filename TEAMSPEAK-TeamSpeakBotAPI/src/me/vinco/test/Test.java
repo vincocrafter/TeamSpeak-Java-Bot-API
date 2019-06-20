@@ -23,7 +23,7 @@ public class Test {
 	public static void main(String[] args) {
 		query.getConfig().setDebug(true);
 		try {
-			query.connect("94.16.119.194", 10011, "Query", "ICfw8Joz", 1, "Ts³-Bot", 1);
+			query.connect("94.16.119.194", 10011, "", "", 1, "Ts³-Bot", 1);
 		} catch (IOException | QueryLoginException e) {
 		
 			e.printStackTrace();
