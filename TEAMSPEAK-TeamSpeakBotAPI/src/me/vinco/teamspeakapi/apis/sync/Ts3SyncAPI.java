@@ -34,11 +34,6 @@ public class Ts3SyncAPI {
 		return query;
 	}
 	
-	/*
-	 * 
-	 * 
-	 */
-	
 	public void connectTeamSpeakQuery(int serverID) {
 		if (!this.isConnected()) {
 			selectVirtualServer(serverID);

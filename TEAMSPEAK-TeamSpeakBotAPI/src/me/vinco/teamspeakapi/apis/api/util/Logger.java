@@ -16,30 +16,28 @@ public class Logger {
 	}
 
 	public void log(int logLevel, Object message) {
-		if (serverQuery.getConfig().isDebug()) {
-			String t = "[" + Thread.currentThread().getName() + "] ";
-			String time = "[" + serverQuery.getTime() + "] ";
+		String t = "[" + Thread.currentThread().getName() + "] ";
+		String time = "[" + serverQuery.getTime() + "] ";
 
-			switch (logLevel) {
-			case 1:
-				System.out.println(time + t + "[INFO] :  " + message);
-				break;
-			case 2:
-				System.out.println(time + t + "[ERROR] : " + message);
-				break;
-			case 3:
-				System.out.println(time + t + "[WARNING] : " + message);
-				break;
-			case 4:
-				System.out.println(time + t + "[QUERY] : " + message);
-				break;
-			case 5:
-				System.out.println(time + t + "[Event Manager] : " + message);
-				break;
-			default:
-				System.out.println(time + t + "[Other] : " + message);
-				break;
-			}
+		switch (logLevel) {
+		case 1:
+			System.out.println(time + t + "[INFO] :  " + message);
+			break;
+		case 2:
+			System.out.println(time + t + "[ERROR] : " + message);
+			break;
+		case 3:
+			System.out.println(time + t + "[WARNING] : " + message);
+			break;
+		case 4:
+			System.out.println(time + t + "[QUERY] : " + message);
+			break;
+		case 5:
+			System.out.println(time + t + "[Event Manager] : " + message);
+			break;
+		default:
+			System.out.println(time + t + "[Other] : " + message);
+			break;
 		}
 	}
 

@@ -11,7 +11,6 @@
  */
 package me.vinco.teamspeakapi.apis.api.keepalive;
 
-import me.vinco.teamspeakapi.apis.api.util.Logger;
 import me.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class KeepAliveThread extends Thread{

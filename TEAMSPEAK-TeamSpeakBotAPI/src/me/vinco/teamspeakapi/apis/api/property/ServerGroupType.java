@@ -2,8 +2,8 @@ package me.vinco.teamspeakapi.apis.api.property;
 
 public enum ServerGroupType {
    DEFAULT(0),
-   QUERY(2),
-   NORMAL(1);
+   NORMAL(1),
+   QUERY(2);
 
    private int i = 0;
 
