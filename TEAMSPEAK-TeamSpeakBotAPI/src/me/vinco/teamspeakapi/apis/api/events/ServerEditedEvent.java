@@ -3,12 +3,13 @@ package me.vinco.teamspeakapi.apis.api.events;
 import me.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class ServerEditedEvent extends BaseEvent {
+	
    public ServerEditedEvent(String[] infos) {
       super(infos);
    }
 
    public int getClientID() {
-      return Integer.parseInt(this.get(2));
+      return this.toInt(this.get(2));
    }
 
    public String getClientName() {

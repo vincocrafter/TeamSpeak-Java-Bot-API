@@ -5,28 +5,21 @@ import me.vinco.teamspeakapi.apis.api.property.TextMessageType;
 import me.vinco.teamspeakapi.apis.api.util.Formatter;
 
 public class TextMessageEvent extends BaseEvent {
+	
    public TextMessageEvent(String[] infos) {
       super(infos);
    }
-
-   public void printInfos() {
-      super.printInfos();
-   }
-
-   public String[] getInfos() {
-      return super.getInfos();
-   }
-
+   
    public int getClientID() {
-      return Integer.parseInt(this.get(4));
+      return toInt(this.get(4));
    }
 
    public String getClientName() {
-      return this.get(4);
+      return this.get(5);
    }
 
    public int getTargetMode() {
-      return Integer.parseInt(this.get(1));
+      return toInt(this.get(1));
    }
 
    public String getMessage() {
@@ -35,11 +28,10 @@ public class TextMessageEvent extends BaseEvent {
 
    public TextMessageType getTextMessageType() {
       for(TextMessageType textmessagetype : TextMessageType.values()) {
-         if(this.getTargetMode() == textmessagetype.getI()) {
+         if(getTargetMode() == textmessagetype.getI()) {
             return textmessagetype;
          }
       }
-
       return null;
    }
 }
