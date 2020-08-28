@@ -9,6 +9,7 @@
  * 
  *Uhrzeit : 20:00:17
  */
+
 package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.io.IOException;

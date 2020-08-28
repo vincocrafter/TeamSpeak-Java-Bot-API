@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.apis.api.property;
 
 public enum VirtualServerProperty {
+	
    VIRTUALSERVER_NAME("virtualserver_name"),
    VIRTUALSERVER_WELCOMEMESSAGE("virtualserver_welcomemessage"),
    VIRTUALSERVER_MAXCLIENTS("virtualserver_maxclients"),
