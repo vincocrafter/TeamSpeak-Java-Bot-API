@@ -3,6 +3,7 @@ package me.vinco.teamspeakapi.apis.api.wrapper;
 import me.vinco.teamspeakapi.apis.api.property.ChannelGroupType;
 
 public class ChannelGroup extends _DefaultInfo {
+	
    public ChannelGroup(String[] infos) {
       super(infos);
    }

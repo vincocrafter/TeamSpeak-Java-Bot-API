@@ -1,6 +1,8 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class DataBaseClientInfo {
+	
+	
    String[] infos;
 
    public DataBaseClientInfo(String[] infos) {

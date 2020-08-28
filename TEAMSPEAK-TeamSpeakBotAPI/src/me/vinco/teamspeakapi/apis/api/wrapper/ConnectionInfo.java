@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class ConnectionInfo extends _DefaultInfo {
+	
    public ConnectionInfo(String[] infos) {
       super(infos);
    }

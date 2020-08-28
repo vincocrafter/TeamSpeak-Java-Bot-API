@@ -5,6 +5,7 @@ import java.io.File;
 import me.vinco.teamspeakapi.apis.api.property.ChannelCodec;
 
 public class ChannelInfo extends _DefaultInfo {
+	
    private int cid;
 
    public ChannelInfo(String[] infos, int chid) {

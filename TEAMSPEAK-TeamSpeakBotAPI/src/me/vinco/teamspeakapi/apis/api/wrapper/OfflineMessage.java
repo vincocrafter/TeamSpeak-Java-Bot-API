@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class OfflineMessage extends _DefaultInfo {
+	
    private String[] infos;
 
    public OfflineMessage(String[] infos) {

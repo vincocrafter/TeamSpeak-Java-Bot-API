@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class HostInfo extends _DefaultInfo {
+	
    public HostInfo(String[] infos) {
       super(infos);
    }

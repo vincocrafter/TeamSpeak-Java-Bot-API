@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class Ban extends _DefaultInfo {
+	
    public Ban(String[] infos) {
       super(infos);
    }

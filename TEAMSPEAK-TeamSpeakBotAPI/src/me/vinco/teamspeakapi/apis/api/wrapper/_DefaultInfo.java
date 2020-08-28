@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class _DefaultInfo {
+	
 	String[] infos;
 
 	public _DefaultInfo(String[] infos) {

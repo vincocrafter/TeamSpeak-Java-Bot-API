@@ -1,6 +1,7 @@
 package me.vinco.teamspeakapi.apis.api.wrapper;
 
 public class QueryClientInfo extends _DefaultInfo {
+	
    public QueryClientInfo(String[] infos) {
       super(infos);
    }
