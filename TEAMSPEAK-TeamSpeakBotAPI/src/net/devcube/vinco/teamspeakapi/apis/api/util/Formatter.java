@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.util;
+package net.devcube.vinco.teamspeakapi.apis.api.util;
 
 public class Formatter {
 

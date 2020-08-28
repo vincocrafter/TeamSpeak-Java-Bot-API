@@ -9,7 +9,7 @@
  * 
  *Uhrzeit : 18:23:31
  */
-package me.vinco.teamspeakapi.apis.api.exception.query;
+package net.devcube.vinco.teamspeakapi.apis.api.exception.query;
 
 public class QueryLoginException extends Throwable {
 	   private static final long serialVersionUID = 1L;

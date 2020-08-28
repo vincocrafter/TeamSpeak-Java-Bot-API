@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.exception.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.exception.wrapper;
 
 public class UnknownQueryException extends Throwable {
    private static final long serialVersionUID = 1L;

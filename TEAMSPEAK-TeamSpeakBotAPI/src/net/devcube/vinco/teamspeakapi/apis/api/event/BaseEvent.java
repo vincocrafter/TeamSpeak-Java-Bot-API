@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.event;
+package net.devcube.vinco.teamspeakapi.apis.api.event;
 
 public class BaseEvent {
 	

@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.property;
+package net.devcube.vinco.teamspeakapi.apis.api.property;
 
 public enum LogLevel {
    ERROR(1),

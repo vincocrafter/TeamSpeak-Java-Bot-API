@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.wrapper;
 
 public class Ban extends _DefaultInfo {
 	

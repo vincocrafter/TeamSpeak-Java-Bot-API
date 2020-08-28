@@ -1,8 +1,8 @@
-package me.vinco.teamspeakapi.apis.api.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.wrapper;
 
 import java.io.File;
 
-import me.vinco.teamspeakapi.apis.api.property.ChannelCodec;
+import net.devcube.vinco.teamspeakapi.apis.api.property.ChannelCodec;
 
 public class ChannelInfo extends _DefaultInfo {
 	

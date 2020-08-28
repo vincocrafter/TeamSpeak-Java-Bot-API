@@ -9,11 +9,11 @@
  * 
  *Uhrzeit : 20:00:09
  */
-package me.vinco.teamspeakapi.query.manager;
+package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.net.Socket;
 
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryReader {
 

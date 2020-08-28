@@ -9,10 +9,10 @@
  * 
  *Uhrzeit : 15:15:10
  */
-package me.vinco.teamspeakapi.apis.api.commandmanager;
+package net.devcube.vinco.teamspeakapi.apis.api.commandmanager;
 
-import me.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
-import me.vinco.teamspeakapi.apis.api.wrapper.ClientInfo;
+import net.devcube.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.wrapper.ClientInfo;
 
 public class Command {
 	   private String name;

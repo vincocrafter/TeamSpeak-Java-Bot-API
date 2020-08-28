@@ -1,8 +1,8 @@
-package me.vinco.teamspeakapi.apis.api.events;
+package net.devcube.vinco.teamspeakapi.apis.api.events;
 
-import me.vinco.teamspeakapi.apis.api.event.BaseEvent;
-import me.vinco.teamspeakapi.apis.api.property.TextMessageType;
-import me.vinco.teamspeakapi.apis.api.util.Formatter;
+import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.property.TextMessageType;
+import net.devcube.vinco.teamspeakapi.apis.api.util.Formatter;
 
 public class TextMessageEvent extends BaseEvent {
 	

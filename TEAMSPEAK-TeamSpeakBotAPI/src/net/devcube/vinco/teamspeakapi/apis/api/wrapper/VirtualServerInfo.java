@@ -1,4 +1,4 @@
-package me.vinco.teamspeakapi.apis.api.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.wrapper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

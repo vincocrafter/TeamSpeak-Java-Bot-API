@@ -9,7 +9,7 @@
  * 
  *Uhrzeit : 19:12:48
  */
-package me.vinco.teamspeakapi.query;
+package net.devcube.vinco.teamspeakapi.query;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -18,14 +18,14 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import me.vinco.teamspeakapi.apis.api.event.EventManager;
-import me.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
-import me.vinco.teamspeakapi.apis.api.util.Logger;
-import me.vinco.teamspeakapi.apis.async.Ts3AnsycAPI;
-import me.vinco.teamspeakapi.apis.sync.Ts3SyncAPI;
-import me.vinco.teamspeakapi.query.manager.QueryConfig;
-import me.vinco.teamspeakapi.query.manager.QueryReader;
-import me.vinco.teamspeakapi.query.manager.QueryWriter;
+import net.devcube.vinco.teamspeakapi.apis.api.event.EventManager;
+import net.devcube.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.apis.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.apis.async.Ts3AnsycAPI;
+import net.devcube.vinco.teamspeakapi.apis.sync.Ts3SyncAPI;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 public class Ts3ServerQuery {
 

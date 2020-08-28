@@ -1,6 +1,6 @@
-package me.vinco.teamspeakapi.apis.api.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.wrapper;
 
-import me.vinco.teamspeakapi.apis.api.property.ServerGroupType;
+import net.devcube.vinco.teamspeakapi.apis.api.property.ServerGroupType;
 
 public class ServerGroup extends _DefaultInfo {
 	

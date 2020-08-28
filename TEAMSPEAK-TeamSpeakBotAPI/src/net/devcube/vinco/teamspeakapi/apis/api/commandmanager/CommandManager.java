@@ -9,12 +9,12 @@
  * 
  *Uhrzeit : 15:15:05
  */
-package me.vinco.teamspeakapi.apis.api.commandmanager;
+package net.devcube.vinco.teamspeakapi.apis.api.commandmanager;
 
 import java.util.ArrayList;
 
-import me.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
-import me.vinco.teamspeakapi.apis.api.wrapper.ClientInfo;
+import net.devcube.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.wrapper.ClientInfo;
 
 public class CommandManager {
 	private ArrayList<Command> commands = new ArrayList<Command>();

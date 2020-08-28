@@ -9,12 +9,12 @@
  * 
  *Uhrzeit : 14:31:15
  */
-package me.vinco.test;
+package net.devcube.vinco.test;
 
 import java.io.IOException;
 
-import me.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Test {
 	

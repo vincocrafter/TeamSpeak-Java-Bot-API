@@ -9,24 +9,24 @@
  * 
  *Uhrzeit : 16:34:08
  */
-package me.vinco.teamspeakapi.apis.api.event;
+package net.devcube.vinco.teamspeakapi.apis.api.event;
 
 import java.util.ArrayList;
 import java.util.Timer;
 
-import me.vinco.teamspeakapi.apis.api.events.ChannelCreateEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelDeletedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelDescriptionEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelPasswordChangedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientJoinEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientLeaveEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientMoveEvent;
-import me.vinco.teamspeakapi.apis.api.events.PrivilegeKeyUsedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ServerEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
-import me.vinco.teamspeakapi.apis.api.exception.wrapper.UnknownEventException;
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelCreateEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelDeletedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelDescriptionEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelPasswordChangedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientJoinEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientLeaveEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientMoveEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.PrivilegeKeyUsedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ServerEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.exception.wrapper.UnknownEventException;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class EventManager {
 

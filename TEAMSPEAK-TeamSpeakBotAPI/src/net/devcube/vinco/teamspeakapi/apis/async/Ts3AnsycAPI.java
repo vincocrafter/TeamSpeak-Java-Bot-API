@@ -9,9 +9,9 @@
  * 
  *Uhrzeit : 19:14:06
  */
-package me.vinco.teamspeakapi.apis.async;
+package net.devcube.vinco.teamspeakapi.apis.async;
 
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Ts3AnsycAPI {
 		

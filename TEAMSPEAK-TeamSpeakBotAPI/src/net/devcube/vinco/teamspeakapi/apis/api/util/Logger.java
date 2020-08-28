@@ -1,6 +1,6 @@
-package me.vinco.teamspeakapi.apis.api.util;
+package net.devcube.vinco.teamspeakapi.apis.api.util;
 
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Logger {
 	public static final int INFO = 1;

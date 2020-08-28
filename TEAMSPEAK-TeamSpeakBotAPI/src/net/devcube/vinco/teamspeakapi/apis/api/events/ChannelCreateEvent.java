@@ -1,6 +1,6 @@
-package me.vinco.teamspeakapi.apis.api.events;
+package net.devcube.vinco.teamspeakapi.apis.api.events;
 
-import me.vinco.teamspeakapi.apis.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class ChannelCreateEvent extends BaseEvent {
    public ChannelCreateEvent(String[] infos) {

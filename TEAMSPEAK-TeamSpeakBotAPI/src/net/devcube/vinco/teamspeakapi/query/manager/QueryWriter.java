@@ -9,7 +9,7 @@
  * 
  *Uhrzeit : 20:00:17
  */
-package me.vinco.teamspeakapi.query.manager;
+package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,8 +17,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import me.vinco.teamspeakapi.apis.api.util.Logger;
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.apis.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryWriter {
 

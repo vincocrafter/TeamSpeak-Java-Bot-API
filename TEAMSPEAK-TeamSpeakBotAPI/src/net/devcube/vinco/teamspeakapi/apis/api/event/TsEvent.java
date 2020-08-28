@@ -1,16 +1,16 @@
-package me.vinco.teamspeakapi.apis.api.event;
+package net.devcube.vinco.teamspeakapi.apis.api.event;
 
-import me.vinco.teamspeakapi.apis.api.events.ChannelCreateEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelDeletedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelDescriptionEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ChannelPasswordChangedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientJoinEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientLeaveEvent;
-import me.vinco.teamspeakapi.apis.api.events.ClientMoveEvent;
-import me.vinco.teamspeakapi.apis.api.events.PrivilegeKeyUsedEvent;
-import me.vinco.teamspeakapi.apis.api.events.ServerEditedEvent;
-import me.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelCreateEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelDeletedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelDescriptionEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ChannelPasswordChangedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientJoinEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientLeaveEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ClientMoveEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.PrivilegeKeyUsedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.ServerEditedEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.events.TextMessageEvent;
 
 public interface TsEvent {
 	

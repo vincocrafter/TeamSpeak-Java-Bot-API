@@ -9,9 +9,9 @@
  * 
  *Uhrzeit : 16:51:51
  */
-package me.vinco.teamspeakapi.apis.api.keepalive;
+package net.devcube.vinco.teamspeakapi.apis.api.keepalive;
 
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class KeepAliveThread extends Thread{
 	private static final int SLEEP = 180000;

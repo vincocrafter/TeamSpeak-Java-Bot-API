@@ -9,10 +9,10 @@
  * 
  *Uhrzeit : 19:13:51
  */
-package me.vinco.teamspeakapi.apis.sync;
+package net.devcube.vinco.teamspeakapi.apis.sync;
 
-import me.vinco.teamspeakapi.apis.api.event.TsEvent;
-import me.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.apis.api.event.TsEvent;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 
 public class Ts3SyncAPI {

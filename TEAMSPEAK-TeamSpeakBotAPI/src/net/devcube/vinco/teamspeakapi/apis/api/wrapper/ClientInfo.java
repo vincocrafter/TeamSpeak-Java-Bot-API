@@ -1,8 +1,8 @@
-package me.vinco.teamspeakapi.apis.api.wrapper;
+package net.devcube.vinco.teamspeakapi.apis.api.wrapper;
 
 import java.util.ArrayList;
 
-import me.vinco.teamspeakapi.apis.api.property.ClientType;
+import net.devcube.vinco.teamspeakapi.apis.api.property.ClientType;
 
 public class ClientInfo extends _DefaultInfo {
 
