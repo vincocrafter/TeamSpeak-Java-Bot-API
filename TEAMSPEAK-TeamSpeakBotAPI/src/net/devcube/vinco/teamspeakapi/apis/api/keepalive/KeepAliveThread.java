@@ -13,7 +13,8 @@ package net.devcube.vinco.teamspeakapi.apis.api.keepalive;
 
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
-public class KeepAliveThread extends Thread{
+public class KeepAliveThread extends Thread {
+
 	private static final int SLEEP = 180000;
 	private final Ts3ServerQuery query;
 
@@ -38,7 +39,7 @@ public class KeepAliveThread extends Thread{
 		}
 
 	}
-	
+
 	public void interrupt() {
 		query.getLogger().log(2, "KeepAliveThread has been stopped");
 		super.interrupt();
@@ -50,6 +51,5 @@ public class KeepAliveThread extends Thread{
 	public static int getSleep() {
 		return SLEEP;
 	}
-
 
 }
