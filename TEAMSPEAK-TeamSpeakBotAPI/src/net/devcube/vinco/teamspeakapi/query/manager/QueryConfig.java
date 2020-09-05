@@ -21,7 +21,6 @@ private Ts3ServerQuery query;
 	private boolean eventDebug = false;
 	private boolean keepAliveDebug = false;
 	
-	
 	public QueryConfig(Ts3ServerQuery query) {
 		this.query = query;
 	}
