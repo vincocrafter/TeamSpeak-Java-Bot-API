@@ -7,46 +7,46 @@ public class Ban extends _DefaultInfo {
    }
 
    public int getBanID() {
-      return this.toInt(this.get(0));
+      return toInt(get(0));
    }
 
    public String getIP() {
-      return this.get(2);
+      return get(2);
    }
 
    public String getClientUUID() {
-      return this.get(3);
+      return get(3);
    }
 
    public String getLastNickName() {
-      return this.get(4);
+      return get(4);
    }
 
    public long getCreatingTime() {
-      return this.toLong(this.get(5));
+      return toLong(get(5));
    }
 
    public int getBanDuration() {
-      return this.toInt(this.get(6));
+      return toInt(get(6));
    }
 
    public String getBannerName() {
-      return this.get(7);
+      return get(7);
    }
 
    public int getBannerClientDataBaseID() {
-      return this.toInt(this.get(8));
+      return toInt(get(8));
    }
 
    public String getBannerClientUUID() {
-      return this.get(9);
+      return get(9);
    }
 
    public String getBanReason() {
-      return this.get(10) != null?this.get(10):"";
+      return get(10) != null?get(10):"";
    }
 
    public int getBanEnforcements() {
-      return this.toInt(this.get(11).replace("|", ""));
+      return toInt(get(11).replace("|", ""));
    }
 }

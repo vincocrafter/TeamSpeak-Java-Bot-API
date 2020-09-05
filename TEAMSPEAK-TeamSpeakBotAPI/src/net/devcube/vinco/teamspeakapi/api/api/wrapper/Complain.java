@@ -7,26 +7,26 @@ public class Complain extends _DefaultInfo {
 	}
 
 	public int getTargetClientDataBaseID() {
-		return this.toInt(this.get(0));
+		return toInt(get(0));
 	}
 
 	public String getTargetName() {
-		return this.get(1);
+		return get(1);
 	}
 
 	public int getSenderClientDataBaseID() {
-		return this.toInt(this.get(2));
+		return toInt(get(2));
 	}
 
 	public String getSenderName() {
-		return this.get(1);
+		return get(1);
 	}
 
 	public String getMessage() {
-		return this.get(4);
+		return get(4);
 	}
 
 	public long getTime() {
-		return this.toLong(this.get(5));
+		return toLong(get(5));
 	}
 }

@@ -14,13 +14,13 @@ public class ChannelInfo extends _DefaultInfo {
    }
 
    public String[] getInfos() {
-      return this.infos;
+      return infos;
    }
 
    public void printInfos() {
       int i = 0;
 
-      for(String s : this.infos) {
+      for(String s : infos) {
          System.out.println(i + " : " + s);
          ++i;
       }
@@ -28,39 +28,39 @@ public class ChannelInfo extends _DefaultInfo {
    }
 
    public int getChannelID() {
-      return this.cid;
+      return cid;
    }
 
    public String getChannelOrginalName() {
-      return this.get(1);
+      return get(1);
    }
 
    public String getChannelName() {
-      String s = this.get(1);
+      String s = get(1);
       s = s.replace("\\s", " ");
       s = s.replace("\\p", "|");
       return s;
    }
 
    public String getChannelTopic() {
-      return this.get(2);
+      return get(2);
    }
 
    public String getChannelDescription() {
-      return this.get(3);
+      return get(3);
    }
 
    public String getChannelPassword() {
-      return this.get(4);
+      return get(4);
    }
 
    private int getChannelQuality() {
-      return Integer.parseInt(this.get(6));
+      return Integer.parseInt(get(6));
    }
 
    public ChannelCodec getChannelCodec() {
       for(ChannelCodec channelcodec : ChannelCodec.values()) {
-         if(channelcodec.getIndex() == this.getChannelQuality()) {
+         if(channelcodec.getIndex() == getChannelQuality()) {
             return channelcodec;
          }
       }
@@ -69,46 +69,46 @@ public class ChannelInfo extends _DefaultInfo {
    }
 
    public int getChannelMaxClients() {
-      return Integer.parseInt(this.get(7));
+      return Integer.parseInt(get(7));
    }
 
    public int getChannelMaxFamilyClients() {
-      return Integer.parseInt(this.get(8));
+      return Integer.parseInt(get(8));
    }
 
    public int getNeededTalkPower() {
-      return Integer.parseInt(this.get(22));
+      return Integer.parseInt(get(22));
    }
 
    public boolean isPermanent() {
-      return this.toBol(this.toInt(this.get(10)));
+      return toBol(toInt(get(10)));
    }
 
    public boolean isSemiPermanent() {
-      return this.toBol(this.toInt(this.get(11)));
+      return toBol(toInt(get(11)));
    }
 
    public boolean isDefault() {
-      return this.toBol(this.toInt(this.get(12)));
+      return toBol(toInt(get(12)));
    }
 
    public boolean hasPassword() {
-      return this.toBol(this.toInt(this.get(13)));
+      return toBol(toInt(get(13)));
    }
 
    public File getFilePath() {
-      return new File(this.get(21).replace("\\/", "/"));
+      return new File(get(21).replace("\\/", "/"));
    }
 
    public int getDeleteDelay() {
-      return this.toInt(this.get(17));
+      return toInt(get(17));
    }
 
    public int getSecondsEmpty() {
-      return this.toInt(this.get(27));
+      return toInt(get(27));
    }
 
    public int getIconID() {
-      return this.toInt(this.get(26));
+      return toInt(get(26));
    }
 }

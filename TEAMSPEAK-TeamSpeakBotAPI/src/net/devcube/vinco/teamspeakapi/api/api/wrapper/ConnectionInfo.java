@@ -7,18 +7,18 @@ public class ConnectionInfo extends _DefaultInfo {
    }
 
    public int getFileTransfersBandwidthSend() {
-      return this.toInt(this.get(0));
+      return toInt(get(0));
    }
 
    public int getFileTransfersBandwidthRecived() {
-      return this.toInt(this.get(1));
+      return toInt(get(1));
    }
 
    public int getFileTransfersBytesSend() {
-      return this.toInt(this.get(2));
+      return toInt(get(2));
    }
 
    public int getFileTransfersBytesRecived() {
-      return this.toInt(this.get(3));
+      return toInt(get(3));
    }
 }

@@ -9,21 +9,21 @@ public class ChannelGroup extends _DefaultInfo {
    }
 
    public int getID() {
-      return this.toInt(this.get(0));
+      return toInt(get(0));
    }
 
    public String getName() {
-      return this.get(1).replace("\\s", " ");
+      return get(1).replace("\\s", " ");
    }
 
    private int getTypeID() {
-      return this.toInt(this.get(2));
+      return toInt(get(2));
    }
 
    public ChannelGroupType getType() {
-      for(ChannelGroupType channelgrouptype : ChannelGroupType.values()) {
-         if(this.getTypeID() == channelgrouptype.getIndex()) {
-            return channelgrouptype;
+      for(ChannelGroupType type : ChannelGroupType.values()) {
+         if(getTypeID() == type.getIndex()) {
+            return type;
          }
       }
 
@@ -31,18 +31,18 @@ public class ChannelGroup extends _DefaultInfo {
    }
 
    public boolean isSaved() {
-      return this.toBol(this.toInt(this.get(4)));
+      return toBol(toInt(get(4)));
    }
 
    public int getNeededModifyPower() {
-      return this.toInt(this.get(7));
+      return toInt(get(7));
    }
 
    public int getNeededMemberAddPower() {
-      return this.toInt(this.get(8));
+      return toInt(get(8));
    }
 
    public int getNeededMemberRemovePower() {
-      return this.toInt(this.get(9));
+      return toInt(get(9));
    }
 }

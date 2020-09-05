@@ -1,57 +1,41 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
-public class DataBaseClientInfo {
+public class DataBaseClientInfo extends _DefaultInfo{
 	
 	
-   String[] infos;
-
    public DataBaseClientInfo(String[] infos) {
-      this.infos = infos;
-   }
-
-   public void printInfos() {
-      int i = 0;
-
-      for(String s : this.infos) {
-         System.out.println(i + " : " + s);
-      }
-
-   }
-
-   public String get(int i) {
-      String s = this.infos[i];
-      return s.substring(s.indexOf("=") + 1, s.length());
+      super(infos);
    }
 
    public String getClientUUID() {
-      return this.get(0);
+      return get(0);
    }
 
    public int getClientDataBaseID() {
-      return Integer.parseInt(this.get(2));
+      return Integer.parseInt(get(2));
    }
 
    public String getClientName() {
-      return this.get(1);
+      return get(1);
    }
 
    public long getCreatingTime() {
-      return Long.parseLong(this.get(3));
+      return Long.parseLong(get(3));
    }
 
    public long getLastConnection() {
-      return Long.parseLong(this.get(4));
+      return Long.parseLong(get(4));
    }
 
    public int getConnections() {
-      return Integer.parseInt(this.get(5));
+      return Integer.parseInt(get(5));
    }
 
    public String getLastIP() {
-      return this.get(13);
+      return get(13);
    }
 
    public String getDescription() {
-      return this.get(7);
+      return get(7);
    }
 }
