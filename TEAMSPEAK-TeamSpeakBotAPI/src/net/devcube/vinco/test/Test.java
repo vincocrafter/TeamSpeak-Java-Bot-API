@@ -13,7 +13,7 @@ package net.devcube.vinco.test;
 
 import java.io.IOException;
 
-import net.devcube.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Test {

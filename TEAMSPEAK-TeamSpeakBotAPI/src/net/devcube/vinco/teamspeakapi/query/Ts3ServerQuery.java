@@ -18,11 +18,11 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import net.devcube.vinco.teamspeakapi.apis.api.event.EventManager;
-import net.devcube.vinco.teamspeakapi.apis.api.exception.query.QueryLoginException;
-import net.devcube.vinco.teamspeakapi.apis.api.util.Logger;
-import net.devcube.vinco.teamspeakapi.apis.async.Ts3AnsycAPI;
-import net.devcube.vinco.teamspeakapi.apis.sync.Ts3SyncAPI;
+import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
+import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AnsycAPI;
+import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;

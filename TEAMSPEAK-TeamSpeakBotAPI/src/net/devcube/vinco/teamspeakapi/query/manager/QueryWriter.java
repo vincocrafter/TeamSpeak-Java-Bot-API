@@ -18,7 +18,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import net.devcube.vinco.teamspeakapi.apis.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryWriter {
@@ -27,7 +26,8 @@ public class QueryWriter {
 	private Socket socket;
 	private OutputStream outputStream;
 	private PrintWriter writer;
-
+	
+	
 	public QueryWriter(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.socket = socket;
