@@ -50,6 +50,7 @@ public class Ts3ServerQuery {
 	 * @param virtualServerID
 	 * @param queryNickName
 	 * @param defaultchannelID
+	 * 
 	 * @throws IOException
 	 * @throws QueryLoginException 
 	 */

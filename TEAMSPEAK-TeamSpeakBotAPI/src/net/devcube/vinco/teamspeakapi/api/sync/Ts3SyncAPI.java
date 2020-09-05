@@ -15,26 +15,30 @@ import net.devcube.vinco.teamspeakapi.api.api.event.TsEvent;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
-
 public class Ts3SyncAPI {
-	
+
 	private Ts3ServerQuery query;
 	private boolean connected = false;
-	
+
 	/**
-	 * @param query
+	 * Initiation of the Sync API
+	 * @param Serverquery class
 	 */
 	public Ts3SyncAPI(Ts3ServerQuery query) {
 		this.query = query;
 	}
-	
+
 	/**
 	 * @return the query
 	 */
 	public Ts3ServerQuery getQuery() {
 		return query;
 	}
-	
+
+	/**
+	 * Connects the Query bot to the virtual server
+	 * @param serverID from the virtual server
+	 */
 	public void connectTeamSpeakQuery(int serverID) {
 		if (!this.isConnected()) {
 			selectVirtualServer(serverID);
@@ -51,35 +55,38 @@ public class Ts3SyncAPI {
 	}
 
 	/**
-	 * @param serverid
+	 * Selects the virtual server to connect to
+	 * @param serverid of the virtual server
 	 */
 	public void selectVirtualServer(int serverid) {
 		query.getWriter().executeCommand("use " + serverid);
 	}
-	
+
 	public void addTs3Listener(TsEvent event) {
 		this.query.getEventManager().addTs3Listener(event);
 	}
 
 	/**
+	 * switches the channel of the query bot
 	 * @param channelID
 	 */
 	public void goToChannel(int channelID) {
 		
 	}
-	
+
 	/**
 	 * @return the connected
 	 */
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	/**
-	 * @param connected the connected to set
+	 * @param connected
+	 *                      the connected to set
 	 */
 	private void setConnected(boolean connected) {
 		this.connected = connected;
 	}
-	
+
 }

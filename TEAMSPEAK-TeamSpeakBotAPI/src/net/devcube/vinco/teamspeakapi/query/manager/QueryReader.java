@@ -37,24 +37,33 @@ public class QueryReader {
 	}
 
 	/**
-	 * start listening for packets
+	 * start listening for incoming packets async
 	 */
 
 	public void start() {
-		
+		new Thread(new Runnable() { // New Thread so async
+			
+			@Override
+			public void run() { //starting the while loop here to listen for packets
+				
+				while(getSocket().isConnected()) { // <-- while loop here
+					
+				}
+			}
+		}).start();
 	}
 	
+	//Just a check if the packet is an error message, so it can be ignored
 	public boolean isError(String rs) {
 		return rs.startsWith("error");
 	}
 	
+	//Just a check to validate the packet
 	public boolean isResultValid(String rs) {
 		if (rs == null)
 			return false;
 		if(rs.isEmpty())
 			return false;
-		
-	
 		return true;
 	}
 	
