@@ -12,14 +12,18 @@
 package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryReader {
 
 	private Ts3ServerQuery query;
-	Socket socket;
-
+	private Socket socket;
+	
+	private Queue<String> packets = new LinkedList<>();
+	
 	public QueryReader(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.socket = socket;
@@ -52,6 +56,13 @@ public class QueryReader {
 		
 	
 		return true;
+	}
+	
+	/**
+	 * @return the packets
+	 */
+	public Queue<String> getPackets() {
+		return packets;
 	}
 	
 }

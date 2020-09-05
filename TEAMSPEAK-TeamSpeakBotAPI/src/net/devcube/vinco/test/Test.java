@@ -9,7 +9,7 @@
  * 
  *Uhrzeit : 14:31:15
  */
-package me.vinco.test;
+package net.devcube.vinco.test;
 
 import java.io.IOException;
 
