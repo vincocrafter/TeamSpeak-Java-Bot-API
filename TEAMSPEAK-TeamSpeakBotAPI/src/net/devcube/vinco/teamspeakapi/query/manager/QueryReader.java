@@ -45,7 +45,6 @@ public class QueryReader {
 			
 			@Override
 			public void run() { //starting the while loop here to listen for packets
-				
 				while(getSocket().isConnected()) { // <-- while loop here
 					
 				}
