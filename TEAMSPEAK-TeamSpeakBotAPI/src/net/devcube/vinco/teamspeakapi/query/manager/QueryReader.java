@@ -26,7 +26,7 @@ public class QueryReader {
 	
 	public QueryReader(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
-		this.socket = socket;
+		this.setSocket(socket);
 	}
 
 	/**
@@ -63,6 +63,20 @@ public class QueryReader {
 	 */
 	public Queue<String> getPackets() {
 		return packets;
+	}
+
+	/**
+	 * @return the socket
+	 */
+	public Socket getSocket() {
+		return socket;
+	}
+
+	/**
+	 * @param socket the socket to set
+	 */
+	public void setSocket(Socket socket) {
+		this.socket = socket;
 	}
 	
 }
