@@ -10,128 +10,128 @@ public class VirtualServerInfo extends _DefaultInfo {
 	}
 
 	public String getServerUUID() {
-		return this.get(0);
+		return get(0);
 	}
 
 	public String getServerName() {
-		return this.get(1);
+		return get(1);
 	}
 
 	public String getWelcomeMessage() {
-		return this.get(2);
+		return get(2);
 	}
 
 	public int getServerID() {
-		return this.toInt(this.get(29));
+		return toInt(get(29));
 	}
 
 	public String getPlatform() {
-		return this.get(3);
+		return get(3);
 	}
 
 	public String getVersion() {
-		return this.get(4);
+		return get(4);
 	}
 
 	public String getPassword() {
-		return this.get(5);
+		return get(5);
 	}
 
 	public int getMaxclients() {
-		return this.toInt(this.get(5));
+		return toInt(get(5));
 	}
 
 	public int getChannels() {
-		return this.toInt(this.get(8));
+		return toInt(get(8));
 	}
 
 	public long getCreatingTime() {
-		return this.toLong(this.get(9));
+		return toLong(get(9));
 	}
 
 	public long getUptime() {
-		return this.toLong(this.get(10));
+		return toLong(get(10));
 	}
 
 	public int getOnlineClientsSize() {
-		return this.toInt(this.get(7));
+		return toInt(get(7));
 	}
 
 	public String getHostMessage() {
-		return this.get(12).replace("\\s", " ");
+		return get(12).replace("\\s", " ");
 	}
 
 	public int getHostMessageMode() {
-		return this.toInt(this.get(13));
+		return toInt(get(13));
 	}
 
 	public int getDefaultServerGroup() {
-		return this.toInt(this.get(15));
+		return toInt(get(15));
 	}
 
 	public int getDefaultChannelGroup() {
-		return this.toInt(this.get(16));
+		return toInt(get(16));
 	}
 
 	public boolean hasPassword() {
-		return this.toBol(this.toInt(this.get(17)));
+		return toBol(toInt(get(17)));
 	}
 
 	public int getDefaultChannelAdminGroup() {
-		return this.toInt(this.get(18));
+		return toInt(get(18));
 	}
 
 	public String getHostBannerURL() {
-		return this.get(21);
+		return get(21);
 	}
 
 	public int getComplainAutoBanCount() {
-		return this.toInt(this.get(24));
+		return toInt(get(24));
 	}
 
 	public int getAutoBanTime() {
-		return this.toInt(this.get(25));
+		return toInt(get(25));
 	}
 
 	public int getServerPort() {
-		return this.toInt(this.get(45));
+		return toInt(get(45));
 	}
 
 	public boolean isLogClient() {
-		return this.toBol(this.toInt(this.get(49)));
+		return toBol(toInt(get(49)));
 	}
 
 	public boolean isLogQuery() {
-		return this.toBol(this.toInt(this.get(50)));
+		return toBol(toInt(get(50)));
 	}
 
 	public boolean isLogChannel() {
-		return this.toBol(this.toInt(this.get(51)));
+		return toBol(toInt(get(51)));
 	}
 
 	public boolean isLogPermissions() {
-		return this.toBol(this.toInt(this.get(51)));
+		return toBol(toInt(get(51)));
 	}
 
 	public boolean isLogServer() {
-		return this.toBol(this.toInt(this.get(53)));
+		return toBol(toInt(get(53)));
 	}
 
 	public boolean isLogFiletransfer() {
-		return this.toBol(this.toInt(this.get(54)));
+		return toBol(toInt(get(54)));
 	}
 
 	public int getReservedSlots() {
-		return this.toInt(this.get(58));
+		return toInt(get(58));
 	}
 
 	public int getSecurityLevel() {
-		return this.toInt(this.get(48));
+		return toInt(get(48));
 	}
 
 	public String getOnlineTime() {
 		String s = "";
-		long i = this.getUptime();
+		long i = getUptime();
 		int j = 0;
 		int k = 0;
 		int l = 0;
@@ -168,7 +168,7 @@ public class VirtualServerInfo extends _DefaultInfo {
 
 	public String getCreatedTime() {
 		String s = "";
-		long i = this.getCreatingTime();
+		long i = getCreatingTime();
 		long j = 0L;
 		int k = 0;
 		int l = 0;
@@ -217,7 +217,7 @@ public class VirtualServerInfo extends _DefaultInfo {
 
 	public String getCreatingDate() {
 		SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm:ss");
-		Date date = new Date(this.getCreatingTime());
+		Date date = new Date(getCreatingTime());
 		String s = simpledateformat.format(date);
 		SimpleDateFormat simpledateformat1 = new SimpleDateFormat("dd.MM.yyyy");
 		Date date1 = new Date();
@@ -227,16 +227,16 @@ public class VirtualServerInfo extends _DefaultInfo {
 
 	public String toString() {
 		String s = "VirtualServer[";
-		s = this.add(s, "ServerName=" + this.getServerName());
-		s = this.add(s, "ServerID=" + this.getServerID());
-		s = this.add(s, "ServerUUID=" + this.getServerUUID());
-		s = this.add(s, "MaxClientsOnline=" + this.getMaxclients());
-		s = this.add(s, "OnlineClients=" + this.getOnlineClientsSize());
-		s = this.add(s, "Channels=" + this.getChannels());
-		s = this.add(s, "HostMessage=" + this.getHostMessage());
-		s = this.add(s, "OnlineTime=" + this.getOnlineTime());
-		s = this.add(s, "CreatedDate=" + this.getCreatingDate());
-		s = this.add(s, "]");
+		s = add(s, "ServerName=" + getServerName());
+		s = add(s, "ServerID=" + getServerID());
+		s = add(s, "ServerUUID=" + getServerUUID());
+		s = add(s, "MaxClientsOnline=" + getMaxclients());
+		s = add(s, "OnlineClients=" + getOnlineClientsSize());
+		s = add(s, "Channels=" + getChannels());
+		s = add(s, "HostMessage=" + getHostMessage());
+		s = add(s, "OnlineTime=" + getOnlineTime());
+		s = add(s, "CreatedDate=" + getCreatingDate());
+		s = add(s, "]");
 		return s;
 	}
 
