@@ -21,6 +21,6 @@ public class ClientJoinEvent extends BaseEvent {
    }
 
    public String toString() {
-      return "ClientJoinEvent[ClientID=" + this.getClientID() + ",ClientName=" + this.getClientName() + ",ClientUUID=" + this.getClientUUID() + "]";
+      return "ClientJoinEvent [ClientID=" + this.getClientID() + ",ClientName=" + this.getClientName() + ",ClientUUID=" + this.getClientUUID() + "]";
    }
 }

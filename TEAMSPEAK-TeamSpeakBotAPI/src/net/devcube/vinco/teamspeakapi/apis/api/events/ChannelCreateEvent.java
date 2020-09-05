@@ -3,31 +3,32 @@ package net.devcube.vinco.teamspeakapi.apis.api.events;
 import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class ChannelCreateEvent extends BaseEvent {
+	
    public ChannelCreateEvent(String[] infos) {
       super(infos);
    }
 
    public int getClientID() {
-      return Integer.parseInt(this.get(9));
+      return Integer.parseInt(get(9));
    }
 
    public String getClientName() {
-      return this.get(9).replace("\\s", " ");
+      return get(9).replace("\\s", " ");
    }
 
    public int getChannelID() {
-      return Integer.parseInt(this.get(1));
+      return Integer.parseInt(get(1));
    }
 
    public String getChannelName() {
-      return this.get(3);
+      return get(3);
    }
 
    public String getClientUUID() {
-      return this.get(10);
+      return get(10);
    }
 
    public String toString() {
-      return "ChannelCreateEvent[ClientID=" + this.getClientID() + ",ClientName=" + this.getClientName() + ",ClientUUID=" + this.getClientUUID() + ",ChannelID=" + this.getChannelID() + ",ChannelName=" + this.getChannelName() + "]";
+      return "ChannelCreateEvent[ClientID=" + getClientID() + ",ClientName=" + getClientName() + ",ClientUUID=" + getClientUUID() + ",ChannelID=" + getChannelID() + ",ChannelName=" + getChannelName() + "]";
    }
 }

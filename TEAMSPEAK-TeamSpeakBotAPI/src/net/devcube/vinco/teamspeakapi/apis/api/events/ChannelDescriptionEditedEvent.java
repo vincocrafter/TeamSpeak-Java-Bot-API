@@ -3,6 +3,7 @@ package net.devcube.vinco.teamspeakapi.apis.api.events;
 import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class ChannelDescriptionEditedEvent extends BaseEvent {
+	
    public ChannelDescriptionEditedEvent(String[] infos) {
       super(infos);
    }

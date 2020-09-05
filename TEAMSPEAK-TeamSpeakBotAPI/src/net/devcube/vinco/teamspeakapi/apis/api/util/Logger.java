@@ -14,29 +14,32 @@ public class Logger {
 	public Logger(Ts3ServerQuery serverQuery) {
 		this.serverQuery = serverQuery;
 	}
-
+	
+	//FORMAT
+	// [THREADNAME] [HH:mm:ss] [Type] : message 
+	
 	public void log(int logLevel, Object message) {
 		String t = "[" + Thread.currentThread().getName() + "] ";
 		String time = "[" + serverQuery.getTime() + "] ";
 
 		switch (logLevel) {
 		case 1:
-			System.out.println(time + t + "[INFO] :  " + message);
+			System.out.println(t + time +  "[INFO] :  " + message);
 			break;
 		case 2:
-			System.out.println(time + t + "[ERROR] : " + message);
+			System.err.println(t + time +  "[ERROR] : " + message);
 			break;
 		case 3:
-			System.out.println(time + t + "[WARNING] : " + message);
+			System.out.println(t + time + "[WARNING] : " + message);
 			break;
 		case 4:
-			System.out.println(time + t + "[QUERY] : " + message);
+			System.out.println(t + time + "[QUERY] : " + message);
 			break;
 		case 5:
-			System.out.println(time + t + "[Event Manager] : " + message);
+			System.out.println(t + time + "[Event Manager] : " + message);
 			break;
 		default:
-			System.out.println(time + t + "[Other] : " + message);
+			System.out.println(t + time + "[Other] : " + message);
 			break;
 		}
 	}

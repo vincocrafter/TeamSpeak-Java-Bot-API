@@ -9,18 +9,18 @@ public class ServerEditedEvent extends BaseEvent {
    }
 
    public int getClientID() {
-      return this.toInt(this.get(2));
+      return toInt(get(2));
    }
 
    public String getClientName() {
-      return this.get(3);
+      return get(3);
    }
 
    public String getClientUUID() {
-      return this.get(4);
+      return get(4);
    }
 
    public int getReasonID() {
-      return this.toInt(this.get(1));
+      return toInt(get(1));
    }
 }

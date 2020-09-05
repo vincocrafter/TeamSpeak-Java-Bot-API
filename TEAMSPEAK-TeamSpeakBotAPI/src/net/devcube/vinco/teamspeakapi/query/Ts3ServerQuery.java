@@ -169,6 +169,14 @@ public class Ts3ServerQuery {
 		return simpledateformat.format(date);
 	}
 
+	/**
+	 * @param debug
+	 */
+	public void debug(String debug) {
+		if(config.isDebug())
+			getLogger().log(Logger.INFO, debug);
+	}
+
 	
 
 	

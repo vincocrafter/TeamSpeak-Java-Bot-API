@@ -3,6 +3,7 @@ package net.devcube.vinco.teamspeakapi.apis.api.events;
 import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class PrivilegeKeyUsedEvent extends BaseEvent {
+	
    public PrivilegeKeyUsedEvent(String[] infos) {
       super(infos);
    }

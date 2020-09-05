@@ -11,25 +11,25 @@ public class TextMessageEvent extends BaseEvent {
    }
    
    public int getClientID() {
-      return toInt(this.get(4));
+      return toInt(get(4));
    }
 
    public String getClientName() {
-      return this.get(5);
+      return get(5);
    }
 
    public int getTargetMode() {
-      return toInt(this.get(1));
+      return toInt(get(1));
    }
 
    public String getMessage() {
-      return Formatter.toNormalFormat(this.get(2));
+      return Formatter.toNormalFormat(get(2));
    }
 
    public TextMessageType getTextMessageType() {
-      for(TextMessageType textmessagetype : TextMessageType.values()) {
-         if(getTargetMode() == textmessagetype.getI()) {
-            return textmessagetype;
+      for(TextMessageType type : TextMessageType.values()) {
+         if(getTargetMode() == type.getI()) {
+            return type;
          }
       }
       return null;

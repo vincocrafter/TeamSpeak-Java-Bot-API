@@ -3,6 +3,7 @@ package net.devcube.vinco.teamspeakapi.apis.api.events;
 import net.devcube.vinco.teamspeakapi.apis.api.event.BaseEvent;
 
 public class ChannelDeletedEvent extends BaseEvent {
+	
    public ChannelDeletedEvent(String[] infos) {
       super(infos);
    }

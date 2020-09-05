@@ -12,6 +12,7 @@
 package net.devcube.vinco.teamspeakapi.apis.sync;
 
 import net.devcube.vinco.teamspeakapi.apis.api.event.TsEvent;
+import net.devcube.vinco.teamspeakapi.apis.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 
@@ -38,13 +39,13 @@ public class Ts3SyncAPI {
 		if (!this.isConnected()) {
 			selectVirtualServer(serverID);
 			if (query.getConfig().isDebug()) {
-				query.getLogger().log(1, "Query is sucessfully connceted");
+				query.getLogger().log(Logger.INFO, "Query is sucessfully connceted");
 			}
 
 			setConnected(true);
 			query.readAllMessages();
 		} else {
-			query.getLogger().log(3, "Query is already conncted");
+			query.getLogger().log(Logger.ERROR, "Query is already conncted");
 		}
 
 	}

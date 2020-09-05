@@ -67,9 +67,11 @@ public class QueryWriter {
 	public PrintWriter getWriter() {
 		return writer;
 	}
-
+	
+	// Alle Commands werden hier abgesendet
+	// Hier änderbar
 	public void executeCommand(String command) {
-		query.getLogger().log(Logger.INFO, "Executing Command > (" + command + ")");
+		query.debug("Executing Command > (" + command + ")");
 		writer.println(command);
 		writer.flush();
 	}
