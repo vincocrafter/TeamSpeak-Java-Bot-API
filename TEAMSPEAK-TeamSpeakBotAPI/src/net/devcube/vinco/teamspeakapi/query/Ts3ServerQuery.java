@@ -31,7 +31,7 @@ public class Ts3ServerQuery {
 
 	private Socket socket;
 	
-//Test
+
 	private QueryReader reader;
 	private QueryWriter writer;
 	private QueryConfig config = new QueryConfig(this);
