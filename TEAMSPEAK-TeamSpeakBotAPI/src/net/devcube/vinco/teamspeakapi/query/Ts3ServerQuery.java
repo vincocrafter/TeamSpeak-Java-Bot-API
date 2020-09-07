@@ -172,6 +172,8 @@ public class Ts3ServerQuery {
 	}
 
 	/**
+	 * The Debugging Method
+	 * Checks if the debug is enabled
 	 * @param debug
 	 */
 	public void debug(String debug) {
