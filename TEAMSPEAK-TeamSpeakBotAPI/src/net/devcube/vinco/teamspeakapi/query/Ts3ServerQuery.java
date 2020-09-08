@@ -73,7 +73,7 @@ public class Ts3ServerQuery {
 	 * @param password
 	 */
 	private void login(String username, String password) throws QueryLoginException {
-		this.writer.executeCommand("login " + username + " " + password);
+		writer.executeCommand("login " + username + " " + password);
 
 		String s = "";
 		if (s != null && s.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
