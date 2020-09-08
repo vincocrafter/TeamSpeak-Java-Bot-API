@@ -67,7 +67,7 @@ public class Ts3ServerQuery {
 	}
 	
 	/**
-	 * Log in the Client to the Server using :
+	 * Log in the Client to the Server using the login information
 	 * 
 	 * @param username
 	 * @param password
