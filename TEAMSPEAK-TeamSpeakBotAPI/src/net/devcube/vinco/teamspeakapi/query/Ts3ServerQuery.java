@@ -30,7 +30,6 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 public class Ts3ServerQuery {
 
 	private Socket socket;
-	
 
 	private QueryReader reader;
 	private QueryWriter writer;
@@ -40,7 +39,7 @@ public class Ts3ServerQuery {
 	private Ts3AnsycAPI ansycAPI = new Ts3AnsycAPI(this);
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
-	
+
 	/**
 	 * Connect's the Socket to the Server
 	 * 
@@ -53,10 +52,11 @@ public class Ts3ServerQuery {
 	 * @param defaultchannelID
 	 * 
 	 * @throws IOException
-	 * @throws QueryLoginException 
+	 * @throws QueryLoginException
 	 */
 
-	public void connect(String host, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
+	public void connect(String host, int port, String username, String password, int virtualServerID,
+			String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
 		socket = new Socket(host, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
@@ -65,7 +65,7 @@ public class Ts3ServerQuery {
 		syncAPI.goToChannel(defaultchannelID);
 		socket.setKeepAlive(true);
 	}
-	
+
 	/**
 	 * Log in the Client to the Server using the login information
 	 * 
@@ -80,7 +80,7 @@ public class Ts3ServerQuery {
 			throw new QueryLoginException();
 		}
 	}
-	
+
 	public void stopQuery() {
 		writer.executeCommand("quit");
 		try {
@@ -90,17 +90,16 @@ public class Ts3ServerQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 *  Read all Incoming start Messages
+	 * Read all Incoming start Messages
 	 */
 	public void readAllMessages() {
-		if(!syncAPI.isConnected()) {
-			
+		if (!syncAPI.isConnected()) {
+
 		}
 	}
-	
-	
+
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */
@@ -144,14 +143,14 @@ public class Ts3ServerQuery {
 	public Ts3AnsycAPI getAnsycAPI() {
 		return ansycAPI;
 	}
-	
+
 	/**
 	 * @return the eventManager
 	 */
 	public EventManager getEventManager() {
 		return eventManager;
 	}
-	
+
 	/**
 	 * @return the logger
 	 */
@@ -172,16 +171,13 @@ public class Ts3ServerQuery {
 	}
 
 	/**
-	 * The Debugging Method
-	 * Checks if the debug is enabled
+	 * The Debugging Method Checks if the debug is enabled
+	 * 
 	 * @param debug
 	 */
 	public void debug(String debug) {
-		if(config.isDebug())
+		if (config.isDebug())
 			getLogger().log(Logger.INFO, debug);
 	}
 
-	
-
-	
 }
