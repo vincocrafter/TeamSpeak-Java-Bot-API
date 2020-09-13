@@ -23,7 +23,7 @@ public class Test {
 	public static void main(String[] args) {
 		query.getConfig().setDebug(true);
 		try {
-			query.connect("dev-cube.net", 10011, "", "", 1, "Ts³-Bot", 1);
+			query.connect("hostnane", 10011, "Username", "Passwort", 1, "Ts³-Bot", 1);
 		} catch (IOException | QueryLoginException e) {
 		
 			e.printStackTrace();
