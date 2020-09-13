@@ -11,6 +11,7 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Timer;
 
@@ -178,6 +179,16 @@ public class EventManager {
 				(new BaseEvent(infos)).printInfos();
 			}
 			throw new UnknownEventException("Event that is called is not found : " + eventName);
+		}
+	}
+
+	public void callNewEvent(String eventName, String[] infos) {
+		for (TsEvent registeredEvents : events) {
+			System.out.println(" Event : " + registeredEvents.toString());
+			for (Method methods : registeredEvents.getClass().getDeclaredMethods()) {
+				System.out.println("Method :" + methods.getName());
+				
+			}
 		}
 	}
 

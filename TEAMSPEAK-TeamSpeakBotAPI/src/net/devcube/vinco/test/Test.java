@@ -11,9 +11,6 @@
  */
 package net.devcube.vinco.test;
 
-import java.io.IOException;
-
-import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Test {
@@ -22,12 +19,9 @@ public class Test {
 	
 	public static void main(String[] args) {
 		query.getConfig().setDebug(true);
-		try {
-			query.connect("hostnane", 10011, "Username", "Passwort", 1, "Ts³-Bot", 1);
-		} catch (IOException | QueryLoginException e) {
+		query.getConfig().setEventDebug(true);
 		
-			e.printStackTrace();
-		}
+		query.getEventManager().callNewEvent("test", null);
 		
 	}
 }
