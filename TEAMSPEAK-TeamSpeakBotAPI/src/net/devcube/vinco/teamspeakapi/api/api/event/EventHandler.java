@@ -5,12 +5,16 @@
  *
  *Jahr 2020  
  *
- *Datum : 13.09.2020
+ *Datum : Nov 17, 2020
  * 
- *Uhrzeit : 16:04:55
+ *Uhrzeit : 10:03:04 AM
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
 
 }

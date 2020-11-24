@@ -11,7 +11,9 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Timer;
 
@@ -183,11 +185,18 @@ public class EventManager {
 	}
 
 	public void callNewEvent(String eventName, String[] infos) {
+		if (query.getConfig().isEventDebug()) {
+			query.getLogger().log(5, eventName + " was called!");
+		}
+		
 		for (TsEvent registeredEvents : events) {
-			System.out.println(" Event : " + registeredEvents.toString());
-			for (Method methods : registeredEvents.getClass().getDeclaredMethods()) {
-				System.out.println("Method :" + methods.getName());
-				
+			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
+				if (meth.isAnnotationPresent(EventHandler.class)) { //Check annotation
+					System.out.println("Method :" + meth.getName()); //Prints method with @EventHandler
+					for(Parameter par : meth.getParameters()) {
+						
+					}
+				}
 			}
 		}
 	}

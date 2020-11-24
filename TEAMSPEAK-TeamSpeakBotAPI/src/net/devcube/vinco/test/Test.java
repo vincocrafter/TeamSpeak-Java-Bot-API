@@ -20,8 +20,9 @@ public class Test {
 	public static void main(String[] args) {
 		query.getConfig().setDebug(true);
 		query.getConfig().setEventDebug(true);
-		
-		query.getEventManager().callNewEvent("test", null);
+		query.getEventManager().addTs3Listener(new TsEvents());
+		query.getEventManager().callNewEvent("ClientJoinEvent", null);
+		System.exit(0);
 		
 	}
 }
