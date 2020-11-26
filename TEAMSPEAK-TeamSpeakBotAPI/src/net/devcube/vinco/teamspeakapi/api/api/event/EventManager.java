@@ -11,7 +11,6 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -193,7 +192,7 @@ public class EventManager {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
 				if (meth.isAnnotationPresent(EventHandler.class)) { //Check annotation
 					System.out.println("Method :" + meth.getName()); //Prints method with @EventHandler
-					for(Parameter par : meth.getParameters()) {
+					for(Parameter par : meth.getParameters()) { //Gets the parameters
 						
 					}
 				}
