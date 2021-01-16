@@ -193,7 +193,7 @@ public class EventManager {
 				if (meth.isAnnotationPresent(EventHandler.class)) { //Check annotation
 					System.out.println("Method :" + meth.getName()); //Prints method with @EventHandler
 					for(Parameter par : meth.getParameters()) { //Gets the parameters
-						
+						System.out.println(par);
 					}
 				}
 			}
