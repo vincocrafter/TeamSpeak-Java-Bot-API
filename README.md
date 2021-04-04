@@ -3,8 +3,16 @@ Java solution for using the Teamspeak Query Interface and a Socket connection.
 
 Usage:
 ```java
-public static void main(String[] args){
-        Ts3ServerQuery query=new Ts3ServerQuery();
-        query.connect("hostnane",10011,"Username","Passwort",1,"Ts³-Bot",1);
+public class Test {
+    
+    public static void main(String[] args) {
+        Ts3ServerQuery query = new Ts3ServerQuery();
+        try {
+            query.connect("hostnane", 10011, "Username", "Passwort", 1, "Ts³-Bot", 1);
+        } catch (IOException | QueryLoginException e) {
+            e.printStackTrace();
         }
+
+    }
+}
 ```
