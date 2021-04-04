@@ -25,7 +25,6 @@ public class Test {
 		try {
 			query.connect("hostnane", 10011, "Username", "Passwort", 1, "Ts³-Bot", 1);
 		} catch (IOException | QueryLoginException e) {
-		
 			e.printStackTrace();
 		}
 		
