@@ -3,6 +3,7 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Logger {
+	
 	public static final int INFO = 1;
 	public static final int ERROR = 2;
 	public static final int WARING = 3;

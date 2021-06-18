@@ -3,8 +3,8 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class VirtualServerInfo extends _DefaultInfo {
-	
+public class VirtualServerInfo extends DefaultInfo {
+
 	public VirtualServerInfo(String[] infos) {
 		super(infos);
 	}

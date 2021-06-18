@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientType;
 
-public class ClientInfo extends _DefaultInfo {
+public class ClientInfo extends DefaultInfo {
 
 	int id;
-	
+
 	public ClientInfo(String[] infos, int id) {
 		super(infos);
 		this.id = id;

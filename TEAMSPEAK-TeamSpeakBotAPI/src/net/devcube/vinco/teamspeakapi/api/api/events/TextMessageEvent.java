@@ -28,7 +28,7 @@ public class TextMessageEvent extends BaseEvent {
 
    public TextMessageType getTextMessageType() {
       for(TextMessageType type : TextMessageType.values()) {
-         if(getTargetMode() == type.getI()) {
+         if(getTargetMode() == type.getValue()) {
             return type;
          }
       }

@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum VirtualServerStatus {
+	
    ONLINE("online"),
    OFFLINE("offline"),
    DEPLOY_RUNNING("deploy running"),

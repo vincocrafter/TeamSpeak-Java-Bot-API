@@ -1,10 +1,10 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
-public class _DefaultInfo {
-	
+public class DefaultInfo {
+
 	String[] infos;
 
-	public _DefaultInfo(String[] infos) {
+	public DefaultInfo(String[] infos) {
 		this.infos = infos;
 	}
 

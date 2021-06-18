@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum ServerGroupType {
+	
    DEFAULT(0),
    NORMAL(1),
    QUERY(2);
@@ -11,7 +12,7 @@ public enum ServerGroupType {
       this.i = i;
    }
 
-   public int getIndex() {
+   public int getValue() {
       return this.i;
    }
 }

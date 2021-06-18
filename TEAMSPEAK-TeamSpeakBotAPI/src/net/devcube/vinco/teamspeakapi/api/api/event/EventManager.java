@@ -183,6 +183,8 @@ public class EventManager {
 		}
 	}
 	
+	// New Method of calling Events, using Annotations
+	
 	public void callNewEvent(String eventName, String[] infos) {
 		if (query.getConfig().isEventDebug()) {
 			query.getLogger().log(5, eventName + " was called!");
@@ -191,7 +193,6 @@ public class EventManager {
 		for (TsEvent registeredEvents : events) {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
 				if (meth.isAnnotationPresent(EventHandler.class)) { //Check annotation
-					System.out.println("Method :" + meth.getName()); //Prints method with @EventHandler
 					for(Parameter par : meth.getParameters()) { //Gets the parameters
 						System.out.println(par);
 					}

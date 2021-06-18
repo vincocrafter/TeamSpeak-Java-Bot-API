@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum ChannelCodec {
+	
    CODEC_SPEEX_NARROWBAND(0),
    CODEC_SPEEX_WIDEBAND(1),
    CODEC_SPEEX_ULTRAWIDEBAND(2),
@@ -12,7 +13,7 @@ public enum ChannelCodec {
       this.i = i;
    }
 
-   public int getIndex() {
+   public int getValue() {
       return this.i;
    }
 }

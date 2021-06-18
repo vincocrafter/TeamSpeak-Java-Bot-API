@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum ClientProperty {
+	
    CLIENT_NICKNAME("client_nickname"),
    CLIENT_IS_TALKER("client_is_talker"),
    CLIENT_DESCRIPTION("client_description"),

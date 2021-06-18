@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum TextMessageType {
+	
    CLIENT(1),
    CHANNEL(2),
    SERVER(3);
@@ -11,7 +12,7 @@ public enum TextMessageType {
       this.i = i;
    }
 
-   public int getI() {
+   public int getValue() {
       return this.i;
    }
 }

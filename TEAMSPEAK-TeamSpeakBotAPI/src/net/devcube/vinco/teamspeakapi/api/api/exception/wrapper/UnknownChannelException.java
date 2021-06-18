@@ -1,23 +1,25 @@
 package net.devcube.vinco.teamspeakapi.api.api.exception.wrapper;
 
 public class UnknownChannelException extends Throwable {
-   private static final long serialVersionUID = 1L;
-   String message;
 
-   public UnknownChannelException() {
-   }
+	private static final long serialVersionUID = 1L;
 
-   public UnknownChannelException(String msg) {
-      this.message = null;
-   }
+	String message;
 
-   public void printStackTrace() {
-      if(this.message != null) {
-         System.err.println(this.message);
-      } else {
-         System.err.println("Der Channel ist ung\u00fcltig!");
-      }
+	public UnknownChannelException() {
+	}
 
-      super.printStackTrace();
-   }
+	public UnknownChannelException(String msg) {
+		this.message = msg;
+	}
+
+	public void printStackTrace() {
+		if (this.message != null) {
+			System.err.println(this.message);
+		} else {
+			System.err.println("Der Channel ist ungültig");
+		}
+
+		super.printStackTrace();
+	}
 }

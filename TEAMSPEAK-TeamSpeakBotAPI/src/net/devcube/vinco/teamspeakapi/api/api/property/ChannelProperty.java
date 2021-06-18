@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum ChannelProperty {
+	
    CHANNEL_NAME("channel_name"),
    CHANNEL_TOPIC("channel_topic"),
    CHANNEL_DESCRIPTION("channel_description"),

@@ -1,56 +1,56 @@
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
 public class BaseEvent {
-	
-   private String[] infos;
 
-   public BaseEvent(String[] infos) {
-      this.infos = infos;
-   }
-   
-   public String get(int i) {
-	      try {
-	         String s = this.infos[i];
-	         return s.substring(s.indexOf("=") + 1, s.length());
-	      } catch (ArrayIndexOutOfBoundsException e) {
-	         e.printStackTrace();
-	         return "";
-	      }
-	   }
-   
-   public String[] getInfos() {
-      return this.infos;
-   }
+	private String[] infos;
 
-   public void printInfos() {
-      int i = 0;
-      for(String s : this.infos) {
-         System.out.println(i + " : > " + s);
-         ++i;
-      }
-   }
+	public BaseEvent(String[] infos) {
+		this.infos = infos;
+	}
 
-   public int getClientID() {
-      return toInt(this.get(4));
-   }
+	public String get(int i) {
+		try {
+			String s = this.infos[i];
+			return s.substring(s.indexOf("=") + 1, s.length());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
 
-   public String getClientName() {
-      return get(6);
-   }
+	public String[] getInfos() {
+		return this.infos;
+	}
 
-   public int toInt(String s) {
-      return Integer.parseInt(s);   
-   }
+	public void printInfos() {
+		int i = 0;
+		for (String s : this.infos) {
+			System.out.println(i + " : > " + s);
+			++i;
+		}
+	}
 
-   public double toDouble(String s) {
-      return Double.parseDouble(s);
-   }
+	public int getClientID() {
+		return toInt(this.get(4));
+	}
 
-   public float toFloat(String s) {
-      return Float.parseFloat(s);
-   }
+	public String getClientName() {
+		return get(6);
+	}
 
-   public long toLong(String s) {
-      return Long.parseLong(s);
-   }
+	public int toInt(String s) {
+		return Integer.parseInt(s);
+	}
+
+	public double toDouble(String s) {
+		return Double.parseDouble(s);
+	}
+
+	public float toFloat(String s) {
+		return Float.parseFloat(s);
+	}
+
+	public long toLong(String s) {
+		return Long.parseLong(s);
+	}
 }

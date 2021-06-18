@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum EventType {
+	
    SERVER("server"),
    CHANNEL("channel"),
    TEXT_SERVER("textserver"),

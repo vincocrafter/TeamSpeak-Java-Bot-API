@@ -2,7 +2,7 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
 
-public class PrivilegeKey extends _DefaultInfo {
+public class PrivilegeKey extends DefaultInfo {
 
 	public PrivilegeKey(String[] infos) {
 		super(infos);
@@ -15,7 +15,7 @@ public class PrivilegeKey extends _DefaultInfo {
 	public PrivilegeKeyType getType() {
 		int i = this.getTyp();
 		for (PrivilegeKeyType privilegekeytype : PrivilegeKeyType.values()) {
-			if (i == privilegekeytype.getIndex()) {
+			if (i == privilegekeytype.getValue()) {
 				return privilegekeytype;
 			}
 		}

@@ -11,6 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+// Annotation for the new Event System in EventManager.callNewEvent()
+
 public @interface EventHandler {
 
 }

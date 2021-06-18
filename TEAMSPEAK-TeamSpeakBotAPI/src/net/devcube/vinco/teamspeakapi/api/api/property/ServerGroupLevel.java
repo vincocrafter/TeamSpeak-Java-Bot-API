@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum ServerGroupLevel {
+	
    CHANNEL_GUEST(10),
    SERVER_GUEST(15),
    QUERY_GUEST(20),
@@ -17,7 +18,7 @@ public enum ServerGroupLevel {
       this.i = i;
    }
 
-   public int getIndex() {
+   public int getValue() {
       return this.i;
    }
 }

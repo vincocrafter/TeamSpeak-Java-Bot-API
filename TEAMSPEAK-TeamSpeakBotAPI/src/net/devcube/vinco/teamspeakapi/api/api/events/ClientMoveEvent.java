@@ -3,7 +3,7 @@ package net.devcube.vinco.teamspeakapi.api.api.events;
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
 
 public class ClientMoveEvent extends BaseEvent {
-	
+
 	public ClientMoveEvent(String[] infos) {
 		super(infos);
 	}

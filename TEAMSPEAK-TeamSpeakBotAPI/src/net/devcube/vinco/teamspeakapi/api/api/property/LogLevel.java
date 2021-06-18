@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum LogLevel {
+	
    ERROR(1),
    WARNING(2),
    DEBUG(3),
@@ -12,7 +13,7 @@ public enum LogLevel {
       this.i = i;
    }
 
-   public int getIndex() {
+   public int getValue() {
       return this.i;
    }
 }

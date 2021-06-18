@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum PrivilegeKeyType {
+	
    SERVER_GROUP(0),
    CHANNEL_GROUP(1);
 
@@ -10,7 +11,7 @@ public enum PrivilegeKeyType {
       this.i = i;
    }
 
-   public int getIndex() {
+   public int getValue() {
       return this.i;
    }
 }

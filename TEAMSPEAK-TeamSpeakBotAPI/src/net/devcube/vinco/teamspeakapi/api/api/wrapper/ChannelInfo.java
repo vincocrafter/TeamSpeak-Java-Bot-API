@@ -4,111 +4,111 @@ import java.io.File;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelCodec;
 
-public class ChannelInfo extends _DefaultInfo {
-	
-   private int cid;
+public class ChannelInfo extends DefaultInfo {
 
-   public ChannelInfo(String[] infos, int chid) {
-      super(infos);
-      this.cid = chid;
-   }
+	private int cid;
 
-   public String[] getInfos() {
-      return infos;
-   }
+	public ChannelInfo(String[] infos, int chid) {
+		super(infos);
+		this.cid = chid;
+	}
 
-   public void printInfos() {
-      int i = 0;
+	public String[] getInfos() {
+		return infos;
+	}
 
-      for(String s : infos) {
-         System.out.println(i + " : " + s);
-         ++i;
-      }
+	public void printInfos() {
+		int i = 0;
 
-   }
+		for (String s : infos) {
+			System.out.println(i + " : " + s);
+			++i;
+		}
 
-   public int getChannelID() {
-      return cid;
-   }
+	}
 
-   public String getChannelOrginalName() {
-      return get(1);
-   }
+	public int getChannelID() {
+		return cid;
+	}
 
-   public String getChannelName() {
-      String s = get(1);
-      s = s.replace("\\s", " ");
-      s = s.replace("\\p", "|");
-      return s;
-   }
+	public String getChannelOrginalName() {
+		return get(1);
+	}
 
-   public String getChannelTopic() {
-      return get(2);
-   }
+	public String getChannelName() {
+		String s = get(1);
+		s = s.replace("\\s", " ");
+		s = s.replace("\\p", "|");
+		return s;
+	}
 
-   public String getChannelDescription() {
-      return get(3);
-   }
+	public String getChannelTopic() {
+		return get(2);
+	}
 
-   public String getChannelPassword() {
-      return get(4);
-   }
+	public String getChannelDescription() {
+		return get(3);
+	}
 
-   private int getChannelQuality() {
-      return Integer.parseInt(get(6));
-   }
+	public String getChannelPassword() {
+		return get(4);
+	}
 
-   public ChannelCodec getChannelCodec() {
-      for(ChannelCodec channelcodec : ChannelCodec.values()) {
-         if(channelcodec.getIndex() == getChannelQuality()) {
-            return channelcodec;
-         }
-      }
+	private int getChannelQuality() {
+		return Integer.parseInt(get(6));
+	}
 
-      return null;
-   }
+	public ChannelCodec getChannelCodec() {
+		for (ChannelCodec channelcodec : ChannelCodec.values()) {
+			if (channelcodec.getValue() == getChannelQuality()) {
+				return channelcodec;
+			}
+		}
 
-   public int getChannelMaxClients() {
-      return Integer.parseInt(get(7));
-   }
+		return null;
+	}
 
-   public int getChannelMaxFamilyClients() {
-      return Integer.parseInt(get(8));
-   }
+	public int getChannelMaxClients() {
+		return Integer.parseInt(get(7));
+	}
 
-   public int getNeededTalkPower() {
-      return Integer.parseInt(get(22));
-   }
+	public int getChannelMaxFamilyClients() {
+		return Integer.parseInt(get(8));
+	}
 
-   public boolean isPermanent() {
-      return toBol(toInt(get(10)));
-   }
+	public int getNeededTalkPower() {
+		return Integer.parseInt(get(22));
+	}
 
-   public boolean isSemiPermanent() {
-      return toBol(toInt(get(11)));
-   }
+	public boolean isPermanent() {
+		return toBol(toInt(get(10)));
+	}
 
-   public boolean isDefault() {
-      return toBol(toInt(get(12)));
-   }
+	public boolean isSemiPermanent() {
+		return toBol(toInt(get(11)));
+	}
 
-   public boolean hasPassword() {
-      return toBol(toInt(get(13)));
-   }
+	public boolean isDefault() {
+		return toBol(toInt(get(12)));
+	}
 
-   public File getFilePath() {
-      return new File(get(21).replace("\\/", "/"));
-   }
+	public boolean hasPassword() {
+		return toBol(toInt(get(13)));
+	}
 
-   public int getDeleteDelay() {
-      return toInt(get(17));
-   }
+	public File getFilePath() {
+		return new File(get(21).replace("\\/", "/"));
+	}
 
-   public int getSecondsEmpty() {
-      return toInt(get(27));
-   }
+	public int getDeleteDelay() {
+		return toInt(get(17));
+	}
 
-   public int getIconID() {
-      return toInt(get(26));
-   }
+	public int getSecondsEmpty() {
+		return toInt(get(27));
+	}
+
+	public int getIconID() {
+		return toInt(get(26));
+	}
 }

@@ -1,7 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
-public class Complain extends _DefaultInfo {
-	
+public class Complain extends DefaultInfo {
+
 	public Complain(String[] infos) {
 		super(infos);
 	}

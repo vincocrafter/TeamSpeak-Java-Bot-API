@@ -2,47 +2,47 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
 
-public class ChannelGroup extends _DefaultInfo {
-	
-   public ChannelGroup(String[] infos) {
-      super(infos);
-   }
+public class ChannelGroup extends DefaultInfo {
 
-   public int getID() {
-      return toInt(get(0));
-   }
+	public ChannelGroup(String[] infos) {
+		super(infos);
+	}
 
-   public String getName() {
-      return get(1).replace("\\s", " ");
-   }
+	public int getID() {
+		return toInt(get(0));
+	}
 
-   private int getTypeID() {
-      return toInt(get(2));
-   }
+	public String getName() {
+		return get(1).replace("\\s", " ");
+	}
 
-   public ChannelGroupType getType() {
-      for(ChannelGroupType type : ChannelGroupType.values()) {
-         if(getTypeID() == type.getIndex()) {
-            return type;
-         }
-      }
+	private int getTypeID() {
+		return toInt(get(2));
+	}
 
-      return null;
-   }
+	public ChannelGroupType getType() {
+		for (ChannelGroupType type : ChannelGroupType.values()) {
+			if (getTypeID() == type.getValue()) {
+				return type;
+			}
+		}
 
-   public boolean isSaved() {
-      return toBol(toInt(get(4)));
-   }
+		return null;
+	}
 
-   public int getNeededModifyPower() {
-      return toInt(get(7));
-   }
+	public boolean isSaved() {
+		return toBol(toInt(get(4)));
+	}
 
-   public int getNeededMemberAddPower() {
-      return toInt(get(8));
-   }
+	public int getNeededModifyPower() {
+		return toInt(get(7));
+	}
 
-   public int getNeededMemberRemovePower() {
-      return toInt(get(9));
-   }
+	public int getNeededMemberAddPower() {
+		return toInt(get(8));
+	}
+
+	public int getNeededMemberRemovePower() {
+		return toInt(get(9));
+	}
 }
