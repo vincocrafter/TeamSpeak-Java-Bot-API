@@ -26,8 +26,7 @@ public class QueryWriter {
 	private Socket socket;
 	private OutputStream outputStream;
 	private PrintWriter writer;
-	
-	
+
 	public QueryWriter(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.socket = socket;
@@ -67,12 +66,24 @@ public class QueryWriter {
 	public PrintWriter getWriter() {
 		return writer;
 	}
-	
-	// Alle Commands werden hier abgesendet
-	// Hier änderbar
+
+	// All commands executed here and send to the server
+	// Changes here
 	public void executeCommand(String command) {
 		query.debug("Executing Command > (" + command + ")");
 		writer.println(command);
 		writer.flush();
+	}
+
+	public void executeAsyncCommand(String command) {
+		new Thread() {
+			
+			public void run() {
+				query.debug("Executing AsyncCommand > (" + command + ")");
+				writer.println(command);
+				writer.flush();
+			}
+			
+		}.start();
 	}
 }

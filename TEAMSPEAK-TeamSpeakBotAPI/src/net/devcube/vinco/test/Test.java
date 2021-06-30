@@ -27,6 +27,5 @@ public class Test {
 		} catch (IOException | QueryLoginException e) {
 			e.printStackTrace();
 		}
-		
 	}
 }
