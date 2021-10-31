@@ -49,7 +49,6 @@ public class QueryReader {
 			
 			@Override
 			public void run() { //starting the while loop here to listen for packets
-				
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					while(socket.isConnected()) { // <-- while loop here
