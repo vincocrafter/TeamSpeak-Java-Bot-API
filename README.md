@@ -16,3 +16,13 @@ public class Test {
     }
 }
 ```
+Using the Teamspeak Events:
+```java
+query.getEventManager().addTs3Listener(new TsEventAdapter() {
+			//Override Methods here,
+			@Override
+			public void onChannelCreate(ChannelCreateEvent e) {
+				
+			}
+		});
+```
