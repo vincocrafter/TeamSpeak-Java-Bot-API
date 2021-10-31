@@ -11,6 +11,9 @@
  */
 package net.devcube.vinco.teamspeakapi.query.manager;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -23,6 +26,7 @@ public class QueryReader {
 	private Socket socket;
 	
 	private Queue<String> packets = new LinkedList<>();
+	private Queue<String> errors = new LinkedList<>();
 	
 	public QueryReader(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
@@ -45,9 +49,27 @@ public class QueryReader {
 			
 			@Override
 			public void run() { //starting the while loop here to listen for packets
-				while(socket.isConnected()) { // <-- while loop here
-					
+				
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					while(socket.isConnected()) { // <-- while loop here
+						if(reader.ready()) {
+							String msg = reader.readLine();
+							if(isResultValid(msg)) {
+								if(!isError(msg)) {
+									
+								} else {
+									//Error handeling
+									errors.add(msg);
+								}
+							}
+						}
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				
 			}
 		}).start();
 	}
@@ -87,4 +109,21 @@ public class QueryReader {
 		this.socket = socket;
 	}
 	
+	public String nextPacket() {
+		return packets.poll();
+	}
+	
+	//See Java Documentation to poll and peek
+	public String nextSavePacket() {
+		return packets.peek();
+	}
+	
+	public String nextError() {
+		return errors.poll();
+	}
+	
+	//See Java Documentation to poll and peek
+	public String nextSaveError() {
+		return errors.peek();
+	}
 }

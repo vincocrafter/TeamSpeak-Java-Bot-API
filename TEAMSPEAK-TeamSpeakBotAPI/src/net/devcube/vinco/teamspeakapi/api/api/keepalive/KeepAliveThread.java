@@ -22,7 +22,9 @@ public class KeepAliveThread extends Thread {
 		super("[TeamSpeak3-BotAPI] > KeepAliveThread");
 		this.query = query;
 	}
-
+	
+	
+	// keeps the Socket connected to the (Teamspeak)Server
 	public void run() {
 		while (!this.isInterrupted()) {
 			if (this.query.getConfig().isKeepAliveDebug()) {
@@ -33,13 +35,15 @@ public class KeepAliveThread extends Thread {
 
 			try {
 				Thread.sleep(SLEEP);
-			} catch (InterruptedException interruptedexception) {
-				interruptedexception.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 
 	}
-
+	
+	
+	//stops the Thread
 	public void interrupt() {
 		query.getLogger().log(2, "KeepAliveThread has been stopped");
 		super.interrupt();

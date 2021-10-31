@@ -20,6 +20,7 @@ import java.util.Date;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.api.async.Ts3AnsycAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
@@ -39,7 +40,8 @@ public class Ts3ServerQuery {
 	private Ts3AnsycAPI ansycAPI = new Ts3AnsycAPI(this);
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
-
+	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
+		
 	/**
 	 * Connect's the Socket to the Server
 	 * 
@@ -64,6 +66,7 @@ public class Ts3ServerQuery {
 		syncAPI.connectTeamSpeakQuery(virtualServerID);
 		syncAPI.goToChannel(defaultchannelID);
 		socket.setKeepAlive(true);
+		keepAliveThread.run(); //starts KeepAlivThread
 	}
 
 	/**
@@ -75,7 +78,7 @@ public class Ts3ServerQuery {
 	private void login(String username, String password) throws QueryLoginException {
 		writer.executeCommand("login " + username + " " + password);
 
-		String s = "";
+		String s = reader.nextError();
 		if (s != null && s.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
 			throw new QueryLoginException();
 		}
@@ -83,6 +86,8 @@ public class Ts3ServerQuery {
 
 	public void stopQuery() {
 		writer.executeCommand("quit");
+		keepAliveThread.interrupt();
+		
 		try {
 			socket.close();
 		} catch (IOException e) {
