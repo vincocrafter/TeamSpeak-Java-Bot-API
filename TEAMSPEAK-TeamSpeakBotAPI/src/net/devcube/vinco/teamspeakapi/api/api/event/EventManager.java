@@ -200,9 +200,5 @@ public class EventManager {
 			}
 		}
 	}
-	
-	public void startListening() {
-
-	}
 
 }

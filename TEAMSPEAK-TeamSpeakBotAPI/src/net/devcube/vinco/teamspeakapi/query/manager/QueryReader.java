@@ -49,7 +49,6 @@ public class QueryReader {
 			
 			@Override
 			public void run() { //starting the while loop here to listen for packets
-				
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					while(socket.isConnected()) { // <-- while loop here
@@ -57,7 +56,14 @@ public class QueryReader {
 							String msg = reader.readLine();
 							if(isResultValid(msg)) {
 								if(!isError(msg)) {
-									
+									if(!isEvent(msg)) {
+										//Information here
+										packets.add(msg);
+									} else {
+										//Call Event here
+										String[] event = msg.split(" ");
+//										query.getEventManager().callNewEvent(event[0], event); need a Class here to call Event -> see callNewEvent
+									}
 								} else {
 									//Error handeling
 									errors.add(msg);
@@ -86,6 +92,11 @@ public class QueryReader {
 		if(rs.isEmpty())
 			return false;
 		return true;
+	}
+	
+	//Just check if it is an Event
+	public boolean isEvent(String rs) {
+		return rs.startsWith("notify");
 	}
 	
 	/**
