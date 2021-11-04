@@ -182,22 +182,60 @@ public class EventManager {
 			throw new UnknownEventException("Event that is called is not found : " + eventName);
 		}
 	}
-	
+
 	// New Method of calling Events, using Annotations
-	
-	public void callNewEvent(String eventName, String[] infos) {
+
+	public void callNewEvent(String[] infos) {
+		BaseEvent event = getEventByName(infos);
+		String eventName = infos[0];
 		if (query.getConfig().isEventDebug()) {
 			query.getLogger().log(5, eventName + " was called!");
 		}
-		
+
 		for (TsEvent registeredEvents : events) {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
-				if (meth.isAnnotationPresent(EventHandler.class)) { //Check annotation
-					for(Parameter par : meth.getParameters()) { //Gets the parameters
-						System.out.println(par);
+				if (meth.isAnnotationPresent(EventHandler.class)) { // Check annotation
+					for (Parameter par : meth.getParameters()) { // Gets the parameters
+						if(par.getName().equals(event.getClass().getName())) { //Check for parameter name is equal to the (Base)Event Class Name
+							//Example -> public void test(PrivilegeKeyUsedEvent ev) {
+							//PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
+							
+						}
 					}
 				}
 			}
+		}
+	}
+	
+	//returnes Different (BaseEvent) Classes depending by the given information
+	
+	private BaseEvent getEventByName(String[] infos) {
+		String eventName = infos[0];
+		switch (eventName) {
+		case "notifytokenused": // TOKEN USED EVENT
+			return new PrivilegeKeyUsedEvent(infos);
+		case "notifycliententerview": // CLIENT JOIN EVENT
+			return new ClientJoinEvent(infos);
+		case "notifyclientleftview": // CLIENT LEAVE EVENT
+			return new ClientLeaveEvent(infos);
+		case "notifychanneldescriptionchanged": // CHANNEL DESCRIPTION CHANGED
+			return new ChannelDescriptionEditedEvent(infos);
+		case "notifychanneledited": // CHANNEL EDITED
+			return new ChannelEditedEvent(infos);
+		case "notifyserveredited": // SERVER EDITED
+			return new ServerEditedEvent(infos);
+		case "notifyclientmoved": // CLIENT MOVED
+			return new ClientMoveEvent(infos);
+		case "notifychannelcreated": // CHANNEL CREATED
+			return new ChannelCreateEvent(infos);
+		case "notifychanneldeleted": // CHANNEL DELETED
+			return new ChannelDeletedEvent(infos);
+		case "notifychannelpasswordchanged": // CHANNEL PASSWORD CHANGED
+			return new ChannelPasswordChangedEvent(infos);
+		case "notifytextmessage": // TEXT MESSAGE SEND
+			return new TextMessageEvent(infos);
+		default:
+			return null;
 		}
 	}
 
