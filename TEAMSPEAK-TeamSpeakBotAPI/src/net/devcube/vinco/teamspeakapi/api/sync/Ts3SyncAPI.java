@@ -12,6 +12,7 @@
 package net.devcube.vinco.teamspeakapi.api.sync;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.TsEvent;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
@@ -39,9 +40,10 @@ public class Ts3SyncAPI {
 	 * Connects the Query bot to the virtual server
 	 * @param serverID from the virtual server
 	 */
-	public void connectTeamSpeakQuery(int serverID) {
+	public void connectTeamSpeakQuery(int serverID,String nickname) {
 		if (!this.isConnected()) {
 			selectVirtualServer(serverID);
+			query.getWriter().executeCommand("clientupdate client_nickname=" + Formatter.toTsFormat(nickname));
 			if (query.getConfig().isDebug()) {
 				query.getLogger().log(Logger.INFO, "Query is sucessfully connceted");
 			}

@@ -61,7 +61,7 @@ public class QueryReader {
 										packets.add(msg);
 									} else {
 										//Call Event here
-										query.getEventManager().callNewEvent(msg.split(" ")); //need a Class here to call Event -> see callNewEvent
+										query.getEventManager().callNewEvent(msg.split(" "));
 									}
 								} else {
 									//Error handeling

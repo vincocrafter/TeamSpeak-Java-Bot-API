@@ -32,7 +32,9 @@ public class KeepAliveThread extends Thread {
 			}
 
 			query.getWriter().executeCommand("version");
-
+			query.getReader().nextPacket(); // remove the anwser from the Queues
+			query.getReader().nextError();
+			
 			try {
 				Thread.sleep(SLEEP);
 			} catch (InterruptedException e) {

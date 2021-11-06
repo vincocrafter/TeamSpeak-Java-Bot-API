@@ -62,11 +62,14 @@ public class Ts3ServerQuery {
 		socket = new Socket(host, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
+		reader.start(); //starts the readerThread
 		login(username, password);
-		syncAPI.connectTeamSpeakQuery(virtualServerID);
+		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
+		registerAllEvents();
 		syncAPI.goToChannel(defaultchannelID);
 		socket.setKeepAlive(true);
-		keepAliveThread.run(); //starts KeepAlivThread
+		keepAliveThread.start(); //starts KeepAlivThread
+		
 	}
 
 	/**
@@ -104,7 +107,22 @@ public class Ts3ServerQuery {
 
 		}
 	}
+	
+	// register all Events
+	
+	public void registerAllEvents() {
+	      if(config.isDebug()) {
+	         getLogger().log(1, "registering all events");
+	      }
 
+	      writer.executeCommand("servernotifyregister event=server");
+	      writer.executeCommand("servernotifyregister event=channel id=0");
+	      writer.executeCommand("servernotifyregister event=textserver");
+	      writer.executeCommand("servernotifyregister event=textchannel");
+	      writer.executeCommand("servernotifyregister event=textprivate");
+	      writer.executeCommand("servernotifyregister event=tokenused");
+	   }
+	
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */

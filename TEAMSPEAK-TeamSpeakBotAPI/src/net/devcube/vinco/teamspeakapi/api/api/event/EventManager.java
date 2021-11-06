@@ -11,6 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -194,14 +196,19 @@ public class EventManager {
 
 		for (TsEvent registeredEvents : events) {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
-				if (meth.isAnnotationPresent(EventHandler.class)) { // Check annotation
-					for (Parameter par : meth.getParameters()) { // Gets the parameters
+				//[not working] if (meth.isAnnotationPresent(EventHandler.class)) { // Check annotation
+				for (Parameter par : meth.getParameters()) { // Gets the parameters		
 						if(par.getName().equals(event.getClass().getName())) { //Check for parameter name is equal to the (Base)Event Class Name
 							//Example -> public void test(PrivilegeKeyUsedEvent ev) {
 							//PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
-							
+							try {
+								meth.invoke(null, infos);
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
-					}
+					//}
 				}
 			}
 		}
