@@ -26,5 +26,3 @@ query.getEventManager().addTs3Listener(new TsEventAdapter() {
 			}
 		});
 ```
-
-verbuqqt was here (committing to master because no one stopped me)
