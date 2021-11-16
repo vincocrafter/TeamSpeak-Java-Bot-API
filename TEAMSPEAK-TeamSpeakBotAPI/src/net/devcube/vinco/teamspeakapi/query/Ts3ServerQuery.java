@@ -203,4 +203,14 @@ public class Ts3ServerQuery {
 			getLogger().log(Logger.INFO, debug);
 	}
 
+	/**
+	 * The Debugging Method Checks if the debug is enabled
+	 * 
+	 * @param debug
+	 */
+	public void debug(int level, String debug) {
+		if (config.isDebug())
+			getLogger().log(level, debug);
+	}
+	
 }

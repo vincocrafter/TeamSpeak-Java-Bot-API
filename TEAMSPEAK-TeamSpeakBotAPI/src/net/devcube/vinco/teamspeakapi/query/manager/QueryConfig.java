@@ -11,6 +11,7 @@
  */
 package net.devcube.vinco.teamspeakapi.query.manager;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryConfig {
@@ -20,6 +21,8 @@ private Ts3ServerQuery query;
 	private boolean debug = false;
 	private boolean eventDebug = false;
 	private boolean keepAliveDebug = false;
+	private EventCallType eventCallType = EventCallType.NEW;
+	
 	
 	public QueryConfig(Ts3ServerQuery query) {
 		this.query = query;
@@ -72,6 +75,20 @@ private Ts3ServerQuery query;
 	 */
 	public void setKeepAliveDebug(boolean keepAliveDebug) {
 		this.keepAliveDebug = keepAliveDebug;
+	}
+
+	/**
+	 * @return the eventCallType
+	 */
+	public EventCallType getEventCallType() {
+		return eventCallType;
+	}
+
+	/**
+	 * @param eventCallType the eventCallType to set
+	 */
+	public void setEventCallType(EventCallType eventCallType) {
+		this.eventCallType = eventCallType;
 	}
 	
 	

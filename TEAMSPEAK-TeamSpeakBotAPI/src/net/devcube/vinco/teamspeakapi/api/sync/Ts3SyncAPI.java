@@ -38,11 +38,13 @@ public class Ts3SyncAPI {
 
 	/**
 	 * Connects the Query bot to the virtual server
+	 * And changes the Query bot's name to the param nickname
 	 * @param serverID from the virtual server
+	 * @param QueryBot nickname
 	 */
-	public void connectTeamSpeakQuery(int serverID,String nickname) {
+	public void connectTeamSpeakQuery(int serverID, String nickname) {
 		if (!this.isConnected()) {
-			selectVirtualServer(serverID);
+			selectVirtualServer(serverID); //select the virtualServer 
 			query.getWriter().executeCommand("clientupdate client_nickname=" + Formatter.toTsFormat(nickname));
 			if (query.getConfig().isDebug()) {
 				query.getLogger().log(Logger.INFO, "Query is sucessfully connceted");

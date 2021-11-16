@@ -16,8 +16,12 @@ public class Logger {
 		this.serverQuery = serverQuery;
 	}
 	
-	//FORMAT
-	// [THREADNAME] [HH:mm:ss] [Type] : message 
+	/**
+	 * Format -> [THREADNAME] [HH:mm:ss] [Type] : message 
+	 * 
+	 * @param logLevel
+	 * @param message
+	 */
 	
 	public void log(int logLevel, Object message) {
 		String t = "[" + Thread.currentThread().getName() + "] ";

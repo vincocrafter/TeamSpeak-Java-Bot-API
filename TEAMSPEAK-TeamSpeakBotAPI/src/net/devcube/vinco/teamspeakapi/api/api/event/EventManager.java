@@ -11,7 +11,6 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -82,7 +81,9 @@ public class EventManager {
 
 		}
 	}
-
+	
+	//Old Event Call
+	@Deprecated
 	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
 		if (query.getConfig().isEventDebug()) {
 			query.getLogger().log(5, eventName + " was called!");
@@ -185,8 +186,12 @@ public class EventManager {
 		}
 	}
 
-	// New Method of calling Events, using Annotations
-
+	
+	/** 
+	 * New Method of calling Events, using Annotations
+	 * @param String[] eventInformation
+	 */
+	
 	public void callNewEvent(String[] infos) {
 		BaseEvent event = getEventByName(infos);
 		String eventName = infos[0];
@@ -214,7 +219,11 @@ public class EventManager {
 		}
 	}
 	
-	//returnes Different (BaseEvent) Classes depending by the given information
+	/**
+	 *Returners Different (BaseEvent)Classes depending by the given information.
+	 *Only called by the callNewEvent Method
+	 * @param String[] eventInformation
+	 */
 	
 	private BaseEvent getEventByName(String[] infos) {
 		String eventName = infos[0];
