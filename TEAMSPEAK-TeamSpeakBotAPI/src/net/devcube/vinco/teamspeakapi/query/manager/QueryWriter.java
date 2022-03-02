@@ -18,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryWriter {
@@ -70,7 +71,7 @@ public class QueryWriter {
 	// All commands executed here and send to the server
 	// Changes here
 	public void executeCommand(String command) {
-		query.debug("Executing Command > (" + command + ")");
+		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");
 		writer.println(command);
 		writer.flush();
 	}
@@ -79,7 +80,7 @@ public class QueryWriter {
 		new Thread() {
 			
 			public void run() {
-				query.debug("Executing AsyncCommand > (" + command + ")");
+				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
 				writer.println(command);
 				writer.flush();
 			}

@@ -11,6 +11,7 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.keepalive;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class KeepAliveThread extends Thread {
@@ -26,6 +27,7 @@ public class KeepAliveThread extends Thread {
 	
 	// keeps the Socket connected to the (Teamspeak)Server
 	public void run() {
+		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		while (!this.isInterrupted()) {
 			if (this.query.getConfig().isKeepAliveDebug()) {
 				query.getLogger().log(1, "KeepAliveMessage has been sent");

@@ -21,6 +21,7 @@ import java.util.Date;
 import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.api.async.Ts3AnsycAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
@@ -197,6 +198,8 @@ public class Ts3ServerQuery {
 	 * The Debugging Method Checks if the debug is enabled
 	 * 
 	 * @param debug
+	 * 
+	 * @deprecated
 	 */
 	public void debug(String debug) {
 		if (config.isDebug())
@@ -207,10 +210,47 @@ public class Ts3ServerQuery {
 	 * The Debugging Method Checks if the debug is enabled
 	 * 
 	 * @param debug
+	 * 
+	 * @deprecated
 	 */
 	public void debug(int level, String debug) {
 		if (config.isDebug())
 			getLogger().log(level, debug);
 	}
 	
+	
+	// new debug Method for more specified debugging
+	public void debug(DebugOutputType type, String debug) {
+		switch (type) {
+		case GENERAL:
+			if(config.isGeneralDebug())
+				logger.log(1, debug);
+			break;
+		case EVENTMANAGER:
+			if(config.isEventManagerDebug())
+				logger.log(5, debug);
+			break;
+		case KEEPALIVETHREAD:
+			if(config.isKeepAliveThreadDebug())
+				logger.log(1, debug);
+			break;
+		case QUERY:
+			if(config.isQueryDebug())
+				logger.log(4, debug);
+			break;
+		case QUERYREADER:
+			if(config.isEventManagerDebug())
+				logger.log(4, debug);
+			break;
+		case QUERYWRITER:
+			if(config.isEventManagerDebug())
+				logger.log(4, debug);
+			break;
+		default:
+			if(config.isInDebug(type)) {
+				logger.log(1, debug);
+			}
+			break;
+		}
+	}
 }

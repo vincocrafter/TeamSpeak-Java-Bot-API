@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownEventException;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
@@ -47,8 +48,10 @@ public class QueryReader {
 	 */
 
 	public void start() {
+		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
 		new Thread(new Runnable() { // New Thread so async
 
+			
 			@SuppressWarnings("deprecation")
 			@Override
 			public void run() { // starting the while loop here to listen for packets
@@ -58,10 +61,12 @@ public class QueryReader {
 						if (reader.ready()) {
 							String msg = reader.readLine();
 							if (isResultValid(msg)) {
+								//query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
 								if (!isError(msg)) {
 									if (!isEvent(msg)) {
 										// Information here
 										packets.add(msg);
+										query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
 									} else {
 										// Call Event here
 										String[] infos = msg.split(" ");
@@ -72,20 +77,23 @@ public class QueryReader {
 										 * @see QueryConfig.eventCallType
 										 */
 										if (query.getConfig().getEventCallType() == EventCallType.NEW) { //New one
+											query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + infos);
 											query.getEventManager().callNewEvent(infos);
 										} else if (query.getConfig().getEventCallType() == EventCallType.OLD) { //Old one
+											query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + infos);
 											try {
 												query.getEventManager().callEvent(infos, infos[0]);
 											} catch (UnknownEventException e) {
-												query.debug(5, "Unkown Event Exception: ");
+												query.debug(DebugOutputType.QUERYREADER, "Got an Error in Old Event: ");
 												e.printStackTrace();
 											}
 										} else { //And here both types of Event call
+											query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + infos);
 											query.getEventManager().callNewEvent(infos);
 											try {
 												query.getEventManager().callEvent(infos, infos[0]);
 											} catch (UnknownEventException e) {
-												query.debug(5, "Unkown Event Exception: ");
+												query.debug(DebugOutputType.QUERYREADER, "Got an Error in Old Event: ");
 												e.printStackTrace();
 											}
 										}
@@ -93,6 +101,7 @@ public class QueryReader {
 								} else {
 									// Error handeling
 									errors.add(msg);
+									query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
 								}
 							}
 						}
