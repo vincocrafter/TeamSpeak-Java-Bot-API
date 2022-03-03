@@ -49,8 +49,9 @@ public class QueryReader {
 
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
+		
 		new Thread(new Runnable() { // New Thread so async
-
+			
 			
 			@SuppressWarnings("deprecation")
 			@Override
@@ -77,10 +78,10 @@ public class QueryReader {
 										 * @see QueryConfig.eventCallType
 										 */
 										if (query.getConfig().getEventCallType() == EventCallType.NEW) { //New one
-											query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + infos);
+											query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
 											query.getEventManager().callNewEvent(infos);
 										} else if (query.getConfig().getEventCallType() == EventCallType.OLD) { //Old one
-											query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + infos);
+											query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + msg);
 											try {
 												query.getEventManager().callEvent(infos, infos[0]);
 											} catch (UnknownEventException e) {
@@ -88,7 +89,7 @@ public class QueryReader {
 												e.printStackTrace();
 											}
 										} else { //And here both types of Event call
-											query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + infos);
+											query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + msg);
 											query.getEventManager().callNewEvent(infos);
 											try {
 												query.getEventManager().callEvent(infos, infos[0]);

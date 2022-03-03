@@ -30,6 +30,7 @@ import net.devcube.vinco.teamspeakapi.api.api.events.ServerEditedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.TextMessageEvent;
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownEventException;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class EventManager {
@@ -200,7 +201,7 @@ public class EventManager {
 			query.getLogger().log(5, eventName + " was called!");
 		}
 
-		debugNewEvent(eventName, infos.toString()); // new debug Method for Event calling
+		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
 
 		for (TsEvent registeredEvents : events) {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
@@ -266,27 +267,27 @@ public class EventManager {
 		query.debug(DebugOutputType.EVENTMANAGER, eventName + " was called");
 
 		if (eventName.equalsIgnoreCase("notifychannelcreated")) {
-			query.debug(DebugOutputType.CHANNEL_CREATED, infos.toString());
+			query.debug(DebugOutputType.CHANNEL_CREATED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneldeleted")) {
-			query.debug(DebugOutputType.CHANNEL_DELETED, infos.toString());
+			query.debug(DebugOutputType.CHANNEL_DELETED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneldescriptionchanged")) {
-			query.debug(DebugOutputType.CHANNEL_DESCRIPTION_EDITED, infos.toString());
+			query.debug(DebugOutputType.CHANNEL_DESCRIPTION_EDITED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneledited")) {
 			query.debug(DebugOutputType.CHANNEL_EDITED, infos.toString());
 		} else if (eventName.equalsIgnoreCase("notifychannelpasswordchanged")) {
-			query.debug(DebugOutputType.CHANNEL_PASSWORD_CHANGED, infos.toString());
+			query.debug(DebugOutputType.CHANNEL_PASSWORD_CHANGED, infos);
 		} else if (eventName.equalsIgnoreCase("notifycliententerview")) {
-			query.debug(DebugOutputType.CLIENT_JOIN, infos.toString());
+			query.debug(DebugOutputType.CLIENT_JOIN, infos);
 		} else if (eventName.equalsIgnoreCase("notifyclientleftview")) {
-			query.debug(DebugOutputType.CLIENT_LEAVE, infos.toString());
-		} else if (eventName.equalsIgnoreCase("notifyclientleftview")) {
-			query.debug(DebugOutputType.CLIENT_MOVE, infos.toString());
+			query.debug(DebugOutputType.CLIENT_LEAVE, infos);
+		} else if (eventName.equalsIgnoreCase("notifyclientmoved")) {
+			query.debug(DebugOutputType.CLIENT_MOVE, infos);
 		} else if (eventName.equalsIgnoreCase("notifytokenused")) {
-			query.debug(DebugOutputType.PRIVILEGEKEY_USED, infos.toString());
+			query.debug(DebugOutputType.PRIVILEGEKEY_USED, infos);
 		} else if (eventName.equalsIgnoreCase("notifyserveredited")) {
-			query.debug(DebugOutputType.SERVER_EDITED, infos.toString());
+			query.debug(DebugOutputType.SERVER_EDITED, infos);
 		} else if (eventName.equalsIgnoreCase("notifytextmessage")) {
-			query.debug(DebugOutputType.TEXT_MESSAGE, infos.toString());
+			query.debug(DebugOutputType.TEXT_MESSAGE, infos);
 		}
 
 	}

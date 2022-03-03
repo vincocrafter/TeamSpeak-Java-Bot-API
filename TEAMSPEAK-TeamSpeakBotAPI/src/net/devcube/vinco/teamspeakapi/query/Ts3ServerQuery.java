@@ -223,32 +223,32 @@ public class Ts3ServerQuery {
 	public void debug(DebugOutputType type, String debug) {
 		switch (type) {
 		case GENERAL:
-			if(config.isGeneralDebug())
+			if(config.isGeneralDebug() || config.isEverything())
 				logger.log(1, debug);
 			break;
 		case EVENTMANAGER:
-			if(config.isEventManagerDebug())
+			if(config.isEventManagerDebug() || config.isEverything())
 				logger.log(5, debug);
 			break;
 		case KEEPALIVETHREAD:
-			if(config.isKeepAliveThreadDebug())
+			if(config.isKeepAliveThreadDebug() || config.isEverything())
 				logger.log(1, debug);
 			break;
 		case QUERY:
-			if(config.isQueryDebug())
+			if(config.isQueryDebug() || config.isEverything())
 				logger.log(4, debug);
 			break;
 		case QUERYREADER:
-			if(config.isEventManagerDebug())
+			if(config.isQueryReaderDebug() || config.isEverything())
 				logger.log(4, debug);
 			break;
 		case QUERYWRITER:
-			if(config.isEventManagerDebug())
+			if(config.isQueryWriterDebug() || config.isEverything())
 				logger.log(4, debug);
 			break;
 		default:
-			if(config.isInDebug(type)) {
-				logger.log(1, debug);
+			if(config.isInDebug(type) || config.isEverything()) {
+				logger.log(5, debug);
 			}
 			break;
 		}

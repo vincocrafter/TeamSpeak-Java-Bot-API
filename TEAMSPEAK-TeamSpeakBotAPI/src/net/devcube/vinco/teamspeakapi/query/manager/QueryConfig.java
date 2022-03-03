@@ -115,6 +115,10 @@ private Ts3ServerQuery query;
 		return debuglist.contains(debugOutputType);
 	}
 	
+	public boolean isEverything() {
+		return isInDebug(DebugOutputType.EVERYTHING);
+	}
+	
 	public boolean isGeneralDebug() {
 		return isInDebug(DebugOutputType.GENERAL);
 	}

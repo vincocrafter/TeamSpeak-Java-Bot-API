@@ -30,4 +30,14 @@ public class Formatter {
 		str = str.replace("\\t", "\t");
 		return str;
 	}
+	
+	public static String connectString(String[] args) {
+		String s = "";
+
+		for (String s1 : args) {
+			s = s + " " + s1;
+		}
+
+		return s.trim();
+	}
 }
