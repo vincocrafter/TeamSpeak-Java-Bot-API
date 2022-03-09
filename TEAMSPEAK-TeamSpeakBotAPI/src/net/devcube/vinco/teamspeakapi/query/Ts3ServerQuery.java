@@ -199,29 +199,6 @@ public class Ts3ServerQuery {
 		return simpledateformat.format(date);
 	}
 
-	/**
-	 * The Debugging Method Checks if the debug is enabled
-	 * 
-	 * @param debug
-	 * 
-	 * @deprecated
-	 */
-	public void debug(String debug) {
-		if (config.isDebug())
-			getLogger().log(Logger.INFO, debug);
-	}
-
-	/**
-	 * The Debugging Method Checks if the debug is enabled
-	 * 
-	 * @param debug
-	 * 
-	 * @deprecated
-	 */
-	public void debug(int level, String debug) {
-		if (config.isDebug())
-			getLogger().log(level, debug);
-	}
 	
 	
 	/** 

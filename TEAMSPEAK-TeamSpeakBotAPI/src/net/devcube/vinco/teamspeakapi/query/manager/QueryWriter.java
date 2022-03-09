@@ -75,6 +75,12 @@ public class QueryWriter {
 		writer.println(command);
 		writer.flush();
 	}
+	
+	
+	//idea of sending a Command and reading the following Message from the Server
+	public void executeReadCommand(String command) {
+		
+	}
 
 	public void executeAsyncCommand(String command) {
 		new Thread() {

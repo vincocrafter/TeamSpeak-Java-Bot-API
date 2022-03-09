@@ -21,10 +21,7 @@ public class QueryConfig {
 	
 private Ts3ServerQuery query;
 		
-	private boolean debug = false;
-	private boolean eventDebug = false;
-	private boolean keepAliveDebug = false;
-	
+
 	
 	private EventCallType eventCallType = EventCallType.NEW;
 	
@@ -45,52 +42,6 @@ private Ts3ServerQuery query;
 		return query;
 	}
 
-	/**
-	 * @return the debug
-	 * @deprecated
-	 */
-	public boolean isDebug() {
-		return debug;
-	}
-
-	/**
-	 * @param debug the debug to set
-	 * @deprecated
-	 */
-	public void setDebug(boolean debug) {
-		this.debug = debug;
-	}
-
-	/**
-	 * @return the eventDebug
-	 * @deprecated
-	 */
-	public boolean isEventDebug() {
-		return eventDebug;
-	}
-
-	/**
-	 * @param eventDebug the eventDebug to set
-	 * @deprecated
-	 */
-	public void setEventDebug(boolean eventDebug) {
-		this.eventDebug = eventDebug;
-	}
-	
-	/**
-	 * @return the keepAliveDebug
-	 * @deprecated
-	 */
-	public boolean isKeepAliveDebug() {
-		return keepAliveDebug;
-	}
-	
-	/**
-	 * @param keepAliveDebug the keepAliveDebug to set
-	 */
-	public void setKeepAliveDebug(boolean keepAliveDebug) {
-		this.keepAliveDebug = keepAliveDebug;
-	}
 
 	/**
 	 * @return the eventCallType

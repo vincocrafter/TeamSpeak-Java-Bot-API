@@ -48,41 +48,37 @@ public class EventManager {
 		return events;
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public void registerEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
 		} else {
-			if (query.getConfig().isEventDebug()) {
-				query.getLogger().log(5, "Registering Event : " + event.getClass().getName());
-			}
+			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
+			
 			events.add(event);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public void addTs3Listener(TsEvent event) {
 		if (event != null) {
-			if (query.getConfig().isEventDebug()) {
-				query.getLogger().log(5, "Registering Event : " + event.getClass().getName());
-			}
+			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
+			
 			events.add(event);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public void unregisterEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
 		} else {
 			if (events.contains(event)) {
-				if (query.getConfig().isEventDebug()) {
-					query.getLogger().log(5, "Unregistering Event : " + event.getClass().getName());
-				}
-
+				query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
 				events.remove(event);
-			} else if (query.getConfig().isEventDebug()) {
+			} else {
 				query.getLogger().log(5, "Event was not found");
+				query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 			}
 
 		}
@@ -96,9 +92,7 @@ public class EventManager {
 	 * @deprecated
 	 */
 	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
-		if (query.getConfig().isEventDebug()) {
-			query.getLogger().log(5, eventName + " was called!");
-		}
+		
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
 			for (TsEvent event : getEvents()) {
@@ -190,9 +184,6 @@ public class EventManager {
 			}
 			break;
 		default:
-			if (query.getConfig().isEventDebug()) {
-				(new BaseEvent(infos)).printInfos();
-			}
 			throw new UnknownEventException("Event that is called is not found : " + eventName);
 		}
 	}
