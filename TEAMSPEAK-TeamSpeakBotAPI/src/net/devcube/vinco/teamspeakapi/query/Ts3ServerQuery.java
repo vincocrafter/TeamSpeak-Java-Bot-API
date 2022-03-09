@@ -29,6 +29,10 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
+/**
+ * @apiNote This is the mainclass of the TeamSpeak Query API, it handles the connection between the client and the server and set the API up
+ */
+
 public class Ts3ServerQuery {
 
 	private Socket socket;
@@ -81,10 +85,13 @@ public class Ts3ServerQuery {
 	 */
 	private void login(String username, String password) throws QueryLoginException {
 		writer.executeCommand("login " + username + " " + password);
-
+		
 		String s = reader.nextError();
 		if (s != null && s.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
+			debug(DebugOutputType.QUERY, "Login failed");
 			throw new QueryLoginException();
+		} else {
+			debug(DebugOutputType.QUERY, "Logged in sucessfully");
 		}
 	}
 
@@ -112,9 +119,7 @@ public class Ts3ServerQuery {
 	// register all Events
 	
 	public void registerAllEvents() {
-	      if(config.isDebug()) {
-	         getLogger().log(1, "registering all events");
-	      }
+		debug(DebugOutputType.QUERY, "Registering all Events");
 
 	      writer.executeCommand("servernotifyregister event=server");
 	      writer.executeCommand("servernotifyregister event=channel id=0");
@@ -219,7 +224,15 @@ public class Ts3ServerQuery {
 	}
 	
 	
-	// new debug Method for more specified debugging
+	/** 
+	 * new debug Method for more specified debugging and outputting
+	 * 
+	 * @param type
+	 * @param debug message
+	 * @see DebugOutputType
+	 * @see QueryConfig
+	 */
+	
 	public void debug(DebugOutputType type, String debug) {
 		switch (type) {
 		case GENERAL:

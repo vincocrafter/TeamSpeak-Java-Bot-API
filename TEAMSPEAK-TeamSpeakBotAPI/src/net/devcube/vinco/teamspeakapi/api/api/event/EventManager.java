@@ -32,6 +32,7 @@ import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownEventExce
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 
 public class EventManager {
 
@@ -47,6 +48,7 @@ public class EventManager {
 		return events;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void registerEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
@@ -58,6 +60,7 @@ public class EventManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void addTs3Listener(TsEvent event) {
 		if (event != null) {
 			if (query.getConfig().isEventDebug()) {
@@ -67,6 +70,7 @@ public class EventManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void unregisterEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
@@ -84,8 +88,13 @@ public class EventManager {
 		}
 	}
 
-	// Old Event Call
-	@Deprecated
+	/**
+	 * Old Event Call
+	 * @param infos
+	 * @param eventName
+	 * @throws UnknownEventException
+	 * @deprecated
+	 */
 	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
 		if (query.getConfig().isEventDebug()) {
 			query.getLogger().log(5, eventName + " was called!");
@@ -197,9 +206,7 @@ public class EventManager {
 	public void callNewEvent(String[] infos) {
 		BaseEvent event = getEventByName(infos);
 		String eventName = infos[0];
-		if (query.getConfig().isEventDebug()) {
-			query.getLogger().log(5, eventName + " was called!");
-		}
+		
 
 		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
 
@@ -262,7 +269,14 @@ public class EventManager {
 		}
 	}
 
-	// debugs selected Events
+	/**
+	 * debugs selected Events
+	 * @param eventName
+	 * @param infos
+	 * @see callNewEvent()
+	 * @see QueryConfig
+	 * @see DebugOutputType
+	 */
 	private void debugNewEvent(String eventName, String infos) {
 		query.debug(DebugOutputType.EVENTMANAGER, eventName + " was called");
 

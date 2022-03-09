@@ -13,20 +13,7 @@ public class ChannelInfo extends DefaultInfo {
 		this.cid = chid;
 	}
 
-	public String[] getInfos() {
-		return infos;
-	}
-
-	public void printInfos() {
-		int i = 0;
-
-		for (String s : infos) {
-			System.out.println(i + " : " + s);
-			++i;
-		}
-
-	}
-
+	
 	public int getChannelID() {
 		return cid;
 	}

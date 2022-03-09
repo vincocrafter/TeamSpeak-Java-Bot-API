@@ -28,7 +28,10 @@ private Ts3ServerQuery query;
 	
 	private EventCallType eventCallType = EventCallType.NEW;
 	
-	//idea of specify much more the types of output, array to select more as one type for more detailed debugging
+	/**
+	 * idea of specify much more the types of output, array to select more as one type for more detailed debugging
+	 * @see Ts3ServerQuery.debug()
+	 */
 	private ArrayList<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
 	
 	public QueryConfig(Ts3ServerQuery query) {
@@ -44,6 +47,7 @@ private Ts3ServerQuery query;
 
 	/**
 	 * @return the debug
+	 * @deprecated
 	 */
 	public boolean isDebug() {
 		return debug;
@@ -51,6 +55,7 @@ private Ts3ServerQuery query;
 
 	/**
 	 * @param debug the debug to set
+	 * @deprecated
 	 */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
@@ -58,6 +63,7 @@ private Ts3ServerQuery query;
 
 	/**
 	 * @return the eventDebug
+	 * @deprecated
 	 */
 	public boolean isEventDebug() {
 		return eventDebug;
@@ -65,6 +71,7 @@ private Ts3ServerQuery query;
 
 	/**
 	 * @param eventDebug the eventDebug to set
+	 * @deprecated
 	 */
 	public void setEventDebug(boolean eventDebug) {
 		this.eventDebug = eventDebug;
@@ -72,6 +79,7 @@ private Ts3ServerQuery query;
 	
 	/**
 	 * @return the keepAliveDebug
+	 * @deprecated
 	 */
 	public boolean isKeepAliveDebug() {
 		return keepAliveDebug;
@@ -110,6 +118,11 @@ private Ts3ServerQuery query;
 	public void addDebugItem(DebugOutputType debugOutputType) {
 		debuglist.add(debugOutputType);
 	}
+	
+	public void remDebugItem(DebugOutputType debugOutputType) {
+		debuglist.remove(debugOutputType);
+	}
+	
 	
 	public boolean isInDebug(DebugOutputType debugOutputType) {
 		return debuglist.contains(debugOutputType);

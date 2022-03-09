@@ -19,8 +19,13 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
  */
 
 public enum EventCallType {
-
-	NEW, //is set as default -> see QueryConfig.eventCallType
+	
+	/**
+	 * is set as defaut
+	 * @see QueryConfig.eventCallType
+	 */
+	
+	NEW, 
 	OLD, BOTH;
 
 }

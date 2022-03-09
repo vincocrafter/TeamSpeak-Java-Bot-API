@@ -29,9 +29,7 @@ public class KeepAliveThread extends Thread {
 	public void run() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		while (!this.isInterrupted()) {
-			if (this.query.getConfig().isKeepAliveDebug()) {
-				query.getLogger().log(1, "KeepAliveMessage has been sent");
-			}
+			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
 
 			query.getWriter().executeCommand("version");
 			query.getReader().nextPacket(); // remove the anwser from the Queues
@@ -49,7 +47,7 @@ public class KeepAliveThread extends Thread {
 	
 	//stops the Thread
 	public void interrupt() {
-		query.getLogger().log(2, "KeepAliveThread has been stopped");
+		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has beeen stopped");
 		super.interrupt();
 	}
 
