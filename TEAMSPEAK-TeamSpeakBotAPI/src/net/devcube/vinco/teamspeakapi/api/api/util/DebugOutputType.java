@@ -11,9 +11,21 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
+/**
+ * Idea of specify the type of Debug the programmer wants from the API
+ * 
+ */
+
 public enum DebugOutputType {
 	
-	EVERYTHING, GENERAL, EVENTMANAGER, KEEPALIVETHREAD, QUERY, QUERYREADER, QUERYWRITER,
+	EVERYTHING, GENERAL, EVENTMANAGER, KEEPALIVETHREAD, QUERY, QUERYREADER, QUERYWRITER, 
+	
+	/**
+	 *  Debug for changes in the QueryReader Queues
+	 *  
+	 *  @see QueryReader
+	 */
+	QUERYREADERQUEUE,
 	
 	//to select debug for a specific Event
 	CHANNEL_CREATED, CHANNEL_DELETED, CHANNEL_DESCRIPTION_EDITED, CHANNEL_EDITED, CHANNEL_PASSWORD_CHANGED,

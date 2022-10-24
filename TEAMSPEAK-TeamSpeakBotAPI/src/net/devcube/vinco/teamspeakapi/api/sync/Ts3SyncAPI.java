@@ -15,6 +15,7 @@ import net.devcube.vinco.teamspeakapi.api.api.event.TsEvent;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Ts3SyncAPI {
@@ -46,7 +47,7 @@ public class Ts3SyncAPI {
 	public void connectTeamSpeakQuery(int serverID, String nickname) {
 		if (!this.isConnected()) {
 			selectVirtualServer(serverID); //select the virtualServer 
-			query.getWriter().executeCommand("clientupdate client_nickname=" + Formatter.toTsFormat(nickname));
+			query.getWriter().executeReadErrorCommand("clientupdate client_nickname=" + Formatter.toTsFormat(nickname));
 			query.debug(DebugOutputType.QUERY, "Query is sucessfully connected");
 
 			setConnected(true);
@@ -62,11 +63,11 @@ public class Ts3SyncAPI {
 	 * @param serverid of the virtual server
 	 */
 	public void selectVirtualServer(int serverid) {
-		query.getWriter().executeCommand("use " + serverid);
+		query.getWriter().executeReadErrorCommand("use " + serverid);
 	}
 
 	public void addTs3Listener(TsEvent event) {
-		this.query.getEventManager().addTs3Listener(event);
+		query.getEventManager().addTs3Listener(event);
 	}
 
 	/**
@@ -75,6 +76,16 @@ public class Ts3SyncAPI {
 	 */
 	public void goToChannel(int channelID) {
 		
+	}
+	
+	/**
+	 * Returns information about the Query Client
+	 * @return QueryClientInfo
+	 */
+	
+	public QueryClientInfo getQueryInfo() {
+		String res = query.getWriter().executeReadCommand("whoami")[0];
+		return new QueryClientInfo(res.split(" "));
 	}
 
 	/**

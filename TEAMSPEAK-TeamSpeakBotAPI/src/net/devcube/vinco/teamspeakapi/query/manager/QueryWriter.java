@@ -68,29 +68,51 @@ public class QueryWriter {
 		return writer;
 	}
 
-	// All commands executed here and send to the server
-	// Changes here
-	public void executeCommand(String command) {
+	/**
+	 *  All commands executed here and send to the server
+	 * @param command
+	 */
+	private void executeCommand(String command) {
 		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");
 		writer.println(command);
 		writer.flush();
 	}
 	
+	/**
+	 * Now -> Default use for Command sending instead of executeCommand
+	 * Same as below, but some Commands are only getting an Error as answer
+	 * 
+	 * @param command
+	 * @return {Normal Packets, Errors}
+	 */
+	public String executeReadErrorCommand(String command) {
+		executeCommand(command);
+		while (query.getReader().nextSaveError() == null); // ?Waiting for incoming Error?
+		return query.getReader().nextError();
+	}
 	
-	//idea of sending a Command and reading the following Message from the Server
-	public void executeReadCommand(String command) {
-		
+	/**
+	 * Idea of sending a Command and reading the following Message from the Server
+	 * 
+	 * @param command
+	 * @return {Normal Packets, Errors}
+	 */
+	public String[] executeReadCommand(String command) {
+		executeCommand(command);
+		while (query.getReader().nextSavePacket() == null); // ?Waiting for incoming Packet?
+		while (query.getReader().nextSaveError() == null); // ?Waiting for incoming Error?
+		return new String[] { query.getReader().nextPacket(), query.getReader().nextError() };
 	}
 
 	public void executeAsyncCommand(String command) {
 		new Thread() {
-			
+
 			public void run() {
 				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
 				writer.println(command);
 				writer.flush();
 			}
-			
+
 		}.start();
 	}
 }

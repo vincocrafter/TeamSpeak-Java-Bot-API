@@ -51,6 +51,7 @@ private Ts3ServerQuery query;
 	}
 
 	/**
+	 * CHange the type between the old and the new system to call Events
 	 * @param eventCallType the eventCallType to set
 	 */
 	public void setEventCallType(EventCallType eventCallType) {
@@ -58,6 +59,7 @@ private Ts3ServerQuery query;
 	}
 	
 	/**
+	 * Get a list of all selected Types of debugging
 	 * @return the debuglist
 	 */
 	public ArrayList<DebugOutputType> getDebuglist() {
@@ -70,7 +72,7 @@ private Ts3ServerQuery query;
 		debuglist.add(debugOutputType);
 	}
 	
-	public void remDebugItem(DebugOutputType debugOutputType) {
+	public void removeDebugItem(DebugOutputType debugOutputType) {
 		debuglist.remove(debugOutputType);
 	}
 	
@@ -101,6 +103,10 @@ private Ts3ServerQuery query;
 	
 	public boolean isQueryReaderDebug() {
 		return isInDebug(DebugOutputType.QUERYREADER);
+	}
+	
+	public boolean isQueryReaderQueueDebug() {
+		return isInDebug(DebugOutputType.QUERYREADERQUEUE);
 	}
 	
 	public boolean isQueryWriterDebug() {

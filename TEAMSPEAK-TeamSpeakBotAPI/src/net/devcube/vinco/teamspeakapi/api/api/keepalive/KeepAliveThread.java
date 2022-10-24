@@ -31,9 +31,12 @@ public class KeepAliveThread extends Thread {
 		while (!this.isInterrupted()) {
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
 
-			query.getWriter().executeCommand("version");
-			query.getReader().nextPacket(); // remove the anwser from the Queues
-			query.getReader().nextError();
+//			query.getWriter().executeCommand("version");
+//			query.getReader().nextPacket(); // remove the anwser from the Queues
+//			query.getReader().nextError();
+			
+			//Same as above with new Method
+			query.getWriter().executeReadCommand("version");
 			
 			try {
 				Thread.sleep(SLEEP);

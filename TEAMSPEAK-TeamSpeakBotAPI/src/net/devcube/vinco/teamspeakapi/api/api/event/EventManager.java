@@ -48,27 +48,22 @@ public class EventManager {
 		return events;
 	}
 
-	
 	public void registerEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
 		} else {
 			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
-			
 			events.add(event);
 		}
 	}
 
-	
 	public void addTs3Listener(TsEvent event) {
 		if (event != null) {
 			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
-			
 			events.add(event);
 		}
 	}
 
-	
 	public void unregisterEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
 			throw new UnknownEventException();
@@ -86,13 +81,14 @@ public class EventManager {
 
 	/**
 	 * Old Event Call
+	 * 
 	 * @param infos
 	 * @param eventName
 	 * @throws UnknownEventException
 	 * @deprecated
 	 */
 	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
-		
+
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
 			for (TsEvent event : getEvents()) {
@@ -197,7 +193,6 @@ public class EventManager {
 	public void callNewEvent(String[] infos) {
 		BaseEvent event = getEventByName(infos);
 		String eventName = infos[0];
-		
 
 		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
 
@@ -262,6 +257,7 @@ public class EventManager {
 
 	/**
 	 * debugs selected Events
+	 * 
 	 * @param eventName
 	 * @param infos
 	 * @see callNewEvent()

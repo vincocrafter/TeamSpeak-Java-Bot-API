@@ -30,7 +30,8 @@ public class QueryReader {
 
 	private Queue<String> packets = new LinkedList<>();
 	private Queue<String> errors = new LinkedList<>();
-
+	
+	
 	public QueryReader(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.setSocket(socket);
@@ -49,7 +50,7 @@ public class QueryReader {
 
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
-		
+			
 		new Thread(new Runnable() { // New Thread so async
 			
 			
@@ -64,15 +65,14 @@ public class QueryReader {
 							if (isResultValid(msg)) {
 								//query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
 								if (!isError(msg)) {
-									if (!isEvent(msg)) {
-										// Information here
-										packets.add(msg);
+									if (!isEvent(msg)) { // Information here
 										query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
-									} else {
-										// Call Event here
+										packets.add(msg);
+										query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
+									} else {  //Event here
 										String[] infos = msg.split(" ");
 										/*
-										 * Decide wich EventCall you prefer
+										 * Decide which EventCall you prefer
 										 * here the new one
 										 * it is also the default one 
 										 * @see QueryConfig.eventCallType
@@ -101,8 +101,9 @@ public class QueryReader {
 									}
 								} else {
 									// Error handeling
-									errors.add(msg);
 									query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
+									errors.add(msg);
+									query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
 								}
 							}
 						}
@@ -141,7 +142,14 @@ public class QueryReader {
 	public Queue<String> getPackets() {
 		return packets;
 	}
-
+	
+	/**
+	 * @return the errors
+	 */
+	public Queue<String> getErrors() {
+		return errors;
+	}
+	
 	/**
 	 * @return the socket
 	 */
@@ -156,21 +164,30 @@ public class QueryReader {
 		this.socket = socket;
 	}
 
-	public String nextPacket() {
+	public synchronized String nextPacket() {
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.peek());
 		return packets.poll();
 	}
 
-	// See Java Documentation to poll and peek
-	public String nextSavePacket() {
+	/**
+	 *  See Java Documentation to poll and peek
+	 */
+	public synchronized String nextSavePacket() {
 		return packets.peek();
 	}
 
-	public String nextError() {
+	public synchronized String nextError() {
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: " + errors.peek());
 		return errors.poll();
 	}
 
-	// See Java Documentation to poll and peek
-	public String nextSaveError() {
+	/**
+	 *  See Java Documentation to poll and peek
+	 */
+	public synchronized String nextSaveError() {
 		return errors.peek();
 	}
+	
+	
+	
 }

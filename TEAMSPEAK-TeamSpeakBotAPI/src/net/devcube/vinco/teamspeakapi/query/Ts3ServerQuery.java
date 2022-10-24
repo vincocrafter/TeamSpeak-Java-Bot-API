@@ -84,21 +84,24 @@ public class Ts3ServerQuery {
 	 * @param password
 	 */
 	private void login(String username, String password) throws QueryLoginException {
-		writer.executeCommand("login " + username + " " + password);
-		
-		String s = reader.nextError();
-		if (s != null && s.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
+		String res = writer.executeReadCommand("login " + username + " " + password)[1];
+		reader.nextPacket(); // To remove one Answer, because Server is giving two Answers
+		if (res.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
 			debug(DebugOutputType.QUERY, "Login failed");
 			throw new QueryLoginException();
 		} else {
 			debug(DebugOutputType.QUERY, "Logged in sucessfully");
 		}
 	}
-
+	
+	/**
+	 * Stops the Query, Socket and all Threads
+	 * 
+	 */
+	
 	public void stopQuery() {
-		writer.executeCommand("quit");
+		writer.executeReadCommand("quit");
 		keepAliveThread.interrupt();
-		
 		try {
 			socket.close();
 		} catch (IOException e) {
@@ -116,17 +119,19 @@ public class Ts3ServerQuery {
 		}
 	}
 	
-	// register all Events
+	/** 
+	 * Register all Events
+	 */
 	
 	public void registerAllEvents() {
 		debug(DebugOutputType.QUERY, "Registering all Events");
 
-	      writer.executeCommand("servernotifyregister event=server");
-	      writer.executeCommand("servernotifyregister event=channel id=0");
-	      writer.executeCommand("servernotifyregister event=textserver");
-	      writer.executeCommand("servernotifyregister event=textchannel");
-	      writer.executeCommand("servernotifyregister event=textprivate");
-	      writer.executeCommand("servernotifyregister event=tokenused");
+	      writer.executeReadErrorCommand("servernotifyregister event=server");
+	      writer.executeReadErrorCommand("servernotifyregister event=channel id=0");
+	      writer.executeReadErrorCommand("servernotifyregister event=textserver");
+	      writer.executeReadErrorCommand("servernotifyregister event=textchannel");
+	      writer.executeReadErrorCommand("servernotifyregister event=textprivate");
+	      writer.executeReadErrorCommand("servernotifyregister event=tokenused");
 	   }
 	
 	/**
@@ -230,6 +235,10 @@ public class Ts3ServerQuery {
 			break;
 		case QUERYREADER:
 			if(config.isQueryReaderDebug() || config.isEverything())
+				logger.log(4, debug);
+			break;
+		case QUERYREADERQUEUE:
+			if(config.isQueryReaderQueueDebug() || config.isEverything())
 				logger.log(4, debug);
 			break;
 		case QUERYWRITER:
