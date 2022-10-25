@@ -87,7 +87,7 @@ public class QueryWriter {
 	 */
 	public String executeReadErrorCommand(String command) {
 		executeCommand(command);
-		while (query.getReader().nextSaveError() == null); // ?Waiting for incoming Error?
+		while (query.getReader().nextSaveError() == null); 
 		return query.getReader().nextError();
 	}
 	
@@ -99,11 +99,11 @@ public class QueryWriter {
 	 */
 	public String[] executeReadCommand(String command) {
 		executeCommand(command);
-		while (query.getReader().nextSavePacket() == null); // ?Waiting for incoming Packet?
-		while (query.getReader().nextSaveError() == null); // ?Waiting for incoming Error?
+//		while (query.getReader().nextSavePacket() == null);
+		while (query.getReader().nextSaveError() == null);
 		return new String[] { query.getReader().nextPacket(), query.getReader().nextError() };
 	}
-
+	
 	public void executeAsyncCommand(String command) {
 		new Thread() {
 

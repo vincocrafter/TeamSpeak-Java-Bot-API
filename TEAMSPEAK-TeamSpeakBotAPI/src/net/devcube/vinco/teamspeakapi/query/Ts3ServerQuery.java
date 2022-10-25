@@ -68,6 +68,14 @@ public class Ts3ServerQuery {
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
 		reader.start(); //starts the readerThread
+		
+		//Getting out first two automatic messages
+		while (reader.nextSavePacket() == null);
+		reader.nextPacket();
+		while (reader.nextSavePacket() == null);
+		reader.nextPacket();
+		
+		
 		login(username, password);
 		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
 		registerAllEvents();
@@ -84,8 +92,7 @@ public class Ts3ServerQuery {
 	 * @param password
 	 */
 	private void login(String username, String password) throws QueryLoginException {
-		String res = writer.executeReadCommand("login " + username + " " + password)[1];
-		reader.nextPacket(); // To remove one Answer, because Server is giving two Answers
+		String res = writer.executeReadErrorCommand("login " + username + " " + password);
 		if (res.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
 			debug(DebugOutputType.QUERY, "Login failed");
 			throw new QueryLoginException();
@@ -193,7 +200,7 @@ public class Ts3ServerQuery {
 	}
 
 	public String getTime() {
-		SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm:ss.SSS");
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
@@ -235,15 +242,15 @@ public class Ts3ServerQuery {
 			break;
 		case QUERYREADER:
 			if(config.isQueryReaderDebug() || config.isEverything())
-				logger.log(4, debug);
+				logger.log(7, debug);
 			break;
 		case QUERYREADERQUEUE:
 			if(config.isQueryReaderQueueDebug() || config.isEverything())
-				logger.log(4, debug);
+				logger.log(7, debug);
 			break;
 		case QUERYWRITER:
 			if(config.isQueryWriterDebug() || config.isEverything())
-				logger.log(4, debug);
+				logger.log(6, debug);
 			break;
 		default:
 			if(config.isInDebug(type) || config.isEverything()) {

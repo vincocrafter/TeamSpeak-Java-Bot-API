@@ -50,7 +50,7 @@ public class QueryReader {
 
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
-			
+		
 		new Thread(new Runnable() { // New Thread so async
 			
 			
@@ -63,12 +63,12 @@ public class QueryReader {
 						if (reader.ready()) {
 							String msg = reader.readLine();
 							if (isResultValid(msg)) {
-								//query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
+								query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
 								if (!isError(msg)) {
 									if (!isEvent(msg)) { // Information here
 										query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
-										packets.add(msg);
 										query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
+										packets.add(msg);
 									} else {  //Event here
 										String[] infos = msg.split(" ");
 										/*
@@ -102,8 +102,8 @@ public class QueryReader {
 								} else {
 									// Error handeling
 									query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
-									errors.add(msg);
 									query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
+									errors.add(msg);
 								}
 							}
 						}
@@ -114,7 +114,7 @@ public class QueryReader {
 				}
 
 			}
-		}).start();
+		}, "TeamSpeak3-BotAPI > QueryReaderThreat").start();
 	}
 
 	// Just a check if the packet is an error message, so it can be ignored
@@ -187,7 +187,4 @@ public class QueryReader {
 	public synchronized String nextSaveError() {
 		return errors.peek();
 	}
-	
-	
-	
 }

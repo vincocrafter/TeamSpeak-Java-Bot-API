@@ -43,6 +43,12 @@ public class Logger {
 		case 5:
 			System.out.println(t + time + "[Event Manager] : " + message);
 			break;
+		case 6:
+			System.out.println(t + time + "[QUERY WRITER] : " + message);
+			break;
+		case 7:
+			System.out.println(t + time + "[QUERY READER] : " + message);
+			break;
 		default:
 			System.out.println(t + time + "[Other] : " + message);
 			break;

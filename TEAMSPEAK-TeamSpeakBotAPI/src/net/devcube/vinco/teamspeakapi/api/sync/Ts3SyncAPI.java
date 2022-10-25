@@ -84,8 +84,7 @@ public class Ts3SyncAPI {
 	 */
 	
 	public QueryClientInfo getQueryInfo() {
-		String res = query.getWriter().executeReadCommand("whoami")[0];
-		return new QueryClientInfo(res.split(" "));
+		return new QueryClientInfo(query.getWriter().executeReadCommand("whoami")[0].split(" "));
 	}
 
 	/**
