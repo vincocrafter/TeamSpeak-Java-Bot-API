@@ -63,7 +63,7 @@ public class QueryReader {
 						if (reader.ready()) {
 							String msg = reader.readLine();
 							if (isResultValid(msg)) {
-								query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
+//								query.debug(DebugOutputType.QUERYREADER, "Got incoming Packet: " + msg); //maybe stupid (bc. debugged below)
 								if (!isError(msg)) {
 									if (!isEvent(msg)) { // Information here
 										query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
