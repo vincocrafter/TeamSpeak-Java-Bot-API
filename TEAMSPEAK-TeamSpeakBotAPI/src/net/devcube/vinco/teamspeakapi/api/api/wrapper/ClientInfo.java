@@ -3,14 +3,13 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import java.util.ArrayList;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ClientInfo extends DefaultInfo {
 
-	int id;
 
-	public ClientInfo(String[] infos, int id) {
+	public ClientInfo(String[] infos) {
 		super(infos);
-		this.id = id;
 	}
 
 	public String[] getClientInfos() {
@@ -18,11 +17,7 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getClientName() {
-		String s = get(3);
-		s = s.replace("\\", " ");
-		s = s.replace("\\s", " ");
-		s = s.replace(" s", " ");
-		return s;
+		return Formatter.toNormalFormat(get("client_nickname"));
 	}
 
 	public String getNickName() {
@@ -30,58 +25,57 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getClientUUID() {
-		return get(2);
+		return get("client_unique_identifier");
 	}
 
 	public int getClientID() {
-		return id;
+		return toInt(get("cid"));
 	}
 
 	public int getClientDatabaseID() {
-		return Integer.parseInt(get(17));
+		return toInt("client_database_id");
 	}
 
 	public String getPlatform() {
-		return get(5);
+		return get("client_platform");
 	}
 
 	public int getChannelID() {
-		return Integer.parseInt(get(0));
+		return toInt(get("cid"));
 	}
 
 	public boolean isInputMuted() {
-		return get(6).equalsIgnoreCase("1");
+		return get("client_input_muted").equalsIgnoreCase("1");
 	}
 
 	public boolean isOutputMuted() {
-		return get(7).equalsIgnoreCase("1");
+		return get("client_output_muted").equalsIgnoreCase("1");
 	}
 
 	public boolean isRecording() {
-		return get(13).equalsIgnoreCase("1");
+		return get("client_is_recording").equalsIgnoreCase("1");
 	}
 
 	public ArrayList<Integer> getServerGroups() {
 		ArrayList<Integer> arraylist = new ArrayList<Integer>();
-		if (infos[19].split("=")[1].contains(",")) {
-			String[] astring = infos[19].split("=")[1].split(",");
-
+		if (get("client_servergroups").contains(",")) {
+			String[] astring = get("client_servergroups").split(",");
 			for (String s : astring) {
-				arraylist.add(Integer.valueOf(Integer.parseInt(s)));
+				arraylist.add(toInt(s));
 			}
 		} else {
-			arraylist.add(Integer.valueOf(Integer.parseInt(infos[19].split("=")[1])));
+			arraylist.add(toInt(get("client_servergroups")));
 		}
 
 		return arraylist;
 	}
 
 	public long getCreated() {
-		return toLong(get(20));
+		return toLong(get("client_created"));
 	}
 
 	private int getClientTypeInt() {
-		return toInt(get(25));
+		return toInt(get("client_type"));
 	}
 
 	public boolean isServerQueryClient() {
@@ -97,19 +91,15 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getClientDescription() {
-		String s = get(24);
-		s = s.replace("\\", " ");
-		s = s.replace("\\s", " ");
-		s = s.replace(" s", " ");
-		return s;
+		return Formatter.toNormalFormat(get("client_description"));
 	}
 
 	public boolean isInServerGroup(int groupid) {
-		return getServerGroups().contains(Integer.valueOf(groupid));
+		return getServerGroups().contains(groupid);
 	}
 
 	public long getLastConncetion() {
-		return Long.parseLong(get(21));
+		return toLong(get("client_lastconnected"));
 	}
 
 	public ClientType getClientType() {
@@ -117,35 +107,35 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public int getChannelGroupID() {
-		return Integer.parseInt(get(18));
+		return toInt(get("client_channel_group_id"));
 	}
 
 	public String getIP() {
-		return get(59);
+		return get(get("connection_client_ip"));
 	}
 
 	public String getAwayMessage() {
-		return get(24);
+		return get("lient_away_message");
 	}
 
 	public String getCountry() {
-		return get(42);
+		return get("client_country=");
 	}
 
 	public int getTalkPower() {
-		return Integer.parseInt(get(27));
+		return toInt(get("client_talk_power"));
 	}
 
 	public String getVersion() {
-		return get(4);
+		return Formatter.toNormalFormat(get("client_version"));
 	}
 
 	public boolean isAway() {
-		return toBol(toInt(get(23)));
+		return toBol(toInt(get("client_away")));
 	}
 
 	public int getAllTimeConnections() {
-		return toInt(get(22));
+		return toInt(get("client_totalconnections"));
 	}
 
 	public int getTotalConncetions() {
@@ -157,31 +147,31 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getMyTeamspeakID() {
-		return get(45);
+		return get("client_myteamspeak_id");
 	}
 
 	public int getNeededServerQueryViewPower() {
-		return toInt(get(38));
+		return toInt(get("client_needed_serverquery_view_power"));
 	}
 
 	public boolean isTalker() {
-		return toBol(toInt(get(31)));
+		return toBol(toInt(get("client_is_talker")));
 	}
 
 	public boolean isPrioritySpeaker() {
-		return toBol(toInt(get(36)));
+		return toBol(toInt(get("client_is_priority_speaker")));
 	}
 
 	public boolean isChannelCommander() {
-		return toBol(toInt(get(41)));
+		return toBol(toInt(get("client_is_channel_commander")));
 	}
 
 	public boolean isTalkPowerRequesting() {
-		return toBol(toInt(get(28)));
+		return toBol(toInt(get("client_talk_request")));
 	}
 
 	public String getTalkPowerRequestMsg() {
-		return get(29);
+		return get("client_talk_request_msg");
 	}
 
 	public boolean hasPhoneticName() {
@@ -189,11 +179,11 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getPhoneticName() {
-		return get(37);
+		return get("client_nickname_phonetic");
 	}
 
 	public int getDefaultChannelID() {
-		String s = get(11).replace("\\/", "");
+		String s = get("client_default_channel").replace("\\/", "");
 		return !s.equalsIgnoreCase("") && !s.isEmpty() ? toInt(s) : -1;
 	}
 }

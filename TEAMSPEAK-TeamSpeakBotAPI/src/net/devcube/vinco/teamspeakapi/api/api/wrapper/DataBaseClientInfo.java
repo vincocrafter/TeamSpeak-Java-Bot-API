@@ -7,34 +7,34 @@ public class DataBaseClientInfo extends DefaultInfo {
 	}
 
 	public String getClientUUID() {
-		return get(0);
+		return get("client_unique_identifier");
 	}
 
 	public int getClientDataBaseID() {
-		return Integer.parseInt(get(2));
+		return toInt(get("client_database_id"));
 	}
 
 	public String getClientName() {
-		return get(1);
+		return get("client_nickname");
 	}
 
 	public long getCreatingTime() {
-		return Long.parseLong(get(3));
+		return toLong(get("client_created"));
 	}
 
 	public long getLastConnection() {
-		return Long.parseLong(get(4));
+		return toLong(get("client_lastconnected"));
 	}
 
 	public int getConnections() {
-		return Integer.parseInt(get(5));
+		return toInt(get("client_totalconnections"));
 	}
 
 	public String getLastIP() {
-		return get(13);
+		return get("client_lastip");
 	}
 
 	public String getDescription() {
-		return get(7);
+		return get("client_description");
 	}
 }

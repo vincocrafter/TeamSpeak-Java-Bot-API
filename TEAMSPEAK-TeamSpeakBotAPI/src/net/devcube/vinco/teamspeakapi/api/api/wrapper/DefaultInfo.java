@@ -25,7 +25,17 @@ public class DefaultInfo {
 			return "";
 		}
 	}
-
+	
+	public String get(String value_name) {
+        for (String s : infos) {
+            String[] split = s.split("=");
+            if(split[0].equals(value_name)){
+            	return split.length < 2 ? null : split[1];
+            }
+        }
+        return null;
+    }
+	
 	public String[] getInfos() {
 		return this.infos;
 	}

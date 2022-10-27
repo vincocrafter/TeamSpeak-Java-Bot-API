@@ -6,28 +6,24 @@ public class HostInfo extends DefaultInfo {
 		super(infos);
 	}
 
-	public String get(int i) {
-		String s = infos[i];
-		return s.substring(s.indexOf("=") + 1, s.length());
-	}
 
 	public int getInstanceUptime() {
-		return Integer.parseInt(get(0));
+		return toInt(get("instance_uptime"));
 	}
 
 	public int getVirtualServersRunning() {
-		return Integer.parseInt(get(2));
+		return toInt(get("virtualservers_running_total"));
 	}
 
 	public int getMaxClients() {
-		return Integer.parseInt(get(3));
+		return toInt(get("virtualservers_total_maxclients"));
 	}
 
 	public int getClientsOnline() {
-		return Integer.parseInt(get(4));
+		return toInt(get("virtualservers_total_clients_online"));
 	}
 
 	public int getChannes() {
-		return Integer.parseInt(get(5));
+		return toInt(get("virtualservers_total_channels_online"));
 	}
 }
