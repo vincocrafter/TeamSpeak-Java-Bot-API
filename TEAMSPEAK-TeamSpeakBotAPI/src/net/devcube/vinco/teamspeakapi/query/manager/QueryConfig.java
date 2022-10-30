@@ -21,9 +21,10 @@ public class QueryConfig {
 	
 private Ts3ServerQuery query;
 		
-
-	
 	private EventCallType eventCallType = EventCallType.NEW;
+	private boolean timeMilliseconds = false;
+	private boolean fileLogging = false;
+	
 	
 	/**
 	 * idea of specify much more the types of output, array to select more as one type for more detailed debugging
@@ -112,5 +113,34 @@ private Ts3ServerQuery query;
 	public boolean isQueryWriterDebug() {
 		return isInDebug(DebugOutputType.QUERYWRITER);
 	}
-	 
+
+	/**
+	 * Time in Logging with Milliseconds
+	 * @return the timeMilliseconds
+	 */
+	public boolean isTimeMilliseconds() {
+		return timeMilliseconds;
+	}
+
+	/**
+	 * Change in the Logging with/without Milliseconds
+	 * @param timeMilliseconds the timeMilliseconds to set
+	 */
+	public void setTimeMilliseconds(boolean timeMilliseconds) {
+		this.timeMilliseconds = timeMilliseconds;
+	}
+
+	/**
+	 * @return the fileLogging
+	 */
+	public boolean isFileLogging() {
+		return fileLogging;
+	}
+
+	/**
+	 * @param fileLogging the fileLogging to set
+	 */
+	public void setFileLogging(boolean fileLogging) {
+		this.fileLogging = fileLogging;
+	}
 }

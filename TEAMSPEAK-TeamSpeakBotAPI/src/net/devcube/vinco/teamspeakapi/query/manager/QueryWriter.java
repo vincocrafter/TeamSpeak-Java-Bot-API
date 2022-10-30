@@ -79,15 +79,15 @@ public class QueryWriter {
 	}
 	
 	/**
-	 * Now -> Default use for Command sending instead of executeCommand
+	 * Now -> Default use for Command sending instead of executeCommand()
 	 * Same as below, but some Commands are only getting an Error as answer
 	 * 
 	 * @param command
-	 * @return {Normal Packets, Errors}
+	 * @return {Errors}
 	 */
 	public String executeReadErrorCommand(String command) {
 		executeCommand(command);
-		while (query.getReader().nextSaveError() == null); 
+		while (query.getReader().nextSaveError() == null);
 		return query.getReader().nextError();
 	}
 	

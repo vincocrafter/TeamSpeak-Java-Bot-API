@@ -18,45 +18,50 @@ public class Permission {
 	}
 
 	public Permission(int permID, int permValue, boolean negated, boolean skip) {
-		this.permID = permID;
-		this.permValue = permValue;
-		this.negated = negated;
-		this.skip = skip;
+		this(null, permID, permValue, negated, skip);
 	}
 
 	public Permission(String permName, int permValue, boolean negated, boolean skip) {
-		this.permName = permName;
-		this.permValue = permValue;
-		this.negated = negated;
-		this.skip = skip;
+		this(permName, -1, permValue, negated, skip);
 	}
 
 	public Permission(String permName, int permID, int permValue) {
-		this.permName = permName;
-		this.permID = permID;
-		this.permValue = permValue;
+		this(permName, permID, permValue, false, false);
 	}
 
 	public Permission(int permID, int permValue) {
-		this.permID = permID;
-		this.permValue = permValue;
+		this(null, permID, permValue, false, false);
 	}
 
 	public Permission(String permName, int permValue) {
-		this.permName = permName;
-		this.permValue = permValue;
-	}
-
-	public Permission(int permID, String permName, String permDesc) {
-		this.permID = permID;
-		this.permName = permName;
-		this.permDesc = permDesc;
+		this(permName, -1, permValue, false, false);
 	}
 
 	public Permission(int permID, String permName) {
-		this.permID = permID;
-		this.permName = permName;
+		this(permName, permID, 0, false, false);
 	}
+
+	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip, String permDesc) {
+		this.permName = permName;
+		this.permID = permID;
+		this.permValue = permValue;
+		this.negated = negated;
+		this.skip = skip;
+		this.permDesc = permDesc;
+	}
+
+	public Permission(String permName, int permID, String permDesc) {
+		this(permName, permID, -1, false, false, permDesc);
+	}
+	
+	public Permission(String permName, int permID, int permValue, String permDesc) {
+		this(permName, permID, permValue, false, false, permDesc);
+	}
+
+	public Permission(String permName, String permDesc) {
+		this(permName, -1, -1, false, false, permDesc);
+	}
+
 
 	public String getPermName() {
 		return this.permName;

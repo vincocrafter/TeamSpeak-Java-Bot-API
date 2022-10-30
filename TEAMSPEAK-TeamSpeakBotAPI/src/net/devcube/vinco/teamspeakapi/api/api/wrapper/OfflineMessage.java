@@ -11,19 +11,19 @@ public class OfflineMessage extends DefaultInfo {
 	}
 
 	public int getMessageID() {
-		return Integer.parseInt(this.get(0));
+		return Integer.parseInt(get(0));
 	}
 
 	public String getClientUUID() {
-		return this.get(1);
+		return get(1);
 	}
 
 	public String getSubject() {
-		return this.get(2);
+		return get(2);
 	}
 
 	public String getMessage() {
-		return this.get(3);
+		return get(3);
 	}
 
 	public long getTime() {

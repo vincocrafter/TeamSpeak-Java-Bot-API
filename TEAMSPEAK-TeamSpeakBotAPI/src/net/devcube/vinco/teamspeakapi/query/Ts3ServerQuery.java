@@ -30,7 +30,8 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 /**
- * @apiNote This is the mainclass of the TeamSpeak Query API, it handles the connection between the client and the server and set the API up
+ * @apiNote This is the mainclass of the TeamSpeak Query API, it handles the
+ *          connection between the client and the server and set the API up
  */
 
 public class Ts3ServerQuery {
@@ -46,7 +47,7 @@ public class Ts3ServerQuery {
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
 	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
-		
+
 	/**
 	 * Connect's the Socket to the Server
 	 * 
@@ -62,27 +63,27 @@ public class Ts3ServerQuery {
 	 * @throws QueryLoginException
 	 */
 
-	public void connect(String host, int port, String username, String password, int virtualServerID,
-			String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
+	public void connect(String host, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
 		socket = new Socket(host, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
-		reader.start(); //starts the readerThread
-		
-		//Getting out first two automatic messages
-		while (reader.nextSavePacket() == null);
+		reader.start(); // starts the readerThread
+
+		// Getting out first two automatic messages
+		while (reader.nextSavePacket() == null)
+			;
 		reader.nextPacket();
-		while (reader.nextSavePacket() == null);
+		while (reader.nextSavePacket() == null)
+			;
 		reader.nextPacket();
-		
-		
+
 		login(username, password);
 		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
 		registerAllEvents();
 		syncAPI.goToChannel(defaultchannelID);
 		socket.setKeepAlive(true);
-		keepAliveThread.start(); //starts KeepAlivThread
-		
+		keepAliveThread.start(); // starts KeepAlivThread
+
 	}
 
 	/**
@@ -100,12 +101,12 @@ public class Ts3ServerQuery {
 			debug(DebugOutputType.QUERY, "Logged in sucessfully");
 		}
 	}
-	
+
 	/**
 	 * Stops the Query, Socket and all Threads
 	 * 
 	 */
-	
+
 	public void stopQuery() {
 		writer.executeReadCommand("quit");
 		keepAliveThread.interrupt();
@@ -118,29 +119,20 @@ public class Ts3ServerQuery {
 	}
 
 	/**
-	 * Read all Incoming start Messages
-	 */
-	public void readAllMessages() {
-		if (!syncAPI.isConnected()) {
-
-		}
-	}
-	
-	/** 
 	 * Register all Events
 	 */
-	
+
 	public void registerAllEvents() {
 		debug(DebugOutputType.QUERY, "Registering all Events");
 
-	      writer.executeReadErrorCommand("servernotifyregister event=server");
-	      writer.executeReadErrorCommand("servernotifyregister event=channel id=0");
-	      writer.executeReadErrorCommand("servernotifyregister event=textserver");
-	      writer.executeReadErrorCommand("servernotifyregister event=textchannel");
-	      writer.executeReadErrorCommand("servernotifyregister event=textprivate");
-	      writer.executeReadErrorCommand("servernotifyregister event=tokenused");
-	   }
-	
+		writer.executeReadErrorCommand("servernotifyregister event=server");
+		writer.executeReadErrorCommand("servernotifyregister event=channel id=0");
+		writer.executeReadErrorCommand("servernotifyregister event=textserver");
+		writer.executeReadErrorCommand("servernotifyregister event=textchannel");
+		writer.executeReadErrorCommand("servernotifyregister event=textprivate");
+		writer.executeReadErrorCommand("servernotifyregister event=tokenused");
+	}
+
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */
@@ -200,7 +192,13 @@ public class Ts3ServerQuery {
 	}
 
 	public String getTime() {
-		SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm:ss.SSS");
+		String format = "";
+		if (config.isTimeMilliseconds()) {
+			format = "HH:mm:ss.SSS";
+		} else {
+			format = "HH:mm:ss";
+		}
+		SimpleDateFormat simpledateformat = new SimpleDateFormat(format);
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
@@ -211,50 +209,66 @@ public class Ts3ServerQuery {
 		return simpledateformat.format(date);
 	}
 
-	
-	
-	/** 
+	/**
 	 * new debug Method for more specified debugging and outputting
 	 * 
 	 * @param type
-	 * @param debug message
+	 * @param debug
+	 *                  message
 	 * @see DebugOutputType
 	 * @see QueryConfig
 	 */
 	
+	//TO-DO, when debugging File, debug should no be in the Console
+	
 	public void debug(DebugOutputType type, String debug) {
 		switch (type) {
 		case GENERAL:
-			if(config.isGeneralDebug() || config.isEverything())
+			if (config.isGeneralDebug() || config.isEverything()) {
 				logger.log(1, debug);
+				logger.logFile(1, debug);
+			}
 			break;
 		case EVENTMANAGER:
-			if(config.isEventManagerDebug() || config.isEverything())
+			if (config.isEventManagerDebug() || config.isEverything()) {
 				logger.log(5, debug);
+				logger.logFile(5, debug);
+			}
 			break;
 		case KEEPALIVETHREAD:
-			if(config.isKeepAliveThreadDebug() || config.isEverything())
+			if (config.isKeepAliveThreadDebug() || config.isEverything()) {
 				logger.log(1, debug);
+				logger.logFile(1, debug);
+			}
 			break;
 		case QUERY:
-			if(config.isQueryDebug() || config.isEverything())
+			if (config.isQueryDebug() || config.isEverything()) {
 				logger.log(4, debug);
+				logger.logFile(4, debug);
+			}
 			break;
 		case QUERYREADER:
-			if(config.isQueryReaderDebug() || config.isEverything())
+			if (config.isQueryReaderDebug() || config.isEverything()) {
 				logger.log(7, debug);
+				logger.logFile(7, debug);
+			}
 			break;
 		case QUERYREADERQUEUE:
-			if(config.isQueryReaderQueueDebug() || config.isEverything())
-				logger.log(7, debug);
+			if (config.isQueryReaderQueueDebug() || config.isEverything()) {
+				logger.log(8, debug);
+				logger.logFile(8, debug);
+			}
 			break;
 		case QUERYWRITER:
-			if(config.isQueryWriterDebug() || config.isEverything())
+			if (config.isQueryWriterDebug() || config.isEverything()) {
 				logger.log(6, debug);
+				logger.logFile(6, debug);
+			}
 			break;
 		default:
-			if(config.isInDebug(type) || config.isEverything()) {
+			if (config.isInDebug(type) || config.isEverything()) {
 				logger.log(5, debug);
+				logger.logFile(5, debug);
 			}
 			break;
 		}
