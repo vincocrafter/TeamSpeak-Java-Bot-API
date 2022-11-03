@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+
 public class DataBaseClientInfo extends DefaultInfo {
 
 	public DataBaseClientInfo(String[] infos) {
@@ -15,7 +17,7 @@ public class DataBaseClientInfo extends DefaultInfo {
 	}
 
 	public String getClientName() {
-		return get("client_nickname");
+		return Formatter.toNormalFormat(get("client_nickname"));
 	}
 
 	public long getCreatingTime() {
@@ -35,6 +37,6 @@ public class DataBaseClientInfo extends DefaultInfo {
 	}
 
 	public String getDescription() {
-		return get("client_description");
+		return Formatter.toNormalFormat(get("client_description"));
 	}
 }

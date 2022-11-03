@@ -24,14 +24,14 @@ private Ts3ServerQuery query;
 	private EventCallType eventCallType = EventCallType.NEW;
 	private boolean timeMilliseconds = false;
 	private boolean fileLogging = false;
-	
+	//ENUM for specifing Type of Outputting : CONSOLE, FILE, BOTH
 	
 	/**
 	 * idea of specify much more the types of output, array to select more as one type for more detailed debugging
 	 * @see Ts3ServerQuery.debug()
 	 */
 	private ArrayList<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
-	
+		
 	public QueryConfig(Ts3ServerQuery query) {
 		this.query = query;
 	}

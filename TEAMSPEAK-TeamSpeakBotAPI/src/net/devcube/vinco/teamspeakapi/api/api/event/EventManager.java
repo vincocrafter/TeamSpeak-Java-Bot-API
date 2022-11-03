@@ -11,6 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -187,7 +189,8 @@ public class EventManager {
 	/**
 	 * New Method of calling Events, using Annotations
 	 * 
-	 * @param String[] eventInformation
+	 * @param String[]
+	 *                     eventInformation
 	 */
 
 	public void callNewEvent(String[] infos) {
@@ -198,21 +201,20 @@ public class EventManager {
 
 		for (TsEvent registeredEvents : events) {
 			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
-				// [not working] if (meth.isAnnotationPresent(EventHandler.class)) { // Check
-				// annotation
-				for (Parameter par : meth.getParameters()) { // Gets the parameters
-					if (par.getName().equals(event.getClass().getName())) { // Check for parameter name is equal to the
-																			// (Base)Event Class Name
-						// Example -> public void test(PrivilegeKeyUsedEvent ev) {
-						// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
-						try {
-							meth.invoke(null, infos);
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+				if (meth.isAnnotationPresent(EventHandler.class)) { // Check
+					for (AnnotatedType ann1 : meth.getAnnotatedParameterTypes()) {
+						if (ann1.getType().getTypeName().equals(event.getClass().getName())) { // Check for parameter name is equal to the
+							// (Base)Event Class Name
+							// Example -> public void test(PrivilegeKeyUsedEvent ev) {
+							// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
+							try {
+								meth.invoke(meth, getEventByName(infos));
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
-					// }
 				}
 			}
 		}
@@ -222,7 +224,8 @@ public class EventManager {
 	 * Returners Different (BaseEvent)Classes depending by the given information.
 	 * Only called by the callNewEvent Method
 	 * 
-	 * @param String[] eventInformation
+	 * @param String[]
+	 *                     eventInformation
 	 */
 
 	private BaseEvent getEventByName(String[] infos) {
@@ -268,27 +271,27 @@ public class EventManager {
 		query.debug(DebugOutputType.EVENTMANAGER, eventName + " was called");
 
 		if (eventName.equalsIgnoreCase("notifychannelcreated")) {
-			query.debug(DebugOutputType.CHANNEL_CREATED, infos);
+			query.debug(DebugOutputType.E_CHANNEL_CREATED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneldeleted")) {
-			query.debug(DebugOutputType.CHANNEL_DELETED, infos);
+			query.debug(DebugOutputType.E_CHANNEL_DELETED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneldescriptionchanged")) {
-			query.debug(DebugOutputType.CHANNEL_DESCRIPTION_EDITED, infos);
+			query.debug(DebugOutputType.E_CHANNEL_DESCRIPTION_EDITED, infos);
 		} else if (eventName.equalsIgnoreCase("notifychanneledited")) {
-			query.debug(DebugOutputType.CHANNEL_EDITED, infos.toString());
+			query.debug(DebugOutputType.E_CHANNEL_EDITED, infos.toString());
 		} else if (eventName.equalsIgnoreCase("notifychannelpasswordchanged")) {
-			query.debug(DebugOutputType.CHANNEL_PASSWORD_CHANGED, infos);
+			query.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, infos);
 		} else if (eventName.equalsIgnoreCase("notifycliententerview")) {
-			query.debug(DebugOutputType.CLIENT_JOIN, infos);
+			query.debug(DebugOutputType.E_CLIENT_JOIN, infos);
 		} else if (eventName.equalsIgnoreCase("notifyclientleftview")) {
-			query.debug(DebugOutputType.CLIENT_LEAVE, infos);
+			query.debug(DebugOutputType.E_CLIENT_LEAVE, infos);
 		} else if (eventName.equalsIgnoreCase("notifyclientmoved")) {
-			query.debug(DebugOutputType.CLIENT_MOVE, infos);
+			query.debug(DebugOutputType.E_CLIENT_MOVE, infos);
 		} else if (eventName.equalsIgnoreCase("notifytokenused")) {
-			query.debug(DebugOutputType.PRIVILEGEKEY_USED, infos);
+			query.debug(DebugOutputType.E_PRIVILEGEKEY_USED, infos);
 		} else if (eventName.equalsIgnoreCase("notifyserveredited")) {
-			query.debug(DebugOutputType.SERVER_EDITED, infos);
+			query.debug(DebugOutputType.E_SERVER_EDITED, infos);
 		} else if (eventName.equalsIgnoreCase("notifytextmessage")) {
-			query.debug(DebugOutputType.TEXT_MESSAGE, infos);
+			query.debug(DebugOutputType.E_TEXT_MESSAGE, infos);
 		}
 
 	}

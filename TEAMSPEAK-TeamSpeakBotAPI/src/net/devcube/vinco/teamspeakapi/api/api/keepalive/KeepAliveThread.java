@@ -20,7 +20,7 @@ public class KeepAliveThread extends Thread {
 	private final Ts3ServerQuery query;
 
 	public KeepAliveThread(Ts3ServerQuery query) {
-		super("TeamSpeak3-BotAPI > KeepAliveThread");
+		super("KALT");
 		this.query = query;
 	}
 	

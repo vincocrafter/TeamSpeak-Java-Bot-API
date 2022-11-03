@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+
 public class Ban extends DefaultInfo {
 
 	public Ban(String[] infos) {
@@ -7,46 +9,50 @@ public class Ban extends DefaultInfo {
 	}
 
 	public int getBanID() {
-		return toInt(get(0));
+		return toInt(get("banid"));
 	}
 
 	public String getIP() {
-		return get(2);
+		return get("ip");
 	}
 
 	public String getClientUUID() {
-		return get(3);
+		return get("uid");
 	}
-
+	
+	public String getMyTeamSpeakID() {
+		return get("mytsid");
+	}
+	
 	public String getLastNickName() {
-		return get(4);
+		return get("lastnickname");
 	}
 
 	public long getCreatingTime() {
-		return toLong(get(5));
+		return toLong(get("created"));
 	}
 
 	public int getBanDuration() {
-		return toInt(get(6));
+		return toInt(get("duration"));
 	}
 
 	public String getBannerName() {
-		return get(7);
+		return Formatter.toNormalFormat(get("invokername"));
 	}
 
 	public int getBannerClientDataBaseID() {
-		return toInt(get(8));
+		return toInt(get("invokercldbid"));
 	}
 
 	public String getBannerClientUUID() {
-		return get(9);
+		return get("invokeruid");
 	}
 
 	public String getBanReason() {
-		return get(10) != null ? get(10) : "";
+		return Formatter.toNormalFormat(get("reason"));
 	}
 
 	public int getBanEnforcements() {
-		return toInt(get(11).replace("|", ""));
+		return toInt(get("enforcements").replace("|", ""));
 	}
 }

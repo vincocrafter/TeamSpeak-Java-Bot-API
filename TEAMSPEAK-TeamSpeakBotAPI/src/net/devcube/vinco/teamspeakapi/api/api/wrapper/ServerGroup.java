@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ServerGroup extends DefaultInfo {
 
@@ -9,20 +10,20 @@ public class ServerGroup extends DefaultInfo {
 	}
 
 	public int getID() {
-		return this.toInt(this.get(0));
+		return toInt(get("sgid"));
 	}
 
 	public String getName() {
-		return this.get(1).replace("\\s", " ");
+		return Formatter.toNormalFormat(get("name"));
 	}
 
 	private int getTypeID() {
-		return this.toInt(this.get(2));
+		return toInt(get("type"));
 	}
 
 	public ServerGroupType getType() {
 		for (ServerGroupType servergrouptype : ServerGroupType.values()) {
-			if (this.getTypeID() == servergrouptype.getValue()) {
+			if (getTypeID() == servergrouptype.getValue()) {
 				return servergrouptype;
 			}
 		}
@@ -31,30 +32,34 @@ public class ServerGroup extends DefaultInfo {
 	}
 
 	public long getIconID() {
-		return this.toLong(this.get(3));
+		return toLong(get("iconid"));
 	}
 
 	public boolean isSaved() {
-		return this.toBol(Integer.parseInt(this.get(4)));
+		return toBol(Integer.parseInt(get("savedb")));
 	}
 
 	public int getSortID() {
-		return this.toInt(this.get(5));
+		return toInt(get("sortid"));
 	}
-
+	
+	public int getNameMode() {
+		return toInt(get("namemode"));
+	}
+	
 	public int getNeededModifyPower() {
-		return this.toInt(this.get(7));
+		return toInt(get("n_modifyp"));
 	}
 
 	public int getNeededMemberAddPower() {
-		return this.toInt(this.get(8));
+		return toInt(get("n_member_addp"));
 	}
 
 	public int getNeededMemberRemovePower() {
-		return this.toInt(this.get(9).replace("|", ""));
+		return toInt(get("n_member_removep").replace("|", ""));
 	}
 
 	public String toString() {
-		return "ServerGruppe[ServerGroupName=" + this.getName() + ",GroupID=" + this.getID() + ",SortID=" + this.getSortID() + ",Type=" + this.getType() + ",IconID=" + this.getIconID() + "]";
+		return "ServerGruppe[ServerGroupName=" + getName() + ",GroupID=" + getID() + ",SortID=" + getSortID() + ",Type=" + getType() + ",IconID=" + getIconID() + "]";
 	}
 }

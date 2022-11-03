@@ -9,11 +9,11 @@ public class PrivilegeKey extends DefaultInfo {
 	}
 
 	public String getKey() {
-		return this.get(0);
+		return get("token");
 	}
 
 	public PrivilegeKeyType getType() {
-		int i = this.getTyp();
+		int i = getKeyType();
 		for (PrivilegeKeyType privilegekeytype : PrivilegeKeyType.values()) {
 			if (i == privilegekeytype.getValue()) {
 				return privilegekeytype;
@@ -24,23 +24,22 @@ public class PrivilegeKey extends DefaultInfo {
 	}
 
 	public int getServerGroup() {
-		return this.toInt(this.get(2));
+		return toInt(get("token_id1"));
 	}
 
 	public int getChannelID() {
-		return this.toInt(this.get(3));
+		return toInt(get("token_id2"));
 	}
 
 	public long getCreatedTime() {
-		return this.toLong(this.get(4));
+		return toLong(get("token_created"));
 	}
 
 	public String getDescription() {
-		return this.get(5);
+		return get("token_description");
 	}
 
-	private int getTyp() {
-		String s = this.infos[1];
-		return Integer.parseInt(s.split("=")[1]);
+	public int getKeyType() {
+		return toInt(get("token_type"));
 	}
 }

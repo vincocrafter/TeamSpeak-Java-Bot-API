@@ -67,14 +67,12 @@ public class Ts3ServerQuery {
 		socket = new Socket(host, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
-		reader.start(); // starts the readerThread
+		reader.start(); // starts the reader Thread
 
 		// Getting out first two automatic messages
-		while (reader.nextSavePacket() == null)
-			;
+		while (reader.nextSavePacket() == null);
 		reader.nextPacket();
-		while (reader.nextSavePacket() == null)
-			;
+		while (reader.nextSavePacket() == null);
 		reader.nextPacket();
 
 		login(username, password);

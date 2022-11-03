@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ChannelGroup extends DefaultInfo {
 
@@ -9,15 +10,15 @@ public class ChannelGroup extends DefaultInfo {
 	}
 
 	public int getID() {
-		return toInt(get(0));
+		return toInt(get("cgid"));
 	}
 
 	public String getName() {
-		return get(1).replace("\\s", " ");
+		return Formatter.toNormalFormat(get("name"));
 	}
 
 	private int getTypeID() {
-		return toInt(get(2));
+		return toInt(get("type"));
 	}
 
 	public ChannelGroupType getType() {
@@ -31,18 +32,26 @@ public class ChannelGroup extends DefaultInfo {
 	}
 
 	public boolean isSaved() {
-		return toBol(toInt(get(4)));
+		return toBol(toInt(get("savedb")));
 	}
-
+	
+	public int getSortID() {
+		return toInt(get("sortid"));
+	}
+	
+	public int getNameMode() {
+		return toInt("namemode");
+	}
+	
 	public int getNeededModifyPower() {
-		return toInt(get(7));
+		return toInt(get("n_modifyp"));
 	}
 
 	public int getNeededMemberAddPower() {
-		return toInt(get(8));
+		return toInt(get("n_member_addp"));
 	}
 
 	public int getNeededMemberRemovePower() {
-		return toInt(get(9));
+		return toInt(get("n_member_removep"));
 	}
 }

@@ -7,18 +7,62 @@ public class ConnectionInfo extends DefaultInfo {
 	}
 
 	public int getFileTransfersBandwidthSend() {
-		return toInt(get(0));
+		return toInt(get("connection_filetransfer_bandwidth_sent"));
 	}
 
-	public int getFileTransfersBandwidthRecived() {
-		return toInt(get(1));
+	public int getFileTransfersBandwidthReceived() {
+		return toInt(get("connection_filetransfer_bandwidth_received"));
 	}
 
 	public int getFileTransfersBytesSend() {
-		return toInt(get(2));
+		return toInt(get("connection_filetransfer_bytes_sent_total"));
 	}
 
-	public int getFileTransfersBytesRecived() {
-		return toInt(get(3));
+	public int getFileTransfersBytesReceived() {
+		return toInt(get("connection_filetransfer_bytes_received_total"));
+	}
+	
+	public int getPacketsSendTotal() {
+		return toInt(get("connection_packets_sent_total"));
+	}
+	
+	public int getBytesSendTotal() {
+		return toInt(get("connection_bytes_sent_total"));
+	}
+ 	
+	public int getPacketsReceivedTotal() {
+		return toInt(get("connection_packets_received_total"));
+	}
+	
+	public int getBytesReceivedTotal() {
+		return toInt(get("connection_bytes_received_total"));
+	}
+	
+	public int getBranwidthSendLastSecondTotal() {
+		return toInt(get("connection_bandwidth_sent_last_second_total"));
+	}
+	
+	public int getBranwidthSendLastMinuteTotal() {
+		return toInt(get("connection_bandwidth_sent_last_minute_total"));
+	}
+	
+	public int getBranwidthReceivedLastSecondTotal() {
+		return toInt(get("connection_bandwidth_received_last_second_total"));
+	}
+	
+	public int getBranwidthReceivedLastMinuteTotal() {
+		return toInt(get("connection_bandwidth_received_last_minute_total"));
+	}
+	
+	public long getConnectedTime() {
+		return toLong(get("connection_connected_time"));
+	}
+	
+	public double getPacketlossTotal() {
+		return toDouble(get("connection_packetloss_total"));
+	}
+	
+	public double getPing() {
+		return toDouble(get("connection_ping"));
 	}
 }

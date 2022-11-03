@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+
 public class Complain extends DefaultInfo {
 
 	public Complain(String[] infos) {
@@ -7,26 +9,26 @@ public class Complain extends DefaultInfo {
 	}
 
 	public int getTargetClientDataBaseID() {
-		return toInt(get(0));
+		return toInt(get("tcldbid"));
 	}
 
 	public String getTargetName() {
-		return get(1);
+		return get("tname");
 	}
 
 	public int getSenderClientDataBaseID() {
-		return toInt(get(2));
+		return toInt(get("fcldbid"));
 	}
 
 	public String getSenderName() {
-		return get(1);
+		return Formatter.toNormalFormat(get("fname"));
 	}
 
 	public String getMessage() {
-		return get(4);
+		return Formatter.toNormalFormat(get("message"));
 	}
 
 	public long getTime() {
-		return toLong(get(5));
+		return toLong(get("timestamp"));
 	}
 }

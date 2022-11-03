@@ -280,21 +280,18 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public String toString() {
-		String s = "VirtualServer[";
-		s = add(s, "ServerName=" + getServerName());
-		s = add(s, "ServerID=" + getServerID());
-		s = add(s, "ServerUUID=" + getServerUUID());
-		s = add(s, "MaxClientsOnline=" + getMaxclients());
-		s = add(s, "OnlineClients=" + getOnlineClientsSize());
-		s = add(s, "Channels=" + getChannels());
-		s = add(s, "HostMessage=" + getHostMessage());
-		s = add(s, "OnlineTime=" + getOnlineTime());
-		s = add(s, "CreatedDate=" + getCreatingDate());
-		s = add(s, "]");
-		return s;
-	}
-
-	private String add(String org, String s) {
-		return org + " " + s;
+		StringBuilder s = new StringBuilder("VirtualServer[");
+		
+		s.append("ServerName=" + getServerName());
+		s.append("ServerID=" + getServerID());
+		s.append("ServerUUID=" + getServerUUID());
+		s.append("MaxClientsOnline=" + getMaxclients());
+		s.append("OnlineClients=" + getOnlineClientsSize());
+		s.append("Channels=" + getChannels());
+		s.append("HostMessage=" + getHostMessage());
+		s.append("OnlineTime=" + getOnlineTime());
+		s.append("CreatedDate=" + getCreatingDate());
+		s.append("]");
+		return s.toString();
 	}
 }

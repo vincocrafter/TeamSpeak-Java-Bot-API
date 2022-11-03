@@ -33,7 +33,7 @@ public class DefaultInfo {
             	return split.length < 2 ? null : split[1];
             }
         }
-        return null;
+        return "";
     }
 	
 	public String[] getInfos() {

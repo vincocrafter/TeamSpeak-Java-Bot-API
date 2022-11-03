@@ -184,7 +184,7 @@ public class Ts3SyncAPI {
 	}
 
 	public VirtualServerInfo getServerInfo() {
-		// "virtualserverinfo"
+		// "serverinfo"
 		return null;
 	}
 
