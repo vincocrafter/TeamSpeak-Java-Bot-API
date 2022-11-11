@@ -36,34 +36,38 @@ public class Logger {
 	public void log(int logLevel, Object message) {
 		String t = "[" + Thread.currentThread().getName() + "] ";
 		String time = "[" + serverQuery.getTime() + "] ";
+		String date = "";
+		if (serverQuery.getConfig().isShowDate()) {
+			date = "[" + serverQuery.getDate() + "] ";
+		}
 
 		switch (logLevel) {
 		case 1:
-			System.out.println(t + time + "[INFO] :  " + message);
+			System.out.println(t + date + time + "[INFO] : " + message);
 			break;
 		case 2:
-			System.err.println(t + time + "[ERROR] : " + message);
+			System.err.println(t + date + time + "[ERROR] : " + message);
 			break;
 		case 3:
-			System.out.println(t + time + "[WARNING] : " + message);
+			System.out.println(t + date + time + "[WARNING] : " + message);
 			break;
 		case 4:
-			System.out.println(t + time + "[QUERY] : " + message);
+			System.out.println(t + date + time + "[QUERY] : " + message);
 			break;
 		case 5:
-			System.out.println(t + time + "[Event Manager] : " + message);
+			System.out.println(t + date + time + "[Event Manager] : " + message);
 			break;
 		case 6:
-			System.out.println(t + time + "[QUERY WRITER] : " + message);
+			System.out.println(t + date + time + "[QUERY WRITER] : " + message);
 			break;
 		case 7:
-			System.out.println(t + time + "[QUERY READER] : " + message);
+			System.out.println(t + date + time + "[QUERY READER] : " + message);
 			break;
 		case 8:
-			System.out.println(t + time + "[QUERY READER QUEUE] : " + message);
+			System.out.println(t + date + time + "[QUERY READER QUEUE] : " + message);
 			break;
 		default:
-			System.out.println(t + time + "[Other] : " + message);
+			System.out.println(t + date + time + "[Other] : " + message);
 			break;
 		}
 	}
@@ -75,50 +79,52 @@ public class Logger {
 	 * @param message
 	 */
 	public void logFile(int logLevel, Object message) {
-		if (getServerQuery().getConfig().isFileLogging()) {
+		String t = "[" + Thread.currentThread().getName() + "] ";
+		String time = "[" + serverQuery.getTime() + "] ";
 
-			String t = "[" + Thread.currentThread().getName() + "] ";
-			String time = "[" + serverQuery.getTime() + "] ";
+		String date = "";
+		if (serverQuery.getConfig().isShowDate()) {
+			date = "[" + serverQuery.getDate() + "] ";
+		}
 
-			switch (logLevel) {
-			case 1:
-				writeInLog(t + time + "[INFO] :  " + message);
-				break;
-			case 2:
-				writeInLog(t + time + "[ERROR] : " + message);
-				break;
-			case 3:
-				writeInLog(t + time + "[WARNING] : " + message);
-				break;
-			case 4:
-				writeInLog(t + time + "[QUERY] : " + message);
-				break;
-			case 5:
-				writeInLog(t + time + "[Event Manager] : " + message);
-				break;
-			case 6:
-				writeInLog(t + time + "[QUERY WRITER] : " + message);
-				break;
-			case 7:
-				writeInLog(t + time + "[QUERY READER] : " + message);
-				break;
-			case 8:
-				writeInLog(t + time + "[QUERY READER QUEUE] : " + message);
-				break;
-			default:
-				writeInLog(t + time + "[Other] : " + message);
-				break;
-			}
+		switch (logLevel) {
+		case 1:
+			writeInLog(t + date + time + "[INFO] : " + message);
+			break;
+		case 2:
+			writeInLog(t + date + time + "[ERROR] : " + message);
+			break;
+		case 3:
+			writeInLog(t + date + time + "[WARNING] : " + message);
+			break;
+		case 4:
+			writeInLog(t + date + time + "[QUERY] : " + message);
+			break;
+		case 5:
+			writeInLog(t + date + time + "[Event Manager] : " + message);
+			break;
+		case 6:
+			writeInLog(t + date + time + "[QUERY WRITER] : " + message);
+			break;
+		case 7:
+			writeInLog(t + date + time + "[QUERY READER] : " + message);
+			break;
+		case 8:
+			writeInLog(t + date + time + "[QUERY READER QUEUE] : " + message);
+			break;
+		default:
+			writeInLog(t + date + time + "[Other] : " + message);
+			break;
 		}
 	}
 
 	private void writeInLog(String infos) {
 		String date = getServerQuery().getDate();
 		File cfg = new File("Logs/Log " + date.replace("/", ".") + ".txt");
-		if(!new File("Logs").exists()) {
+		if (!new File("Logs").exists()) {
 			new File("Logs/").mkdir();
 		}
-		
+
 		if (!cfg.exists()) {
 			try {
 				cfg.createNewFile();

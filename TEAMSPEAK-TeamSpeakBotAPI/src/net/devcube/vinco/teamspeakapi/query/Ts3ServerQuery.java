@@ -22,6 +22,7 @@ import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.api.async.Ts3AnsycAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
@@ -70,9 +71,11 @@ public class Ts3ServerQuery {
 		reader.start(); // starts the reader Thread
 
 		// Getting out first two automatic messages
-		while (reader.nextSavePacket() == null);
+		while (reader.nextSavePacket() == null)
+			;
 		reader.nextPacket();
-		while (reader.nextSavePacket() == null);
+		while (reader.nextSavePacket() == null)
+			;
 		reader.nextPacket();
 
 		login(username, password);
@@ -191,7 +194,7 @@ public class Ts3ServerQuery {
 
 	public String getTime() {
 		String format = "";
-		if (config.isTimeMilliseconds()) {
+		if (config.isShowTimeMilliseconds()) {
 			format = "HH:mm:ss.SSS";
 		} else {
 			format = "HH:mm:ss";
@@ -216,59 +219,58 @@ public class Ts3ServerQuery {
 	 * @see DebugOutputType
 	 * @see QueryConfig
 	 */
-	
-	//TO-DO, when debugging File, debug should no be in the Console
-	
+
+
 	public void debug(DebugOutputType type, String debug) {
+		int logLevel = -1;
 		switch (type) {
 		case GENERAL:
 			if (config.isGeneralDebug() || config.isEverything()) {
-				logger.log(1, debug);
-				logger.logFile(1, debug);
+				logLevel = 1;
 			}
 			break;
 		case EVENTMANAGER:
 			if (config.isEventManagerDebug() || config.isEverything()) {
-				logger.log(5, debug);
-				logger.logFile(5, debug);
+				logLevel = 5;
 			}
 			break;
 		case KEEPALIVETHREAD:
 			if (config.isKeepAliveThreadDebug() || config.isEverything()) {
-				logger.log(1, debug);
-				logger.logFile(1, debug);
+				logLevel = 1;
 			}
 			break;
 		case QUERY:
 			if (config.isQueryDebug() || config.isEverything()) {
-				logger.log(4, debug);
-				logger.logFile(4, debug);
+				logLevel = 5;
 			}
 			break;
 		case QUERYREADER:
 			if (config.isQueryReaderDebug() || config.isEverything()) {
-				logger.log(7, debug);
-				logger.logFile(7, debug);
+				logLevel = 7;
 			}
 			break;
 		case QUERYREADERQUEUE:
 			if (config.isQueryReaderQueueDebug() || config.isEverything()) {
-				logger.log(8, debug);
-				logger.logFile(8, debug);
+				logLevel = 8;
 			}
 			break;
 		case QUERYWRITER:
 			if (config.isQueryWriterDebug() || config.isEverything()) {
-				logger.log(6, debug);
-				logger.logFile(6, debug);
+				logLevel = 6;
 			}
 			break;
 		default:
 			if (config.isInDebug(type) || config.isEverything()) {
-				logger.log(5, debug);
-				logger.logFile(5, debug);
+				logLevel = 5;
 			}
 			break;
 		}
+		if (logLevel != -1) {
+			if (config.isDebugType(DebugType.CONSOLE) || config.isDebugType(DebugType.BOTH))
+				logger.log(logLevel, debug);
+			if (config.isDebugType(DebugType.FILE) || config.isDebugType(DebugType.BOTH))
+				logger.logFile(logLevel, debug);
+		}
+
 	}
 }

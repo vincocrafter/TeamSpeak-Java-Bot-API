@@ -208,7 +208,7 @@ public class EventManager {
 							// Example -> public void test(PrivilegeKeyUsedEvent ev) {
 							// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
 							try {
-								meth.invoke(meth, getEventByName(infos));
+								meth.invoke(registeredEvents, getEventByName(infos));
 							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
