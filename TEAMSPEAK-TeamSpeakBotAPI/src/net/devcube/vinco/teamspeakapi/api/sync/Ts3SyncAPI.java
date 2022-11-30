@@ -42,8 +42,7 @@ public class Ts3SyncAPI {
 	/**
 	 * Initiation of the Sync API
 	 * 
-	 * @param Serverquery
-	 *                        class
+	 * @param Serverquery class
 	 */
 	public Ts3SyncAPI(Ts3ServerQuery query) {
 		this.query = query;
@@ -60,10 +59,8 @@ public class Ts3SyncAPI {
 	 * Connects the Query bot to the virtual server And changes the Query bot's name
 	 * to the param nickname
 	 * 
-	 * @param serverID
-	 *                     from the virtual server
-	 * @param QueryBot
-	 *                     nickname
+	 * @param serverID from the virtual server
+	 * @param QueryBot nickname
 	 */
 	public void connectTeamSpeakQuery(int serverID, String nickname) {
 		if (!this.isConnected()) {
@@ -80,8 +77,7 @@ public class Ts3SyncAPI {
 	/**
 	 * Selects the virtual server to connect to
 	 * 
-	 * @param serverid
-	 *                     of the virtual server
+	 * @param serverid of the virtual server
 	 */
 	public void selectVirtualServer(int serverid) {
 		query.getWriter().executeReadErrorCommand("use " + serverid);
@@ -92,11 +88,13 @@ public class Ts3SyncAPI {
 	}
 
 	public void pokeClient(int clientid, String message) {
-		query.getWriter().executeReadErrorCommand("clientpoke clid=" + clientid + " msg=" + Formatter.toTsFormat(message));
+		query.getWriter()
+				.executeReadErrorCommand("clientpoke clid=" + clientid + " msg=" + Formatter.toTsFormat(message));
 	}
 
 	public void pokeClient(ClientInfo c, String message) {
-		query.getWriter().executeReadErrorCommand("clientpoke clid=" + c.getClientID() + " msg=" + Formatter.toTsFormat(message));
+		query.getWriter().executeReadErrorCommand(
+				"clientpoke clid=" + c.getClientID() + " msg=" + Formatter.toTsFormat(message));
 	}
 
 	public void moveClient(int clientid, int channelid) {
@@ -112,7 +110,8 @@ public class Ts3SyncAPI {
 	}
 
 	public void moveClient(ClientInfo c, ChannelInfo cinfo) {
-		query.getWriter().executeReadErrorCommand("clientmove clid=" + c.getClientID() + " cid=" + cinfo.getChannelID());
+		query.getWriter()
+				.executeReadErrorCommand("clientmove clid=" + c.getClientID() + " cid=" + cinfo.getChannelID());
 	}
 
 	/**
@@ -225,8 +224,7 @@ public class Ts3SyncAPI {
 	}
 
 	public boolean isClientOnline(String uuid) {
-		// getOnlineClients().stream().anyMatch(c ->
-		// c.getClientUUID().equalsIgnoreCase(uuid));
+//		getOnlineClients().stream().anyMatch(c -> c.getClientUUID().equalsIgnoreCase(uuid));
 
 		for (ClientInfo clientinfo : getOnlineClients()) {
 			if (clientinfo.getClientUUID().equalsIgnoreCase(uuid)) {
@@ -262,7 +260,8 @@ public class Ts3SyncAPI {
 		if (clientinfo != null) {
 			return clientinfo;
 		} else {
-			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the Information of the Player");
+			throw new UnknownClientInfoException(
+					"The Client is null! Please use the DataBaseClientInfo to get the Information of the Player");
 		}
 	}
 
@@ -377,8 +376,7 @@ public class Ts3SyncAPI {
 	}
 
 	/**
-	 * @param connected
-	 *                      the connected to set
+	 * @param connected the connected to set
 	 */
 	private void setConnected(boolean connected) {
 		this.connected = connected;
