@@ -28,9 +28,14 @@ public class QueryReader {
     private final Ts3ServerQuery query;
     private Socket socket;
 
+    // contains commands not yes sent to the server
     private final Queue<String> command_queue = new LinkedList<>();
+
+    // contains the response messages for only one command
     private final Queue<String> response_queue = new LinkedList<>();
     private final Queue<String> error_queue = new LinkedList<>();
+
+    public Thread qrt;
 
 
     public QueryReader(Ts3ServerQuery query, Socket socket) {
@@ -52,20 +57,27 @@ public class QueryReader {
     public void start() {
         query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
 
-        new Thread(new Runnable() { // New Thread so async
-
-
+        qrt = new Thread(new Runnable() { // New Thread so async
             @Override
             public void run() { // starting the while loop here to listen for packets
                 try {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     while (socket.isConnected()) { // <-- while loop here
-                        if (!reader.ready()) {
-                            continue;
+//                        if (!reader.ready()) {
+//                            System.out.println("test2");
+//                            continue;
+//                        }
+
+                        query.getLogger().log(1, "test");
+
+                        if(!command_queue.isEmpty() && (error_queue.isEmpty() && response_queue.isEmpty())) {
+                            System.out.println("next command: "+ command_queue.peek());
+                            getQuery().getWriter().executeNextCommand();
                         }
+
                         String msg = reader.readLine();
+                        query.getLogger().log(1, "msg:" + msg);
                         if (!isResultValid(msg)) {
-                            System.out.println("INVALID RESPONSE: " + msg);
                             continue;
                         }
                         if (isError(msg)) {
@@ -117,7 +129,8 @@ public class QueryReader {
                 }
 
             }
-        }, "QURT").start();
+        }, "QURT");
+        qrt.start();
     }
 
     // Just a check if the packet is an error message, so it can be ignored

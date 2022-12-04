@@ -92,21 +92,38 @@ public class QueryWriter {
 		return query.getReader().nextError();
 	}
 
-	public void queue_command(String command){
+	public void queue_command(String command) {
 		query.getReader().get_command_queue().add(command);
 	}
 	
 	/**
 	 * Idea of sending a Command and reading the following Message from the Server
 	 * 
-	 * @param command
+	 * @param command the command string
 	 * @return {Normal Packets, Errors}
 	 */
 	public String[] executeReadCommand(String command) {
-		executeCommand(command);
-//		while (query.getReader().nextSavePacket() == null);
+		System.out.println(command);
+		queue_command(command);
 		while (query.getReader().peekResponse() == null);
-		// THIS DOES NOT WORK.
-		return new String[] { query.getReader().peekCommand(), query.getReader().peekResponse() };
+
+		StringBuilder response = new StringBuilder();
+		for (int i = 0; i < query.getReader().get_response_queue().size(); i++) {
+			response.append(query.getReader().get_response_queue().poll());
+			if (i != query.getReader().get_response_queue().size() - 1) {
+				response.append("\n");
+			}
+		}
+		System.out.println("rezq size: " + query.getReader().get_response_queue().size());
+		// query.getReader().pollCommand();
+		return new String[] { response.toString(), query.getReader().pollError() };
+	}
+
+
+	/**
+	 * TODO Write nice Comment
+	 */
+	protected void executeNextCommand() {
+		executeCommand(query.getReader().get_command_queue().peek());
 	}
 }

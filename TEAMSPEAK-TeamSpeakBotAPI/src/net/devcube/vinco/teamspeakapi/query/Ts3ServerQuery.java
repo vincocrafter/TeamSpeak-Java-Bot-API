@@ -75,6 +75,7 @@ public class Ts3ServerQuery {
             ;
         while (reader.get_command_queue().poll() == null)
             ;
+        reader.get_response_queue().clear();
 
         login(username, password);
         syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
