@@ -42,7 +42,7 @@ public class Ts3SyncAPI {
 	/**
 	 * Initiation of the Sync API
 	 * 
-	 * @param Serverquery class
+	 * @param query class
 	 */
 	public Ts3SyncAPI(Ts3ServerQuery query) {
 		this.query = query;
@@ -60,7 +60,7 @@ public class Ts3SyncAPI {
 	 * to the param nickname
 	 * 
 	 * @param serverID from the virtual server
-	 * @param QueryBot nickname
+	 * @param nickname the bots nick
 	 */
 	public void connectTeamSpeakQuery(int serverID, String nickname) {
 		if (!this.isConnected()) {
@@ -77,10 +77,10 @@ public class Ts3SyncAPI {
 	/**
 	 * Selects the virtual server to connect to
 	 * 
-	 * @param serverid of the virtual server
+	 * @param server_id of the virtual server
 	 */
-	public void selectVirtualServer(int serverid) {
-		query.getWriter().executeReadErrorCommand("use " + serverid);
+	public void selectVirtualServer(int server_id) {
+		query.getWriter().executeReadErrorCommand("use " + server_id);
 	}
 
 	public void addTs3Listener(TsEvent event) {

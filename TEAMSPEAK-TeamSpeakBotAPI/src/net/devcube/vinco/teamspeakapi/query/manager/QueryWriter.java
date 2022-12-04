@@ -73,6 +73,7 @@ public class QueryWriter {
 	 * @param command
 	 */
 	private void executeCommand(String command) {
+		System.out.println("EXECUTING " + command + " WITHOUT QUEUEING FIRST - THIS WILL BREAK STUFF");
 		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");
 		writer.println(command);
 		writer.flush();
@@ -90,6 +91,10 @@ public class QueryWriter {
 		while (query.getReader().nextSaveError() == null);
 		return query.getReader().nextError();
 	}
+
+	public void queue_command(String command){
+		query.getReader().get_command_queue().add(command);
+	}
 	
 	/**
 	 * Idea of sending a Command and reading the following Message from the Server
@@ -100,19 +105,8 @@ public class QueryWriter {
 	public String[] executeReadCommand(String command) {
 		executeCommand(command);
 //		while (query.getReader().nextSavePacket() == null);
-		while (query.getReader().nextSaveError() == null);
-		return new String[] { query.getReader().nextPacket(), query.getReader().nextError() };
-	}
-	
-	public void executeAsyncCommand(String command) {
-		new Thread() {
-
-			public void run() {
-				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
-				writer.println(command);
-				writer.flush();
-			}
-
-		}.start();
+		while (query.getReader().peekResponse() == null);
+		// THIS DOES NOT WORK.
+		return new String[] { query.getReader().peekCommand(), query.getReader().peekResponse() };
 	}
 }

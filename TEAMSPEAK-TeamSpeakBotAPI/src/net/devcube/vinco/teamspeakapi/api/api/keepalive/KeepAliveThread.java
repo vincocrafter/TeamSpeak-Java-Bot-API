@@ -36,7 +36,9 @@ public class KeepAliveThread extends Thread {
 //			query.getReader().nextError();
 			
 			//Same as above with new Method
+			// TODO THIS CAN'T WORK
 			query.getWriter().executeReadCommand("version");
+
 			
 			try {
 				Thread.sleep(SLEEP);
