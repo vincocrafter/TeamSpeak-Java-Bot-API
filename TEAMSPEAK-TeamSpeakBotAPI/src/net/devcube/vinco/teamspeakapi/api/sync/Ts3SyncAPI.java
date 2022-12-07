@@ -67,7 +67,7 @@ public class Ts3SyncAPI {
 	 */
 	public void connectTeamSpeakQuery(int serverID, String nickname) {
 		if (!this.isConnected()) {
-			selectVirtualServer(serverID); // select the virtualServer
+			selectVirtualServer(serverID); // select the virtualServer, the query client should connect to, in case more than one virtual server is running
 			query.getWriter().executeReadErrorCommand("clientupdate client_nickname=" + Formatter.toTsFormat(nickname));
 			query.debug(DebugOutputType.QUERY, "Query is sucessfully connected");
 			setConnected(true);
@@ -140,13 +140,11 @@ public class Ts3SyncAPI {
 	}
 
 	public int getPermissionID(String permissionName) {
-		// "permidgetbyname permsid=" + permissionName
-		return -1;
+		return Integer.parseInt(query.getWriter().executeReadCommand("permidgetbyname permsid=" + permissionName)[0].split("permid=")[1]);
 	}
 
 	public String getPermissionName(int permissionID) {
-		// "permget permid=" + permissionID
-		return null;
+		return query.getWriter().executeReadCommand("permget permid=" + permissionID)[0].split("permsid=")[1].split(" ")[0];
 	}
 
 	public ArrayList<Permission> getPermissionList() {
@@ -184,13 +182,11 @@ public class Ts3SyncAPI {
 	}
 
 	public VirtualServerInfo getServerInfo() {
-		// "serverinfo"
-		return null;
+		return new VirtualServerInfo(query.getWriter().executeReadCommand("serverinfo")[0].split(" "));
 	}
 
 	public ConnectionInfo getConnectionInfo() {
-		// "serverrequestconnectioninfo"
-		return null;
+		return new ConnectionInfo(query.getWriter().executeReadCommand("serverrequestconnectioninfo")[0].split(" "));
 	}
 
 	public OfflineMessage getOfflineMessage(int id) {
@@ -211,8 +207,7 @@ public class Ts3SyncAPI {
 	}
 
 	public HostInfo getHostInfo() {
-		// "hostinfo;
-		return null;
+		return new HostInfo(query.getWriter().executeReadCommand("hostinfo")[0].split(" "));
 
 	}
 
@@ -224,37 +219,32 @@ public class Ts3SyncAPI {
 		}
 	}
 
-	public boolean isClientOnline(String uuid) {
+	public boolean isClientOnline(String clientUUID) {
 		// getOnlineClients().stream().anyMatch(c ->
 		// c.getClientUUID().equalsIgnoreCase(uuid));
 
 		for (ClientInfo clientinfo : getOnlineClients()) {
-			if (clientinfo.getClientUUID().equalsIgnoreCase(uuid)) {
+			if (clientinfo.getClientUUID().equalsIgnoreCase(clientUUID)) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
 	public String getClientName(String clientUUID) {
-		// "clientgetnamefromuid cluid=" + clientUUID
-		return null;
+		return query.getWriter().executeReadCommand("clientgetnamefromuid cluid=" + clientUUID)[0].split("name=")[1];
 	}
 
 	public String getClientName(int clientDataBaseID) {
-		// "clientgetnamefromdbid cldbid=" + clientDataBaseID
-		return null;
+		return query.getWriter().executeReadCommand("clientgetnamefromdbid cldbid=" + clientDataBaseID)[0].split("name=")[1];
 	}
 
 	public String getClientUUID(int clientDataBaseID) {
-		// "clientgetnamefromdbid cldbid=" + clientDataBaseID
-		return null;
+		return query.getWriter().executeReadCommand("clientgetnamefromdbid cldbid=" + clientDataBaseID)[0].split("cluid=")[1].split(" ")[0];
 	}
 
 	public int getClientDataBaseID(String clientUUID) {
-		// "clientgetdbidfromuid cluid=" + clientUUID
-		return -1;
+		return Integer.parseInt(query.getWriter().executeReadCommand("clientgetdbidfromuid cluid=" + clientUUID)[0].split("cldbid=")[1]);
 	}
 
 	public ClientInfo getClientInfo(int clientID) throws UnknownClientInfoException {
@@ -267,8 +257,7 @@ public class Ts3SyncAPI {
 	}
 
 	public ClientInfo getClient(int clientid) {
-		// "clientinfo clid=" + clientid
-		return null;
+		return new ClientInfo(query.getWriter().executeReadCommand("clientinfo clid=" + clientid)[0].split(" "));
 	}
 
 	public ClientInfo getClientByUUID(String uuid) {
