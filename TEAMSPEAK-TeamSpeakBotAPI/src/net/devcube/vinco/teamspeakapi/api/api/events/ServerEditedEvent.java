@@ -9,18 +9,23 @@ public class ServerEditedEvent extends BaseEvent {
 	}
 
 	public int getClientID() {
-		return toInt(get(2));
+		return toInt(get("invokerid"));
 	}
 
 	public String getClientName() {
-		return get(3);
+		return get("invokername");
 	}
 
 	public String getClientUUID() {
-		return get(4);
+		return get("invokeruid");
 	}
 
+	
+	/**
+	 * 
+	 * @return everytime 10, because it is the id for serverediting
+	 */
 	public int getReasonID() {
-		return toInt(get(1));
+		return toInt(get("reasonid"));
 	}
 }

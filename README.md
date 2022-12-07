@@ -26,3 +26,15 @@ query.getEventManager().addTs3Listener(new TsEventAdapter() {
 			}
 		});
 ```
+
+Or:
+```java
+public class Events extends TsEventAdapter {
+	
+	@EventHandler
+	public void clientMoveEvent(ClientMoveEvent e) {
+		//Event handeling here
+	}
+	
+}
+```

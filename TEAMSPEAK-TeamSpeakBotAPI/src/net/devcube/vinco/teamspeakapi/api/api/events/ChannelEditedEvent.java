@@ -9,18 +9,28 @@ public class ChannelEditedEvent extends BaseEvent {
 	}
 
 	public int getClientID() {
-		return Integer.parseInt(this.get(5));
+		return toInt(get("invokerid"));
 	}
 
 	public String getClientName() {
-		return this.get(4);
+		return get("invokername");
 	}
-
-	public int getChannelID() {
-		return Integer.parseInt(this.get(1));
-	}
-
+	
 	public String getClientUUID() {
-		return this.get(5);
+		return get("invokeruid");
 	}
+	
+	public int getChannelID() {
+		return toInt(get("cid"));
+	}
+	
+	
+	/**
+	 * 
+	 * @return everytime 10, because it is the id for channelediting
+	 */
+	public int getReasonID() {
+		return toInt(get("reasonid"));
+	}
+	
 }

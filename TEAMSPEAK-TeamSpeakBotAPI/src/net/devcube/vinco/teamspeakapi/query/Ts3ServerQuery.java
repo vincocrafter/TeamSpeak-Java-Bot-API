@@ -209,7 +209,13 @@ public class Ts3ServerQuery {
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
-
+	
+	public String getLogDate() {
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("YYYY/MM/dd");
+		Date date = new Date();
+		return simpledateformat.format(date);
+	}
+	
 	/**
 	 * new debug Method for more specified debugging and outputting
 	 * 

@@ -8,24 +8,16 @@ public class ClientMoveEvent extends BaseEvent {
 		super(infos);
 	}
 
-	public String[] getInfos() {
-		return super.getInfos();
-	}
-
-	public String getClientName() {
-		return "";
-	}
-
 	public int getClientID() {
-		return Integer.parseInt(get(3));
+		return toInt(get("clid"));
 	}
 
 	public int getReasonID() {
-		return Integer.parseInt(get(2));
+		return toInt(get("reasonid"));
 	}
 
 	public int getTargetChannelID() {
-		return Integer.parseInt(get(1));
+		return toInt(get("ctid"));
 	}
 
 	public String toString() {

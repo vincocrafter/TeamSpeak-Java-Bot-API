@@ -119,7 +119,7 @@ public class Logger {
 	}
 
 	private void writeInLog(String infos) {
-		String date = getServerQuery().getDate();
+		String date = getServerQuery().getLogDate();
 		File cfg = new File("Logs/Log " + date.replace("/", ".") + ".txt");
 		if (!new File("Logs").exists()) {
 			new File("Logs/").mkdir();

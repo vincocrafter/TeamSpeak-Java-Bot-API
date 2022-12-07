@@ -17,7 +17,17 @@ public class BaseEvent {
 			return "";
 		}
 	}
-
+	
+	public String get(String value_name) {
+        for (String s : infos) {
+            String[] split = s.split("=");
+            if(split[0].equals(value_name)){
+            	return split.length < 2 ? null : split[1];
+            }
+        }
+        return "";
+    }
+	
 	public String[] getInfos() {
 		return this.infos;
 	}
@@ -31,11 +41,11 @@ public class BaseEvent {
 	}
 
 	public int getClientID() {
-		return toInt(this.get(4));
+		return -1;
 	}
 
 	public String getClientName() {
-		return get(6);
+		return "";
 	}
 
 	public int toInt(String s) {
