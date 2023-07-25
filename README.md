@@ -1,7 +1,16 @@
 # TeamSpeak-Java-Bot-API
-Java solution for using the Teamspeak Query Interface and a Socket connection.
+A Java solution using the Teamspeak Query Interface and a Socket connection.
 
-Usage:
+## Features:
+- Contains everything from the TeamSpeak Query Manual
+- Keeps the connection to the server using a KeepAliveThread
+- Event system using threads
+- Advanced options for debugging and logging
+- Synchronous and asynchronous API
+
+## Usage:
+Everything the API needs is in the `Ts3ServerQuery` Class and the
+`Ts3SyncAPI` Class.
 ```java
 public class Test {
     
@@ -12,29 +21,22 @@ public class Test {
         } catch (IOException | QueryLoginException e) {
             e.printStackTrace();
         }
-
     }
 }
 ```
-Using the Teamspeak Events:
-```java
-query.getEventManager().addTs3Listener(new TsEventAdapter() {
-			//Override Methods here,
-			@Override
-			public void onChannelCreate(ChannelCreateEvent e) {
-				
-			}
-		});
-```
+## Getting Started:
+See [How to start with the API](GettingStarted.md).
 
-Or:
-```java
-public class Events extends TsEventAdapter {
-	
-	@EventHandler
-	public void clientMoveEvent(ClientMoveEvent e) {
-		//Event handeling here
-	}
-	
-}
-```
+## How to use debugging:
+See [How to debug with the API](Debugging.md) or [Advanced Debugging](AdvancedDebugging.md).\
+Or see [Example Log](ExampleDebugLog.md).
+
+## Getting advanced Information:
+See [AdvancedAPI usage](AdvancedAPI.md).
+
+## FloodRate:
+The Floodrate for the TsAPI is set to 0 ms per default (`FloodRate.DEFAULT_TSAPI`).\
+TeamSpeaks default Floodrate is set to 350 ms (`FloodRate.DEFAULT`).\
+(`FloodRate.UNLIMITED`) is set to 0 like the `FloodRate.DEFAULT_TSAPI` so it does not
+matter which one you choose and you do not have to set this one in the most chases.\
+Or set a custom value with `FloodRate.custom(300)`.
