@@ -3,6 +3,7 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerStatus;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class VirtualServerInfo extends DefaultInfo {
@@ -14,17 +15,39 @@ public class VirtualServerInfo extends DefaultInfo {
 	public String getServerUUID() {
 		return get("virtualserver_unique_identifier");
 	}
+	
+	public String getUUID() {
+		return getServerUUID();
+	}
 
 	public String getServerName() {
 		return get("virtualserver_name");
+	}
+	
+	public String getName() {
+		return getServerName();
 	}
 
 	public String getWelcomeMessage() {
 		return Formatter.toNormalFormat(get("virtualserver_welcomemessage"));
 	}
-
+	
+	public VirtualServerStatus getStatus() {
+		String status = get("virtualserver_status");
+		for (VirtualServerStatus serverStatus : VirtualServerStatus.values()) {
+			if (serverStatus.equals(status)) {
+				return serverStatus;
+			}
+		}
+		return null;
+	}
+	
 	public int getServerID() {
 		return toInt(get("virtualserver_id"));
+	}
+	
+	public int getID() {
+		return getServerID();
 	}
 
 	public String getPlatform() {
@@ -282,14 +305,13 @@ public class VirtualServerInfo extends DefaultInfo {
 	public String toString() {
 		StringBuilder s = new StringBuilder("VirtualServer[");
 		
-		s.append("ServerName=" + getServerName());
-		s.append("ServerID=" + getServerID());
-		s.append("ServerUUID=" + getServerUUID());
-		s.append("MaxClientsOnline=" + getMaxclients());
-		s.append("OnlineClients=" + getOnlineClientsSize());
-		s.append("Channels=" + getChannels());
-		s.append("HostMessage=" + getHostMessage());
-		s.append("OnlineTime=" + getOnlineTime());
+		s.append("Name=" + getServerName() + ", ");
+		s.append("ID=" + getServerID() + ", ");
+		s.append("UUID=" + getServerUUID() + ", ");
+		s.append("MaxClientsOnline=" + getMaxclients() + ", ");
+		s.append("OnlineClients=" + getOnlineClientsSize() + ", ");
+		s.append("Channels=" + getChannels() + ", ");
+		s.append("OnlineTime=" + getOnlineTime() + ", ");
 		s.append("CreatedDate=" + getCreatingDate());
 		s.append("]");
 		return s.toString();

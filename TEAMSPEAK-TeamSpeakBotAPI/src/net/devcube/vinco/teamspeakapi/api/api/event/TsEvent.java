@@ -4,6 +4,7 @@ import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDeletedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDescriptionEditedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelEditedEvent;
+import net.devcube.vinco.teamspeakapi.api.api.events.ChannelMovedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelPasswordChangedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientJoinEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientLeaveEvent;
@@ -25,6 +26,8 @@ public interface TsEvent {
    void onServerEdit(ServerEditedEvent e);
 
    void onChannelEdit(ChannelEditedEvent e);
+   
+   void onChannelMoved(ChannelMovedEvent e);
 
    void onChannelDescriptionChanged(ChannelDescriptionEditedEvent e);
 

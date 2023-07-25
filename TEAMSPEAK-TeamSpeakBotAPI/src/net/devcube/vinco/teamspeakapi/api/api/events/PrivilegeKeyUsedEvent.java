@@ -1,34 +1,42 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class PrivilegeKeyUsedEvent extends BaseEvent {
 
-	public PrivilegeKeyUsedEvent(String[] infos) {
-		super(infos);
+	
+	public PrivilegeKeyUsedEvent(String[] infos, Ts3ServerQuery serverQuery) {
+		super(infos, serverQuery);
+		// TODO Auto-generated constructor stub
 	}
 
 	public int getClientID() {
-		return this.toInt(this.get(1));
+		return toInt(get("clid"));
 	}
 
 	public int getClientDataBaseID() {
-		return this.toInt(this.get(2));
+		return toInt(get("cldbid"));
 	}
 
 	public String getClientUUID() {
-		return this.get(3);
+		return get("cluid");
 	}
 
 	public String getToken() {
-		return this.get(4);
+		return get("token");
 	}
 
 	public int getGroupID() {
-		return this.toInt(this.get(6));
+		return toInt(get("token1"));
 	}
 
 	public int getChannelID() {
-		return this.toInt(this.get(7));
+		return toInt(get("token2"));
+	}
+
+	public PrivilegeKeyType getKeyType() {
+		return getChannelID() == 0 ? PrivilegeKeyType.CHANNEL_GROUP : PrivilegeKeyType.SERVER_GROUP;
 	}
 }

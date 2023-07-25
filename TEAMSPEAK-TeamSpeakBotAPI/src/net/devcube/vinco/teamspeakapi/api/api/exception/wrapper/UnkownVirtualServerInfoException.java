@@ -1,15 +1,15 @@
 package net.devcube.vinco.teamspeakapi.api.api.exception.wrapper;
 
-public class UnkownVirtualServerInfo extends Throwable {
+public class UnkownVirtualServerInfoException extends Exception {
 	
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1656152312213321L;
 	
 	String message;
 
-	public UnkownVirtualServerInfo() {
+	public UnkownVirtualServerInfoException() {
 	}
 
-	public UnkownVirtualServerInfo(String msg) {
+	public UnkownVirtualServerInfoException(String msg) {
 		this.message = msg;
 	}
 

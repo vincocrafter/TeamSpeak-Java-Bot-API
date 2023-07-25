@@ -73,9 +73,10 @@ public class QueryWriter {
 	 * @param command
 	 */
 	private void executeCommand(String command) {
-		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");
-		writer.println(command);
-		writer.flush();
+		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");		 
+		query.getReader().getCommands().add(command);
+		//writer.println(command);
+		//writer.flush();
 	}
 	
 	/**
@@ -86,33 +87,43 @@ public class QueryWriter {
 	 * @return {Errors}
 	 */
 	public String executeReadErrorCommand(String command) {
-		executeCommand(command);
-		while (query.getReader().nextSaveError() == null);
-		return query.getReader().nextError();
+		return executeReadCommand(command)[1];
 	}
 	
 	/**
 	 * Idea of sending a Command and reading the following Message from the Server
 	 * 
 	 * @param command
-	 * @return {Normal Packets, Errors}
+	 * @return {Normal Packet, Error}
 	 */
-	public String[] executeReadCommand(String command) {
+	public synchronized String[] executeReadCommand(String command) {
 		executeCommand(command);
-//		while (query.getReader().nextSavePacket() == null);
-		while (query.getReader().nextSaveError() == null);
-		return new String[] { query.getReader().nextPacket(), query.getReader().nextError() };
+		
+		while (!query.getReader().isCommandFinished(command));
+	
+		String packets = query.getReader().nextPacket();
+		String errors = query.getReader().nextError();
+		return new String[] { packets, errors };
 	}
 	
+	/**
+	 * Möglich Werte zurückzubekommen????
+	 * return String[] ?
+	 * @param command
+	 */
+	
 	public void executeAsyncCommand(String command) {
-		new Thread() {
+		new Thread(new Runnable() {
 
 			public void run() {
+				while(!query.getReader().isAsyncCommandAllowed());
 				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
-				writer.println(command);
-				writer.flush();
+				query.getReader().getCommands().add(command);
+				while (!query.getReader().isCommandFinished(command));
+				query.getReader().nextPacket();
+				query.getReader().nextError();
 			}
 
-		}.start();
+		}, "ASYNC").start();
 	}
 }

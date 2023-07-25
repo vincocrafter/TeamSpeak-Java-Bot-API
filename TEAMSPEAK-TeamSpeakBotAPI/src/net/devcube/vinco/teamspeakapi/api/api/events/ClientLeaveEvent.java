@@ -1,21 +1,24 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class ClientLeaveEvent extends BaseEvent {
 
-	public ClientLeaveEvent(String[] infos) {
-		super(infos);
+	public ClientLeaveEvent(String[] infos, Ts3ServerQuery serverQuery) {
+		super(infos, serverQuery);
 	}
-	
+
 	/**
 	 * You should not try to use 
-	 * Ts3SyncAPI.getClientInfo() or
-	 * Ts3SyncAPI.getClient()
+	 * getClientInfo() or
+	 * getClient()
 	 * because the Client is already Offline and the result would be null.
-	 * @see Ts3SyncAPI.getClientInfo()
-	 * @see Ts3SyncAPI.getClient()
+	 * 
+	 * @see Ts3SyncAPI#getClientInfo()
+	 * @see Ts3SyncAPI#getClient()
 	 */
 	
 	@Override
@@ -60,7 +63,7 @@ public class ClientLeaveEvent extends BaseEvent {
 	}
 	
 	public String getInvokerName() {
-		return get("invokername");
+		return Formatter.toNormalFormat(get("invokername"));
 	}
 	
 	public String getInvokerUUID() {

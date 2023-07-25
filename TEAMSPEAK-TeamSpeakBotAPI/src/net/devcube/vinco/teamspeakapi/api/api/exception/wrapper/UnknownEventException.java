@@ -11,9 +11,9 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.exception.wrapper;
 
-public class UnknownEventException extends Throwable {
+public class UnknownEventException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1986497868446754L;
 
 	String message;
 

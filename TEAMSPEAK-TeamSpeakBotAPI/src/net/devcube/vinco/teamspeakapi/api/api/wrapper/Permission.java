@@ -62,6 +62,7 @@ public class Permission {
 		this(permName, -1, -1, false, false, permDesc);
 	}
 
+	
 
 	public String getPermName() {
 		return this.permName;
@@ -85,5 +86,16 @@ public class Permission {
 
 	public boolean isSkip() {
 		return this.skip;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder resultBuilder = new StringBuilder("Permission[");
+		resultBuilder.append("ID=" + getPermID());
+		resultBuilder.append(",Value=" + getPermValue());
+		resultBuilder.append(",Negated=" + isNegated());
+		resultBuilder.append(",Skip=" + isSkip());
+		resultBuilder.append("]");
+		return  resultBuilder.toString();
 	}
 }

@@ -11,16 +11,16 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.exception.query;
 
-public class QueryLoginException extends Exception {
+public class InsufficientClientPermissionException extends Exception {
 
-	private static final long serialVersionUID = 1685446564654566564L;
+	private static final long serialVersionUID = 1222321221202133321L;
 
 	String message;
 
-	public QueryLoginException() {
+	public InsufficientClientPermissionException() {
 	}
 
-	public QueryLoginException(String msg) {
+	public InsufficientClientPermissionException(String msg) {
 		this.message = msg;
 	}
 
@@ -28,7 +28,7 @@ public class QueryLoginException extends Exception {
 		if (this.message != null) {
 			System.err.println(this.message);
 		} else {
-			System.err.println("The Username or Password is wrong");
+			System.err.println("You do not have the needed permissions to perform the use command!");
 		}
 		super.printStackTrace();
 	}

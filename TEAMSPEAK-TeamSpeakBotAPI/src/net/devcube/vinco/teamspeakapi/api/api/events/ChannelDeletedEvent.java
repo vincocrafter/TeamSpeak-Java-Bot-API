@@ -1,30 +1,33 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class ChannelDeletedEvent extends BaseEvent {
 
-	public ChannelDeletedEvent(String[] infos) {
-		super(infos);
+	
+	public ChannelDeletedEvent(String[] infos, Ts3ServerQuery serverQuery) {
+		super(infos, serverQuery);
 	}
 
 	public String getClientName() {
-		return this.get(2);
+		return Formatter.toNormalFormat(get("invokername"));
 	}
 
 	public int getClientID() {
-		return Integer.parseInt(this.get(1));
+		return toInt(get("invokerid"));
 	}
 
 	public String getClientUUID() {
-		return this.get(3);
+		return get("invokeruid");
 	}
 
 	public int getChannelID() {
-		return Integer.parseInt(this.get(4));
+		return toInt(get("cid"));
 	}
 
 	public String toString() {
-		return "ChannelDeleteEvent[ClientID=" + this.getClientID() + ",ClientName=" + this.getClientName() + ",ClientUUID=" + this.getClientUUID() + ",ChannelID=" + this.getChannelID() + "]";
+		return "ChannelDeleteEvent[ClientID=" + getClientID() + ",ClientName=" + getClientName() + ",ClientUUID=" + getClientUUID() + ",ChannelID=" + getChannelID() + "]";
 	}
 }

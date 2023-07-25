@@ -13,12 +13,12 @@ package net.devcube.vinco.teamspeakapi.api.async;
 
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
-public class Ts3AnsycAPI {
+public class Ts3AsycAPI {
 		
 	private Ts3ServerQuery query;
 	
 	
-	public Ts3AnsycAPI(Ts3ServerQuery query ) {
+	public Ts3AsycAPI(Ts3ServerQuery query ) {
 		this.query = query;
 	}
 	

@@ -3,9 +3,9 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
-public class ServerGroup extends DefaultInfo {
+public class ServerGroupInfo extends DefaultInfo {
 
-	public ServerGroup(String[] infos) {
+	public ServerGroupInfo(String[] infos) {
 		super(infos);
 	}
 
@@ -60,6 +60,6 @@ public class ServerGroup extends DefaultInfo {
 	}
 
 	public String toString() {
-		return "ServerGruppe[ServerGroupName=" + getName() + ",GroupID=" + getID() + ",SortID=" + getSortID() + ",Type=" + getType() + ",IconID=" + getIconID() + "]";
+		return "ServerGroup[Name=" + getName() + ",ID=" + getID() + "]";
 	}
 }

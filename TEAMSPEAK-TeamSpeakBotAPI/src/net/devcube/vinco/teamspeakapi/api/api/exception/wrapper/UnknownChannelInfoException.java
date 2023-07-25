@@ -1,15 +1,15 @@
 package net.devcube.vinco.teamspeakapi.api.api.exception.wrapper;
 
-public class UnknownChannelException extends Throwable {
+public class UnknownChannelInfoException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 111257498768565464L;
 
 	String message;
 
-	public UnknownChannelException() {
+	public UnknownChannelInfoException() {
 	}
 
-	public UnknownChannelException(String msg) {
+	public UnknownChannelInfoException(String msg) {
 		this.message = msg;
 	}
 

@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
@@ -12,28 +13,32 @@ public class ClientInfo extends DefaultInfo {
 		super(infos);
 	}
 
-	public String[] getClientInfos() {
-		return infos;
-	}
-
-	public String getClientName() {
+	public String getName() {
 		return Formatter.toNormalFormat(get("client_nickname"));
 	}
 
 	public String getNickName() {
-		return getClientName();
+		return getName();
 	}
 
-	public String getClientUUID() {
+	public String getUUID() {
 		return get("client_unique_identifier");
+	}
+	
+	public String getClientUUID() {
+		return getUUID();
+	}
+
+	public int getID() {
+		return toInt(get("clid"));
 	}
 
 	public int getClientID() {
-		return toInt(get("cid"));
+		return getID();
 	}
-
-	public int getClientDatabaseID() {
-		return toInt("client_database_id");
+	
+	public int getClientDataBaseID() {
+		return toInt(get("client_database_id"));
 	}
 
 	public String getPlatform() {
@@ -56,8 +61,8 @@ public class ClientInfo extends DefaultInfo {
 		return get("client_is_recording").equalsIgnoreCase("1");
 	}
 
-	public ArrayList<Integer> getServerGroups() {
-		ArrayList<Integer> arraylist = new ArrayList<Integer>();
+	public List<Integer> getServerGroups() {
+		List<Integer> arraylist = new ArrayList<Integer>();
 		if (get("client_servergroups").contains(",")) {
 			String[] astring = get("client_servergroups").split(",");
 			for (String s : astring) {
@@ -70,7 +75,7 @@ public class ClientInfo extends DefaultInfo {
 		return arraylist;
 	}
 
-	public long getCreated() {
+	public long getCreatingTime() {
 		return toLong(get("client_created"));
 	}
 
@@ -98,7 +103,7 @@ public class ClientInfo extends DefaultInfo {
 		return getServerGroups().contains(groupid);
 	}
 
-	public long getLastConncetion() {
+	public long getLastConnection() {
 		return toLong(get("client_lastconnected"));
 	}
 
@@ -138,12 +143,12 @@ public class ClientInfo extends DefaultInfo {
 		return toInt(get("client_totalconnections"));
 	}
 
-	public int getTotalConncetions() {
+	public int getTotalConnections() {
 		return getAllTimeConnections();
 	}
 
 	public boolean hasMyTeamspeakID() {
-		return !getMyTeamspeakID().equalsIgnoreCase("");
+		return !getMyTeamspeakID().isEmpty();
 	}
 
 	public String getMyTeamspeakID() {
@@ -155,19 +160,19 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public boolean isTalker() {
-		return toBol(toInt(get("client_is_talker")));
+		return toBol(get("client_is_talker"));
 	}
 
 	public boolean isPrioritySpeaker() {
-		return toBol(toInt(get("client_is_priority_speaker")));
+		return toBol(get("client_is_priority_speaker"));
 	}
 
 	public boolean isChannelCommander() {
-		return toBol(toInt(get("client_is_channel_commander")));
+		return toBol(get("client_is_channel_commander"));
 	}
 
 	public boolean isTalkPowerRequesting() {
-		return toBol(toInt(get("client_talk_request")));
+		return toBol(get("client_talk_request"));
 	}
 
 	public String getTalkPowerRequestMsg() {
@@ -175,7 +180,7 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public boolean hasPhoneticName() {
-		return !getPhoneticName().equalsIgnoreCase("");
+		return !getPhoneticName().isEmpty();
 	}
 
 	public String getPhoneticName() {
@@ -183,7 +188,16 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public int getDefaultChannelID() {
-		String s = get("client_default_channel").replace("\\/", "");
-		return !s.equalsIgnoreCase("") && !s.isEmpty() ? toInt(s) : -1;
+		String s = Formatter.toNormalFormat(get("client_default_channel"));
+		return s.isEmpty() ? 0 : toInt(s);
+	}
+	
+	public boolean isClientTalking() {
+		return toBol(get("client_flag_talking"));
+	}
+	
+	@Override
+	public String toString() {
+		return "Client[Name=" + getName() + ",ID=" + getID() + ",UUID=" + getUUID() + "]";
 	}
 }

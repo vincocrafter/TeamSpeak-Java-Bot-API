@@ -24,7 +24,9 @@ import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
-import net.devcube.vinco.teamspeakapi.api.async.Ts3AnsycAPI;
+import net.devcube.vinco.teamspeakapi.api.api.util.TSError;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AsycAPI;
+import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
@@ -44,7 +46,9 @@ public class Ts3ServerQuery {
 	private QueryConfig config = new QueryConfig(this);
 
 	private Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
-	private Ts3AnsycAPI ansycAPI = new Ts3AnsycAPI(this);
+	private Ts3AsycAPI asycAPI = new Ts3AsycAPI(this);
+	private Ts3BasicAPI basicAPI = new Ts3BasicAPI(this);
+	
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
 	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
@@ -64,27 +68,39 @@ public class Ts3ServerQuery {
 	 * @throws QueryLoginException
 	 */
 
-	public void connect(String host, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
-		socket = new Socket(host, port);
+	public void connect(String hostname, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
+		socket = new Socket(hostname, port);
 		reader = new QueryReader(this, socket);
 		writer = new QueryWriter(this, socket);
 		reader.start(); // starts the reader Thread
 
-		// Getting out first two automatic messages
-		while (reader.nextSavePacket() == null)
-			;
-		reader.nextPacket();
-		while (reader.nextSavePacket() == null)
+		// retrive the first meesages from the server
+		while (reader.getResultPackets().peek().size() < 2)
 			;
 		reader.nextPacket();
 
 		login(username, password);
 		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
-		registerAllEvents();
-		syncAPI.goToChannel(defaultchannelID);
+		if (defaultchannelID != -1)
+			syncAPI.goToChannel(defaultchannelID);
 		socket.setKeepAlive(true);
 		keepAliveThread.start(); // starts KeepAlivThread
+		registerAllEvents();
+	}
 
+	public void connect(String hostname, int port) throws IOException {
+		socket = new Socket(hostname, port);
+		reader = new QueryReader(this, socket);
+		writer = new QueryWriter(this, socket);
+		reader.start(); // starts the reader Thread
+
+		// retrive the first meesages from the server
+		while (reader.getResultPackets().peek().size() < 2)
+			;
+		reader.nextPacket();
+
+		socket.setKeepAlive(true);
+		keepAliveThread.start(); // starts KeepAlivThread
 	}
 
 	/**
@@ -93,11 +109,12 @@ public class Ts3ServerQuery {
 	 * @param username
 	 * @param password
 	 */
-	private void login(String username, String password) throws QueryLoginException {
+	public void login(String username, String password) throws QueryLoginException {
 		String res = writer.executeReadErrorCommand("login " + username + " " + password);
-		if (res.equalsIgnoreCase("error id=520 msg=invalid\\sloginname\\sor\\spassword")) {
-			debug(DebugOutputType.QUERY, "Login failed");
-			throw new QueryLoginException();
+
+		if (TSError.isError(res, TSError.QUERY_INVALID_LOGIN)) {
+			debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
+			throw new QueryLoginException("Invalid loginname or password!");
 		} else {
 			debug(DebugOutputType.QUERY, "Logged in sucessfully");
 		}
@@ -109,14 +126,16 @@ public class Ts3ServerQuery {
 	 */
 
 	public void stopQuery() {
-		writer.executeReadCommand("quit");
+		debug(DebugOutputType.QUERY, "Stopping Query");
 		keepAliveThread.interrupt();
+		writer.executeReadErrorCommand("quit");
 		try {
 			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		reader.stopThreads();
 	}
 
 	/**
@@ -124,14 +143,13 @@ public class Ts3ServerQuery {
 	 */
 
 	public void registerAllEvents() {
-		debug(DebugOutputType.QUERY, "Registering all Events");
-
 		writer.executeReadErrorCommand("servernotifyregister event=server");
 		writer.executeReadErrorCommand("servernotifyregister event=channel id=0");
 		writer.executeReadErrorCommand("servernotifyregister event=textserver");
 		writer.executeReadErrorCommand("servernotifyregister event=textchannel");
 		writer.executeReadErrorCommand("servernotifyregister event=textprivate");
 		writer.executeReadErrorCommand("servernotifyregister event=tokenused");
+		debug(DebugOutputType.QUERY, "Registered all Events");
 	}
 
 	/**
@@ -174,10 +192,17 @@ public class Ts3ServerQuery {
 	/**
 	 * @return the ansycAPI
 	 */
-	public Ts3AnsycAPI getAnsycAPI() {
-		return ansycAPI;
+	public Ts3AsycAPI getAsycAPI() {
+		return asycAPI;
 	}
 
+	/**
+	 * @return the basicAPI
+	 */
+	public Ts3BasicAPI getBasicAPI() {
+		return basicAPI;
+	}
+	
 	/**
 	 * @return the eventManager
 	 */
@@ -201,6 +226,7 @@ public class Ts3ServerQuery {
 		}
 		SimpleDateFormat simpledateformat = new SimpleDateFormat(format);
 		Date date = new Date();
+		
 		return simpledateformat.format(date);
 	}
 
@@ -209,15 +235,15 @@ public class Ts3ServerQuery {
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
-	
+
 	public String getLogDate() {
 		SimpleDateFormat simpledateformat = new SimpleDateFormat("YYYY/MM/dd");
 		Date date = new Date();
 		return simpledateformat.format(date);
 	}
-	
+
 	/**
-	 * new debug Method for more specified debugging and outputting
+	 * New debug Method for more specified debugging and outputting
 	 * 
 	 * @param type
 	 * @param debug
@@ -226,48 +252,57 @@ public class Ts3ServerQuery {
 	 * @see QueryConfig
 	 */
 
-
-	public void debug(DebugOutputType type, String debug) {
+	public synchronized void debug(DebugOutputType type, String debug) {
 		int logLevel = -1;
 		switch (type) {
 		case GENERAL:
 			if (config.isGeneralDebug() || config.isEverything()) {
-				logLevel = 1;
+				logLevel = Logger.INFO;
 			}
 			break;
 		case EVENTMANAGER:
 			if (config.isEventManagerDebug() || config.isEverything()) {
-				logLevel = 5;
+				logLevel = Logger.EVENT_MANAGER;
 			}
 			break;
 		case KEEPALIVETHREAD:
 			if (config.isKeepAliveThreadDebug() || config.isEverything()) {
-				logLevel = 1;
+				logLevel = Logger.INFO;
 			}
 			break;
 		case QUERY:
 			if (config.isQueryDebug() || config.isEverything()) {
-				logLevel = 5;
+				logLevel = Logger.QUERY;
 			}
 			break;
 		case QUERYREADER:
 			if (config.isQueryReaderDebug() || config.isEverything()) {
-				logLevel = 7;
+				logLevel = Logger.QUERY_READER;
 			}
 			break;
 		case QUERYREADERQUEUE:
 			if (config.isQueryReaderQueueDebug() || config.isEverything()) {
-				logLevel = 8;
+				logLevel = Logger.QUERY_READER_QUEUE;
 			}
 			break;
 		case QUERYWRITER:
 			if (config.isQueryWriterDebug() || config.isEverything()) {
-				logLevel = 6;
+				logLevel = Logger.QUERY_WRITER;
+			}
+			break;
+		case WARNING:
+			if (config.isWarningDebug() || config.isEverything()) {
+				logLevel = Logger.WARING;
+			}
+			break;
+		case ERROR:
+			if (config.isErrorDebug() || config.isEverything()) {
+				logLevel = Logger.ERROR;
 			}
 			break;
 		default:
 			if (config.isInDebug(type) || config.isEverything()) {
-				logLevel = 5;
+				logLevel = Logger.EVENT_MANAGER;
 			}
 			break;
 		}

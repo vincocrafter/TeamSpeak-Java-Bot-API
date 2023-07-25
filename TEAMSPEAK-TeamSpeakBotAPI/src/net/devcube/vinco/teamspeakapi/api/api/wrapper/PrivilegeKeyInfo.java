@@ -2,9 +2,9 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
 
-public class PrivilegeKey extends DefaultInfo {
+public class PrivilegeKeyInfo extends DefaultInfo {
 
-	public PrivilegeKey(String[] infos) {
+	public PrivilegeKeyInfo(String[] infos) {
 		super(infos);
 	}
 
@@ -41,5 +41,16 @@ public class PrivilegeKey extends DefaultInfo {
 
 	public int getKeyType() {
 		return toInt(get("token_type"));
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder resultBuilder = new StringBuilder("PrivilegeKey[");
+		resultBuilder.append("Key=" + getKey());
+		resultBuilder.append(",Type=" + getType());
+		resultBuilder.append(",ServerGroupID=" + getServerGroup());
+		resultBuilder.append(",ChannelID=" + getChannelID());
+		resultBuilder.append("]");
+		return  resultBuilder.toString();
 	}
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
+import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryConfig {
@@ -39,10 +40,12 @@ public class QueryConfig {
 	 * idea of specify much more the types of output, array to select more as one
 	 * type for more detailed debugging
 	 * 
-	 * @see Ts3ServerQuery.debug()
+	 * @see Ts3ServerQuery#debug()
 	 */
 	private ArrayList<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
-
+	
+	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
+	
 	public QueryConfig(Ts3ServerQuery query) {
 		this.query = query;
 	}
@@ -70,7 +73,11 @@ public class QueryConfig {
 	public void setEventCallType(EventCallType eventCallType) {
 		this.eventCallType = eventCallType;
 	}
-
+	
+	public boolean isEventCallType(EventCallType eventCallType) {
+		return this.eventCallType == eventCallType;
+	}
+	
 	/**
 	 * @return the debugType
 	 */
@@ -95,7 +102,6 @@ public class QueryConfig {
 		return debuglist;
 	}
 
-	// new booleans for new Method
 
 	public void addDebugItem(DebugOutputType debugOutputType) {
 		debuglist.add(debugOutputType);
@@ -119,6 +125,14 @@ public class QueryConfig {
 
 	public boolean isGeneralDebug() {
 		return isInDebug(DebugOutputType.GENERAL);
+	}
+	
+	public boolean isErrorDebug() {
+		return isInDebug(DebugOutputType.ERROR);
+	}
+
+	public boolean isWarningDebug() {
+		return isInDebug(DebugOutputType.WARNING);
 	}
 
 	public boolean isEventManagerDebug() {
@@ -177,5 +191,19 @@ public class QueryConfig {
 	 */
 	public void setShowDate(boolean showDate) {
 		this.showDate = showDate;
+	}
+	
+	/**
+	 * @return the floodRate
+	 */
+	public FloodRate getFloodRate() {
+		return floodRate;
+	}
+	
+	/**
+	 * @param floodRate the floodRate to set
+	 */
+	public void setFloodRate(FloodRate floodRate) {
+		this.floodRate = floodRate;
 	}
 }

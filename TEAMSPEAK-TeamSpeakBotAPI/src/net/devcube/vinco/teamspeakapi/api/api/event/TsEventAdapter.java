@@ -4,6 +4,7 @@ import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDeletedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDescriptionEditedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelEditedEvent;
+import net.devcube.vinco.teamspeakapi.api.api.events.ChannelMovedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelPasswordChangedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientJoinEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientLeaveEvent;
@@ -31,7 +32,10 @@ public abstract class TsEventAdapter implements TsEvent {
 
 	public void onChannelEdit(ChannelEditedEvent e) {
 	}
-
+	
+	public void onChannelMoved(ChannelMovedEvent e) {
+	}
+	
 	public void onChannelDescriptionChanged(ChannelDescriptionEditedEvent e) {
 	}
 

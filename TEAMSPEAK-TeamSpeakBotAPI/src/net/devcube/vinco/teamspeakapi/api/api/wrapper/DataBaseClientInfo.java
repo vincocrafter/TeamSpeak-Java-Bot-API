@@ -28,7 +28,7 @@ public class DataBaseClientInfo extends DefaultInfo {
 		return toLong(get("client_lastconnected"));
 	}
 
-	public int getConnections() {
+	public int getTotalConnections() {
 		return toInt(get("client_totalconnections"));
 	}
 
@@ -38,5 +38,15 @@ public class DataBaseClientInfo extends DefaultInfo {
 
 	public String getDescription() {
 		return Formatter.toNormalFormat(get("client_description"));
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("DataBaseClient[");
+		sb.append("UUID=" + getClientUUID() + ", ");
+		sb.append("DBID=" + getClientDataBaseID() + ", ");
+		sb.append("Name=" + getClientName());
+		sb.append("]");
+		return sb.toString();
 	}
 }

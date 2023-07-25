@@ -2,9 +2,9 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
-public class Complain extends DefaultInfo {
+public class ComplainInfo extends DefaultInfo {
 
-	public Complain(String[] infos) {
+	public ComplainInfo(String[] infos) {
 		super(infos);
 	}
 
@@ -30,5 +30,17 @@ public class Complain extends DefaultInfo {
 
 	public long getTime() {
 		return toLong(get("timestamp"));
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder resultBuilder = new StringBuilder("Complain[");
+		resultBuilder.append("TargetName=" + getTargetName());
+		resultBuilder.append(",TargetDBID=" + getTargetClientDataBaseID());
+		resultBuilder.append(",SenderName=" + getSenderName());
+		resultBuilder.append(",SenderDBID=" + getSenderClientDataBaseID());
+		resultBuilder.append(",Message=" + getMessage());
+		resultBuilder.append("]");
+		return  resultBuilder.toString();
 	}
 }

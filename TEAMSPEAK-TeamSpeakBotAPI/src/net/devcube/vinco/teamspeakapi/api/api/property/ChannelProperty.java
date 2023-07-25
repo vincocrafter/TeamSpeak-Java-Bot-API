@@ -11,7 +11,6 @@ public enum ChannelProperty {
    CHANNEL_ORDER("channel_order"),
    CHANNEL_FLAG_PERMANENT("channel_flag_permanent"),
    CHANNEL_FLAG_SEMI_PERMANENT("channel_flag_semi_permanent"),
-   CHANNEL_FLAG_TEMPORARY("channel_flag_temporary"),
    CHANNEL_FLAG_DEFAULT("channel_flag_default"),
    CHANNEL_FLAG_MAXCLIENTS_UNLIMITED("channel_flag_maxclients_unlimited"),
    CHANNEL_FLAG_MAXFAMILYCLIENTS_UNLIMITED("channel_flag_maxfamilyclients_unlimited"),

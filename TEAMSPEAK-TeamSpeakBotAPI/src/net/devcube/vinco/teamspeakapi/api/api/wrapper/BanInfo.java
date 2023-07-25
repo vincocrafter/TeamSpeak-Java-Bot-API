@@ -2,12 +2,16 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
-public class Ban extends DefaultInfo {
+public class BanInfo extends DefaultInfo {
 
-	public Ban(String[] infos) {
+	public BanInfo(String[] infos) {
 		super(infos);
 	}
 
+	public int getID() {
+		return getBanID();
+	}
+	
 	public int getBanID() {
 		return toInt(get("banid"));
 	}
@@ -54,5 +58,10 @@ public class Ban extends DefaultInfo {
 
 	public int getBanEnforcements() {
 		return toInt(get("enforcements").replace("|", ""));
+	}
+	
+	@Override
+	public String toString() {
+		return "Ban[UUID=" + getClientUUID() + ",ID=" + getBanID() + "]";
 	}
 }

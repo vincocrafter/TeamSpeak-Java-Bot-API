@@ -1,12 +1,8 @@
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
@@ -33,7 +29,7 @@ public class Logger {
 	 * @param message
 	 */
 
-	public void log(int logLevel, Object message) {
+	public synchronized void log(int logLevel, Object message) {
 		String t = "[" + Thread.currentThread().getName() + "] ";
 		String time = "[" + serverQuery.getTime() + "] ";
 		String date = "";
@@ -41,44 +37,50 @@ public class Logger {
 			date = "[" + serverQuery.getDate() + "] ";
 		}
 
+		String prefix = t + date + time;
+		String type = "";
+		
 		switch (logLevel) {
 		case 1:
-			System.out.println(t + date + time + "[INFO] : " + message);
+			type = "[INFO]";
 			break;
 		case 2:
-			System.err.println(t + date + time + "[ERROR] : " + message);
+			type = "[ERROR]";
 			break;
 		case 3:
-			System.out.println(t + date + time + "[WARNING] : " + message);
+			type = "[WARNING]";
 			break;
 		case 4:
-			System.out.println(t + date + time + "[QUERY] : " + message);
+			type = "[QUERY]";
 			break;
 		case 5:
-			System.out.println(t + date + time + "[Event Manager] : " + message);
+			type = "[Event Manager]";
 			break;
 		case 6:
-			System.out.println(t + date + time + "[QUERY WRITER] : " + message);
+			type = "[QUERY WRITER]";
 			break;
 		case 7:
-			System.out.println(t + date + time + "[QUERY READER] : " + message);
+			type = "[QUERY READER]";
 			break;
 		case 8:
-			System.out.println(t + date + time + "[QUERY READER QUEUE] : " + message);
+			type = "[QUERY READER QUEUE]";
 			break;
 		default:
-			System.out.println(t + date + time + "[Other] : " + message);
+			type = "[Other]";
 			break;
 		}
+		String msg = prefix + type + " : " + message;
+
+		System.out.println(msg);
 	}
 
 	/**
-	 * Format -> [THREADNAME] [HH:mm:ss/.SSS] [Type] : message
+	 * Format -> [THREADNAME] [YYYY/MM/dd] [HH:mm:ss.SSS] [Type] : message
 	 * 
 	 * @param logLevel
 	 * @param message
 	 */
-	public void logFile(int logLevel, Object message) {
+	public synchronized void logFile(int logLevel, String logFilePath, Object message) {
 		String t = "[" + Thread.currentThread().getName() + "] ";
 		String time = "[" + serverQuery.getTime() + "] ";
 
@@ -87,110 +89,80 @@ public class Logger {
 			date = "[" + serverQuery.getDate() + "] ";
 		}
 
+		String prefix = t + date + time;
+		String type = "";
+		
 		switch (logLevel) {
 		case 1:
-			writeInLog(t + date + time + "[INFO] : " + message);
+			type = "[INFO]";
 			break;
 		case 2:
-			writeInLog(t + date + time + "[ERROR] : " + message);
+			type = "[ERROR]";
 			break;
 		case 3:
-			writeInLog(t + date + time + "[WARNING] : " + message);
+			type = "[WARNING]";
 			break;
 		case 4:
-			writeInLog(t + date + time + "[QUERY] : " + message);
+			type = "[QUERY]";
 			break;
 		case 5:
-			writeInLog(t + date + time + "[Event Manager] : " + message);
+			type = "[Event Manager]";
 			break;
 		case 6:
-			writeInLog(t + date + time + "[QUERY WRITER] : " + message);
+			type = "[QUERY WRITER]";
 			break;
 		case 7:
-			writeInLog(t + date + time + "[QUERY READER] : " + message);
+			type = "[QUERY READER]";
 			break;
 		case 8:
-			writeInLog(t + date + time + "[QUERY READER QUEUE] : " + message);
+			type = "[QUERY READER QUEUE]";
 			break;
 		default:
-			writeInLog(t + date + time + "[Other] : " + message);
+			type = "[Other]";
 			break;
 		}
+		String msg = prefix + type + " : " + message;
+
+		writeInLog(logFilePath, msg);
 	}
 
-	private void writeInLog(String infos) {
-		String date = getServerQuery().getLogDate();
-		File cfg = new File("Logs/Log " + date.replace("/", ".") + ".txt");
+	/**
+	 * Format -> [THREADNAME] [YYYY/MM/dd] [HH:mm:ss.SSS] [Type] : message
+	 * 
+	 * @param logLevel
+	 * @param message
+	 */
+	public synchronized void logFile(int logLevel, Object message) {
+		String date = serverQuery.getLogDate();
 		if (!new File("Logs").exists()) {
 			new File("Logs/").mkdir();
 		}
 
+		logFile(logLevel, "Logs/Log " + date.replace("/", ".") + ".txt", message);
+	}
+
+	private synchronized void writeInLog(String path, String infos) {
+		File cfg = new File(path);
+
 		if (!cfg.exists()) {
 			try {
 				cfg.createNewFile();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-		if (cfg.exists() && cfg.isFile()) {
-			ArrayList<String> oldLines = new ArrayList<>();
-			try {
-				FileReader fr = new FileReader(cfg);
-				try (BufferedReader br = new BufferedReader(fr)) {
-					br.lines().forEach(line -> {
-						oldLines.add(line);
-					});
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			try {
-				FileWriter fw = new FileWriter(cfg);
-				BufferedWriter bw = new BufferedWriter(fw);
-				for (String lines : oldLines) {
-					if (lines != "") {
-						bw.write(lines);
-						bw.newLine();
-					}
-				}
-				for (String lines : infos.split("\n")) {
-					if (lines != "") {
-						bw.write(lines);
-						bw.newLine();
-					}
-				}
-				bw.close();
-				fw.close();
-
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public ArrayList<String> getLogInfos(String date) {
-		ArrayList<String> lines = new ArrayList<>();
-		File cfg = new File("Logs/Log " + date.replace("/", ".") + ".txt");
 
 		if (cfg.exists() && cfg.isFile()) {
 			try {
-				FileReader fr = new FileReader(cfg);
-				try (BufferedReader br = new BufferedReader(fr)) {
-					br.lines().forEach(line -> {
-						lines.add(line);
-					});
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
+				FileWriter fw = new FileWriter(cfg.getPath(), true);
+				fw.write(infos + System.lineSeparator());
+				fw.flush();
+				fw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		return lines;
-	}
-
-	public Ts3ServerQuery getServerQuery() {
-		return serverQuery;
 	}
 }

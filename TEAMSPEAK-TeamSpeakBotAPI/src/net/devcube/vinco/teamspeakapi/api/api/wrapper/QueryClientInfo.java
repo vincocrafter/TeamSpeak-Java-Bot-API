@@ -7,19 +7,23 @@ public class QueryClientInfo extends DefaultInfo {
 	}
 
 	public String getNickName() {
-		return this.get("client_nickname");
+		return getName();
 	}
 
-	public String getClientName() {
-		return this.getNickName();
+	public String getName() {
+		return get("client_nickname");
 	}
 
-	public String getClientUUID() {
-		return this.get("client_unique_identifier");
+	public String getUUID() {
+		return get("client_unique_identifier");
 	}
 
-	public int getClientID() {
+	public int getID() {
 		return toInt(get("client_id"));
+	}
+	
+	public int getClientID() {
+		return getID();
 	}
 	
 	public int getChannelID() {
@@ -41,4 +45,16 @@ public class QueryClientInfo extends DefaultInfo {
 	public String getVirtualServerUUID() {
 		return get("virtualserver_unique_identifier");
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder resultBuilder = new StringBuilder("QueryClient[");
+		resultBuilder.append("Name=" + getName());
+		resultBuilder.append(",ID=" + getClientID());
+		resultBuilder.append(",UUID=" + getUUID());
+		resultBuilder.append(",VirtualServerID=" + getVirtualServerID());
+		resultBuilder.append("]");
+		return  resultBuilder.toString();
+	}
+	
 }

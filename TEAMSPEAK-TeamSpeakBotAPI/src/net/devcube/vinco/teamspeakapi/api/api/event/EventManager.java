@@ -11,11 +11,9 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Timer;
 
@@ -23,6 +21,7 @@ import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDeletedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDescriptionEditedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelEditedEvent;
+import net.devcube.vinco.teamspeakapi.api.api.events.ChannelMovedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelPasswordChangedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientJoinEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ClientLeaveEvent;
@@ -52,7 +51,8 @@ public class EventManager {
 
 	public void registerEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
-			throw new UnknownEventException();
+			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
+			throw new UnknownEventException("The selected Event was null!");
 		} else {
 			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
 			events.add(event);
@@ -68,16 +68,26 @@ public class EventManager {
 
 	public void unregisterEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
-			throw new UnknownEventException();
+			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
+			throw new UnknownEventException("The selected Event was null!");
 		} else {
 			if (events.contains(event)) {
 				query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
 				events.remove(event);
 			} else {
-				query.getLogger().log(5, "Event was not found");
 				query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 			}
-
+		}
+	}
+	
+	public void removeTs3Listener(TsEvent event) {
+		if (event != null) {
+			if (events.contains(event)) {
+				query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
+				events.remove(event);
+			} else {
+				query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
+			}
 		}
 	}
 
@@ -89,7 +99,7 @@ public class EventManager {
 	 * @throws UnknownEventException
 	 * @deprecated
 	 */
-	public void callEvent(String[] infos, String eventName) throws UnknownEventException {
+	public synchronized void callEvent(String[] infos, String eventName) throws UnknownEventException {
 
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
@@ -97,7 +107,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onPrivilegeKeyUsed(new PrivilegeKeyUsedEvent(infos));
+				event.onPrivilegeKeyUsed(new PrivilegeKeyUsedEvent(infos, query));
 			}
 			break;
 		case "notifycliententerview": // CLIENT JOIN EVENT
@@ -105,7 +115,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onClientJoin(new ClientJoinEvent(infos));
+				event.onClientJoin(new ClientJoinEvent(infos, query));
 			}
 			break;
 		case "notifyclientleftview": // CLIENT LEAVE EVENT
@@ -113,7 +123,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onClientLeave(new ClientLeaveEvent(infos));
+				event.onClientLeave(new ClientLeaveEvent(infos, query));
 			}
 			break;
 		case "notifychanneldescriptionchanged": // CHANNEL DESCRIPTION CHANGED
@@ -121,7 +131,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onChannelDescriptionChanged(new ChannelDescriptionEditedEvent(infos));
+				event.onChannelDescriptionChanged(new ChannelDescriptionEditedEvent(infos, query));
 			}
 			break;
 		case "notifychanneledited": // CHANNEL EDITED
@@ -129,7 +139,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onChannelEdit(new ChannelEditedEvent(infos));
+				event.onChannelEdit(new ChannelEditedEvent(infos, query));
 			}
 			break;
 		case "notifyserveredited": // SERVER EDITED
@@ -137,7 +147,15 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onServerEdit(new ServerEditedEvent(infos));
+				event.onServerEdit(new ServerEditedEvent(infos, query));
+			}
+			break;
+		case "notifychannelmoved": //CHANNEL MOVED
+			for (TsEvent event : getEvents()) {
+				if (event == null) {
+					throw new UnknownEventException("One Event is null");
+				}
+				event.onChannelMoved(new ChannelMovedEvent(infos, query));
 			}
 			break;
 		case "notifyclientmoved": // CLIENT MOVED
@@ -145,7 +163,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onClientMove(new ClientMoveEvent(infos));
+				event.onClientMove(new ClientMoveEvent(infos, query));
 			}
 			break;
 		case "notifychannelcreated": // CHANNEL CREATED
@@ -153,7 +171,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onChannelCreate(new ChannelCreateEvent(infos));
+				event.onChannelCreate(new ChannelCreateEvent(infos, query));
 			}
 			break;
 		case "notifychanneldeleted": // CHANNEL DELETED
@@ -161,7 +179,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onChannelDeleted(new ChannelDeletedEvent(infos));
+				event.onChannelDeleted(new ChannelDeletedEvent(infos, query));
 			}
 			break;
 		case "notifychannelpasswordchanged": // CHANNEL PASSWORD CHANGED
@@ -169,7 +187,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onChannelPasswordChanged(new ChannelPasswordChangedEvent(infos));
+				event.onChannelPasswordChanged(new ChannelPasswordChangedEvent(infos, query));
 			}
 
 			break;
@@ -178,7 +196,7 @@ public class EventManager {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
 				}
-				event.onTextMessage(new TextMessageEvent(infos));
+				event.onTextMessage(new TextMessageEvent(infos, query));
 			}
 			break;
 		default:
@@ -193,7 +211,7 @@ public class EventManager {
 	 *                     eventInformation
 	 */
 
-	public void callNewEvent(String[] infos) {
+	public synchronized void callNewEvent(String[] infos) {
 		BaseEvent event = getEventByName(infos);
 		String eventName = infos[0];
 
@@ -210,7 +228,8 @@ public class EventManager {
 							try {
 								meth.invoke(registeredEvents, getEventByName(infos));
 							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-								// TODO Auto-generated catch block
+								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() 
+										+ "' caused by " + e.getCause().getClass().getName() + "!");
 								e.printStackTrace();
 							}
 						}
@@ -232,27 +251,29 @@ public class EventManager {
 		String eventName = infos[0];
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
-			return new PrivilegeKeyUsedEvent(infos);
+			return new PrivilegeKeyUsedEvent(infos, query);
 		case "notifycliententerview": // CLIENT JOIN EVENT
-			return new ClientJoinEvent(infos);
+			return new ClientJoinEvent(infos, query);
 		case "notifyclientleftview": // CLIENT LEAVE EVENT
-			return new ClientLeaveEvent(infos);
+			return new ClientLeaveEvent(infos, query);
 		case "notifychanneldescriptionchanged": // CHANNEL DESCRIPTION CHANGED
-			return new ChannelDescriptionEditedEvent(infos);
+			return new ChannelDescriptionEditedEvent(infos, query);
 		case "notifychanneledited": // CHANNEL EDITED
-			return new ChannelEditedEvent(infos);
+			return new ChannelEditedEvent(infos, query);
+		case "notifychannelmoved": //CHANNEL MOVED
+			return new ChannelMovedEvent(infos, query);
 		case "notifyserveredited": // SERVER EDITED
-			return new ServerEditedEvent(infos);
+			return new ServerEditedEvent(infos, query);
 		case "notifyclientmoved": // CLIENT MOVED
-			return new ClientMoveEvent(infos);
+			return new ClientMoveEvent(infos, query);
 		case "notifychannelcreated": // CHANNEL CREATED
-			return new ChannelCreateEvent(infos);
+			return new ChannelCreateEvent(infos, query);
 		case "notifychanneldeleted": // CHANNEL DELETED
-			return new ChannelDeletedEvent(infos);
+			return new ChannelDeletedEvent(infos, query);
 		case "notifychannelpasswordchanged": // CHANNEL PASSWORD CHANGED
-			return new ChannelPasswordChangedEvent(infos);
+			return new ChannelPasswordChangedEvent(infos, query);
 		case "notifytextmessage": // TEXT MESSAGE SEND
-			return new TextMessageEvent(infos);
+			return new TextMessageEvent(infos, query);
 		default:
 			return null;
 		}
@@ -263,7 +284,7 @@ public class EventManager {
 	 * 
 	 * @param eventName
 	 * @param infos
-	 * @see callNewEvent()
+	 * @see EventManager#callNewEvent()
 	 * @see QueryConfig
 	 * @see DebugOutputType
 	 */
@@ -280,6 +301,8 @@ public class EventManager {
 			query.debug(DebugOutputType.E_CHANNEL_EDITED, infos.toString());
 		} else if (eventName.equalsIgnoreCase("notifychannelpasswordchanged")) {
 			query.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, infos);
+		} else if(eventName.equalsIgnoreCase("notifychannelmoved")) {
+			query.debug(DebugOutputType.E_CHANNEL_MOVED, infos);
 		} else if (eventName.equalsIgnoreCase("notifycliententerview")) {
 			query.debug(DebugOutputType.E_CLIENT_JOIN, infos);
 		} else if (eventName.equalsIgnoreCase("notifyclientleftview")) {

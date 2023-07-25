@@ -22,10 +22,12 @@ public enum EventCallType {
 	
 	/**
 	 * is set as defaut
-	 * @see QueryConfig.eventCallType
+	 * @see QueryConfig#setEventCallType()
+	 * @see QueryConfig#isEventCallType()
 	 */
 	
 	NEW, 
-	OLD, BOTH;
+	OLD, 
+	BOTH;
 
 }

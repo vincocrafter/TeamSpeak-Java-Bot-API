@@ -1,7 +1,11 @@
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
-public class Formatter {
+public final class Formatter {
 
+	private Formatter() {
+		
+	}
+	
 	public static String toTsFormat(String str) {
 		str = str.replace("\\", "\\\\");
 		str = str.replace(" ", "\\s");
@@ -38,5 +42,9 @@ public class Formatter {
 		}
 
 		return s.trim();
+	}
+	
+	public static int toInt(boolean bool) {
+		return bool ? 1 : 0;
 	}
 }

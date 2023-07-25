@@ -14,11 +14,12 @@ package net.devcube.vinco.teamspeakapi.query.manager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownEventException;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
@@ -28,127 +29,203 @@ public class QueryReader {
 	private Ts3ServerQuery query;
 	private Socket socket;
 
-	private Queue<String> packets = new LinkedList<>();
-	private Queue<String> errors = new LinkedList<>();
+	private Queue<String> commands = new LinkedList<>();
+	private Queue<String> hover = new LinkedList<>();
+
+	private Queue<ArrayList<String>> resultpackets = new LinkedList<>();
+	private Queue<ArrayList<String>> resulterrors = new LinkedList<>();
+	private boolean allowed = true;
+
+	private Thread readerThread;
+	private Thread eventThread;
+	private Thread sleepThread;
 	
-	
+
 	public QueryReader(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.setSocket(socket);
 	}
 
 	/**
-	 * @return the query
-	 */
-	public Ts3ServerQuery getQuery() {
-		return query;
-	}
-
-	/**
-	 * start listening for incoming packets async
+	 * Start listening for incoming packets async
 	 */
 
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
-		
-		new Thread(new Runnable() { // New Thread so async
-			
-			
-			@SuppressWarnings("deprecation")
+		resultpackets.add(new ArrayList<>());
+
+		readerThread = new Thread(new Runnable() { // New Thread so async
+
 			@Override
 			public void run() { // starting the while loop here to listen for packets
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					PrintWriter writer = new PrintWriter(socket.getOutputStream());
 					while (socket.isConnected()) { // <-- while loop here
 						if (reader.ready()) {
-							String msg = reader.readLine();
-							if (isResultValid(msg)) {
-								if (!isError(msg)) {
-									if (!isEvent(msg)) { // Information here
-										query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
-										query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
-										packets.add(msg);
-									} else {  //Event here
-										String[] infos = msg.split(" ");
-										/*
-										 * Decide which EventCall you prefer
-										 * here the new one
-										 * it is also the default one 
-										 * @see QueryConfig.eventCallType
-										 */
-										if (query.getConfig().getEventCallType() == EventCallType.NEW) { //New one
-											query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
-											query.getEventManager().callNewEvent(infos);
-										} else if (query.getConfig().getEventCallType() == EventCallType.OLD) { //Old one
-											query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + msg);
-											try {
-												query.getEventManager().callEvent(infos, infos[0]);
-											} catch (UnknownEventException e) {
-												query.debug(DebugOutputType.QUERYREADER, "Got an Error in Old Event: ");
-												e.printStackTrace();
-											}
-										} else { //And here both types of Event call
-											query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + msg);
-											query.getEventManager().callNewEvent(infos);
-											try {
-												query.getEventManager().callEvent(infos, infos[0]);
-											} catch (UnknownEventException e) {
-												query.debug(DebugOutputType.QUERYREADER, "Got an Error in Old Event: ");
-												e.printStackTrace();
-											}
-										}
-									}
-								} else {
-									// Error handeling
-									query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
-									query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
-									errors.add(msg);
-								}
+							String msg = rl(reader);
+							if (isError(msg)) {// Error handeling
+								query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
+								query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
+								resulterrors.peek().add(msg);
+								if (!hover.isEmpty())
+									hover.poll();
+								continue;
 							}
+							if (isEvent(msg)) { // Event here
+								callEvents(msg);
+								continue;
+							}
+
+							query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
+							query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
+							resultpackets.peek().add(msg);
+						} else { // Execute Commands here
+							if (!hover.isEmpty())
+								continue;
+
+							if (commands.isEmpty())
+								continue;
+
+							if (!allowed)
+								continue;
+
+							int floodRate = query.getConfig().getFloodRate().getValue();
+							resultpackets.add(new ArrayList<>());
+							resulterrors.add(new ArrayList<>());
+							writer.println(commands.peek());
+							if (floodRate > 0) {
+								query.debug(DebugOutputType.QUERYREADERQUEUE, "Send Command to Server > (" + commands.peek() + ")");
+								setCommandSenderSleeping(floodRate);
+							}	
+							hover.add(commands.poll());
+							writer.flush();
 						}
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 			}
-		}, "QURT").start();
+		}, "QURT");
+		readerThread.start();
 	}
 
-	// Just a check if the packet is an error message, so it can be ignored
+	private void callEvents(String msg) {
+		String[] infos = msg.split(" ");
+		/*
+		 * Decide which EventCall you prefer here the new one it is also the default one
+		 * 
+		 * @see QueryConfig#isEventCallType()
+		 */
+		eventThread = new Thread(new Runnable() {
+
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				try {
+					if (query.getConfig().isEventCallType(EventCallType.NEW)) { // New one
+						query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
+						query.getEventManager().callNewEvent(infos);
+					} else if (query.getConfig().isEventCallType(EventCallType.OLD)) { // Old one
+						query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + msg);
+						query.getEventManager().callEvent(infos, infos[0]);
+
+					} else { // And here both types of Event call
+						query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + msg);
+						query.getEventManager().callNewEvent(infos);
+						query.getEventManager().callEvent(infos, infos[0]);
+					}
+				} catch (Exception e) {
+					query.debug(DebugOutputType.ERROR, "Got an Exception from calling an event caused by " + e.getClass().getName() + "!");
+					e.printStackTrace();
+				}
+				
+			}
+		}, "EVMA");
+		eventThread.start();
+	}
+
+	private void setCommandSenderSleeping(int sleepTime) {
+		allowed = false;
+		sleepThread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				allowed = true;
+			}
+		}, "SLEP");
+		sleepThread.start();
+	}
+	
+	
+	public void stopThreads() {
+		readerThread.interrupt();
+		if (eventThread != null)
+			eventThread.interrupt();
+		if (sleepThread != null)
+			sleepThread.interrupt();
+	}
+	
 	private boolean isError(String rs) {
 		return rs.startsWith("error");
 	}
 
-	// Just a check to validate the packet
-	private boolean isResultValid(String rs) {
-		if (rs == null)
-			return false;
-		if (rs.isEmpty())
-			return false;
-		return true;
+	private String rl(BufferedReader reader) throws IOException {
+		StringBuilder line = new StringBuilder();
+		int c;
+		while ((c = reader.read()) != '\r') {
+			if (c == '\n')
+				continue;
+			line.append((char) c);
+		}
+		return line.toString();
 	}
 
-	// Just check if it is an Event
 	private boolean isEvent(String rs) {
 		return rs.startsWith("notify");
 	}
+	
+	/**
+	 * @return the readerThread
+	 */
+	public synchronized Thread getReaderThread() {
+		return readerThread;
+	}
 
 	/**
-	 * @return the packets
+	 * @return the hover
 	 */
-	public Queue<String> getPackets() {
-		return packets;
+	public Queue<String> getHover() {
+		return hover;
 	}
-	
+
 	/**
-	 * @return the errors
+	 * @return the commands
 	 */
-	public Queue<String> getErrors() {
-		return errors;
+	public synchronized Queue<String> getCommands() {
+		return commands;
 	}
-	
+
+	/**
+	 * @return the resultpackets
+	 */
+	public synchronized Queue<ArrayList<String>> getResultPackets() {
+		return resultpackets;
+	}
+
+	/**
+	 * @return the resultpackets
+	 */
+	public synchronized Queue<ArrayList<String>> getResultErrors() {
+		return resulterrors;
+	}
+
 	/**
 	 * @return the socket
 	 */
@@ -157,33 +234,71 @@ public class QueryReader {
 	}
 
 	/**
-	 * @param socket the socket to set
+	 * @param socket
+	 *                   the socket to set
 	 */
 	private void setSocket(Socket socket) {
 		this.socket = socket;
 	}
 
+	public synchronized boolean isCommandFinished() {
+		return hover.isEmpty() && resulterrors.peek() != null && !resulterrors.peek().isEmpty();
+	}
+
+	public synchronized boolean isAsyncCommandAllowed() {
+		return hover.isEmpty() && commands.isEmpty() && resulterrors.isEmpty() && resultpackets.isEmpty();
+	}
+
+	public synchronized boolean isCommandFinished(String command) {
+		return !hover.contains(command) && !commands.contains(command) && resulterrors.peek() != null && !resulterrors.peek().isEmpty();
+	}
+
 	public synchronized String nextPacket() {
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.peek());
-		return packets.poll();
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + resultpackets.peek().size());
+
+		StringBuilder resPackets = new StringBuilder();
+		for (String result : resultpackets.poll()) {
+			resPackets.append(result + System.lineSeparator());
+		}
+
+		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
 	}
 
 	/**
-	 *  See Java Documentation to poll and peek
+	 * See Java Documentation to poll and peek
 	 */
 	public synchronized String nextSavePacket() {
-		return packets.peek();
+		StringBuilder resPackets = new StringBuilder();
+		for (String result : resultpackets.peek()) {
+			resPackets.append(result + System.lineSeparator());
+
+		}
+
+		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
 	}
 
 	public synchronized String nextError() {
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: " + errors.peek());
-		return errors.poll();
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: " + resulterrors.peek().size());
+		StringBuilder resErrors = new StringBuilder();
+		for (String result : resulterrors.poll()) {
+			resErrors.append(result + System.lineSeparator());
+		}
+
+		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
 	}
 
 	/**
-	 *  See Java Documentation to poll and peek
+	 * See Java Documentation to poll and peek
 	 */
 	public synchronized String nextSaveError() {
-		return errors.peek();
+		StringBuilder resErrors = new StringBuilder();
+		for (String result : resulterrors.peek()) {
+			resErrors.append(result + System.lineSeparator());
+
+		}
+
+		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
 	}
+
+	
 }

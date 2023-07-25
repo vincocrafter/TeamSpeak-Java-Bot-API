@@ -1,8 +1,8 @@
 package net.devcube.vinco.teamspeakapi.api.api.exception.wrapper;
 
-public class UnknownQueryException extends Throwable {
+public class UnknownQueryException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 154541645651656544L;
 
 	String message;
 

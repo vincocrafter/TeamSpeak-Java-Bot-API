@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+
 public class DefaultInfo {
 
 	String[] infos;
@@ -9,14 +11,10 @@ public class DefaultInfo {
 	}
 
 	public void printInfos() {
-		int i = 0;
-		for (String s : getInfos()) {
-			System.out.println(i + " : " + s);
-			++i;
-		}
+		System.out.println(Formatter.connectString(infos));
 	}
 
-	public String get(int i) {
+	protected String get(int i) {
 		try {
 			String s = this.infos[i];
 			return s.substring(s.indexOf("=") + 1, s.length());
@@ -26,41 +24,46 @@ public class DefaultInfo {
 		}
 	}
 	
-	public String get(String value_name) {
-        for (String s : infos) {
+	public String get(String valueName) {
+        for (String s : this.infos) {
             String[] split = s.split("=");
-            if(split[0].equals(value_name)){
+            if(split[0].equals(valueName)){
             	return split.length < 2 ? null : split[1];
             }
         }
         return "";
     }
 	
+	public void addInfo(String key, String value) {
+		String fInfos = Formatter.connectString(this.infos) + " " + key + "=" + value;
+		this.infos = fInfos.split(" ");
+	}
+	
 	public String[] getInfos() {
 		return this.infos;
 	}
 
-	public int toInt(String s) {
+	protected int toInt(String s) {
 		return Integer.parseInt(s);
 	}
 
-	public double toDouble(String s) {
+	protected double toDouble(String s) {
 		return Double.parseDouble(s);
 	}
 
-	public float toFloat(String s) {
+	protected float toFloat(String s) {
 		return Float.parseFloat(s);
 	}
 
-	public long toLong(String s) {
+	protected long toLong(String s) {
 		return Long.parseLong(s);
 	}
 
-	public boolean toBol(int i) {
+	protected boolean toBol(int i) {
 		return i == 1;
 	}
 
-	public boolean toBol(String s) {
+	protected boolean toBol(String s) {
 		return Boolean.parseBoolean(s);
 	}
 }

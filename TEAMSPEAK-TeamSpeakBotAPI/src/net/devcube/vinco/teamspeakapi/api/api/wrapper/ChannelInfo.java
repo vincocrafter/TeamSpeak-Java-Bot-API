@@ -1,50 +1,50 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
-import java.io.File;
-
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelCodec;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ChannelInfo extends DefaultInfo {
 
-	private int cid;
 
-	public ChannelInfo(String[] infos, int cid) {
+	public ChannelInfo(String[] infos) {
 		super(infos);
-		this.cid = cid;
 	}
 
 	
 	public int getChannelID() {
-		return cid;
+		return toInt(get("cid"));
+	}
+	
+	public int getID() {
+		return getChannelID();
 	}
 
-	public String getChannelOrginalName() {
+	public String getOrginalName() {
 		return get("channel_name");
 	}
 
-	public String getChannelName() {
+	public String getName() {
 		return Formatter.toNormalFormat(get("channel_name"));
 	}
 
-	public String getChannelTopic() {
+	public String getTopic() {
 		return Formatter.toNormalFormat(get("channel_topic"));
 	}
 
-	public String getChannelDescription() {
+	public String getDescription() {
 		return Formatter.toNormalFormat(get("channel_topic"));
 	}
 
-	public String getChannelPassword() {
+	public String getPassword() {
 		return get("channel_password");
 	}
 
-	public int getChannelQuality() {
+	public int getQuality() {
 		return toInt(get("channel_codec_quality"));
 	}
 
 	
-	public ChannelCodec getChannelCodec() {
+	public ChannelCodec getCodec() {
 		int codec = toInt(get("channel_codec"));
 		
 		for (ChannelCodec channelcodec : ChannelCodec.values()) {
@@ -55,15 +55,15 @@ public class ChannelInfo extends DefaultInfo {
 		return null;
 	}
 
-	public int getChannelMaxClients() {
+	public int getMaxClients() {
 		return toInt(get("channel_maxclients"));
 	}
 
-	public int getChannelMaxFamilyClients() {
+	public int getMaxFamilyClients() {
 		return toInt(get("channel_maxfamilyclients"));
 	}
 	
-	public int getChannelOrder() {
+	public int getOrder() {
 		return toInt(get("channel_order"));
 	}
 
@@ -86,11 +86,15 @@ public class ChannelInfo extends DefaultInfo {
 	public boolean hasPassword() {
 		return toBol(toInt(get("channel_flag_password")));
 	}
-
-	public File getFilePath() {
-		return new File(get("channel_filepath").replace("\\/", "/"));
+	
+	public String getFilePath() {
+		return Formatter.toNormalFormat(get("channel_filepath"));
 	}
-
+	
+	public String getFilePathStr() {
+		return Formatter.toNormalFormat(get("channel_filepath"));
+	}
+	
 	public int getDeleteDelay() {
 		return toInt(get("channel_delete_delay"));
 	}
@@ -101,5 +105,18 @@ public class ChannelInfo extends DefaultInfo {
 
 	public int getIconID() {
 		return toInt(get("channel_icon_id"));
+	}
+	
+	public int getTotalClients() {
+		return toInt(get("total_clients"));
+	}
+	
+	public int getNeededSubscribePower() {
+		return toInt(get("channel_needed_subscribe_power"));
+	}
+	
+	@Override
+	public String toString() {
+		return "Channel[ID=" + getChannelID() + ",Name=" + getName() + "]";
 	}
 }

@@ -16,7 +16,7 @@ import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class KeepAliveThread extends Thread {
 
-	private static final int SLEEP = 180000;
+	private static final int SLEEP = 240_000; //Default Time for Timeout are 300 Seconds
 	private final Ts3ServerQuery query;
 
 	public KeepAliveThread(Ts3ServerQuery query) {
@@ -28,23 +28,18 @@ public class KeepAliveThread extends Thread {
 	// keeps the Socket connected to the (Teamspeak)Server
 	public void run() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
-		while (!this.isInterrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
+			while(!query.getReader().isAsyncCommandAllowed());
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
-
-//			query.getWriter().executeCommand("version");
-//			query.getReader().nextPacket(); // remove the anwser from the Queues
-//			query.getReader().nextError();
+			query.debug(DebugOutputType.KEEPALIVETHREAD, "" + Thread.getAllStackTraces().size());
 			
-			//Same as above with new Method
-			query.getWriter().executeReadCommand("version");
-			
+			query.getWriter().executeReadErrorCommand("version");
 			try {
 				Thread.sleep(SLEEP);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				break;
 			}
 		}
-
 	}
 	
 	

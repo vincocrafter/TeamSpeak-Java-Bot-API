@@ -3,20 +3,28 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
-public class ChannelGroup extends DefaultInfo {
+public class ChannelGroupInfo extends DefaultInfo {
 
-	public ChannelGroup(String[] infos) {
+	public ChannelGroupInfo(String[] infos) {
 		super(infos);
 	}
-
+	
 	public int getID() {
 		return toInt(get("cgid"));
 	}
-
+	
+	public int getChannelGroupID() {
+		return getID();
+	}
+	
 	public String getName() {
 		return Formatter.toNormalFormat(get("name"));
 	}
 
+	public String getChannelGroupName() {
+		return getName();
+	}
+	
 	private int getTypeID() {
 		return toInt(get("type"));
 	}
@@ -53,5 +61,9 @@ public class ChannelGroup extends DefaultInfo {
 
 	public int getNeededMemberRemovePower() {
 		return toInt(get("n_member_removep"));
+	}
+	
+	public String toString() {
+		return "ChannelGroup[Name=" + getName() + ",ID=" + getID() + "]";
 	}
 }

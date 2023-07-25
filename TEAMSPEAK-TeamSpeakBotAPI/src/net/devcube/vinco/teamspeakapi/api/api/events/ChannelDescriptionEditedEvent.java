@@ -1,22 +1,16 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class ChannelDescriptionEditedEvent extends BaseEvent {
 
-	public ChannelDescriptionEditedEvent(String[] infos) {
-		super(infos);
+
+	public ChannelDescriptionEditedEvent(String[] infos, Ts3ServerQuery serverQuery) {
+		super(infos, serverQuery);
 	}
 
 	public int getChannelID() {
-		return Integer.parseInt(this.get(1));
-	}
-
-	public String getClientName() {
-		return "";
-	}
-
-	public int getClientID() {
-		return 0;
+		return toInt(get("cid"));
 	}
 }
