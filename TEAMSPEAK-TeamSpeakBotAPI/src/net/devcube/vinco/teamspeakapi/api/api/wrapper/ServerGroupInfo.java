@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ServerGroupInfo extends DefaultInfo {

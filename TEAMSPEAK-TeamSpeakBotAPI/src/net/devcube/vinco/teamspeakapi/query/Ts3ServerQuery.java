@@ -34,7 +34,7 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 /**
  * @apiNote This is the mainclass of the TeamSpeak Query API, it handles the
- *          connection between the client and the server and set the API up
+ *          connection between the client and the server and set the API up.
  */
 
 public class Ts3ServerQuery {
@@ -75,8 +75,7 @@ public class Ts3ServerQuery {
 		reader.start(); // starts the reader Thread
 
 		// retrive the first meesages from the server
-		while (reader.getResultPackets().peek().size() < 2)
-			;
+		while (reader.getResultPackets().peek().size() < 2);
 		reader.nextPacket();
 
 		login(username, password);
@@ -95,10 +94,8 @@ public class Ts3ServerQuery {
 		reader.start(); // starts the reader Thread
 
 		// retrive the first meesages from the server
-		while (reader.getResultPackets().peek().size() < 2)
-			;
+		while (reader.getResultPackets().peek().size() < 2);
 		reader.nextPacket();
-
 		socket.setKeepAlive(true);
 		keepAliveThread.start(); // starts KeepAlivThread
 	}
@@ -243,13 +240,16 @@ public class Ts3ServerQuery {
 	}
 
 	/**
-	 * New debug Method for more specified debugging and outputting
+	 * New debug Method for more specified debugging and logging.
+	 * Uses QueryConfig for console and/or file debugging.
 	 * 
-	 * @param type
+	 * @param type Type of the debugmessage
 	 * @param debug
 	 *                  message
 	 * @see DebugOutputType
+	 * @see DebugType
 	 * @see QueryConfig
+	 * @see Logger
 	 */
 
 	public synchronized void debug(DebugOutputType type, String debug) {

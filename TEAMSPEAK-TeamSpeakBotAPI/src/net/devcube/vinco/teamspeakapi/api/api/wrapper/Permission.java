@@ -62,8 +62,6 @@ public class Permission {
 		this(permName, -1, -1, false, false, permDesc);
 	}
 
-	
-
 	public String getPermName() {
 		return this.permName;
 	}

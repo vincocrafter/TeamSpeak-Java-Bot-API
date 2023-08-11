@@ -15,6 +15,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
@@ -39,13 +40,13 @@ public class EventManager {
 
 	Ts3ServerQuery query;
 	Timer timer = new Timer();
-	private ArrayList<TsEvent> events = new ArrayList<TsEvent>();
+	private List<TsEvent> events = new ArrayList<TsEvent>();
 
 	public EventManager(Ts3ServerQuery query) {
 		this.query = query;
 	}
 
-	public ArrayList<TsEvent> getEvents() {
+	public List<TsEvent> getEvents() {
 		return events;
 	}
 

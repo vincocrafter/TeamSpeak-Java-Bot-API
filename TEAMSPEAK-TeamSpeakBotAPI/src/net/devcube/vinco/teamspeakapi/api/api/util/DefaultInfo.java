@@ -1,6 +1,4 @@
-package net.devcube.vinco.teamspeakapi.api.api.wrapper;
-
-import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+package net.devcube.vinco.teamspeakapi.api.api.util;
 
 public class DefaultInfo {
 

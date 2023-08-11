@@ -11,6 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
+
 public class PermissionAssignmentInfo extends DefaultInfo {
 
 	/**
@@ -18,7 +20,6 @@ public class PermissionAssignmentInfo extends DefaultInfo {
 	 */
 	public PermissionAssignmentInfo(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public int getTier() {

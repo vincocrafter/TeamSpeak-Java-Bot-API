@@ -36,9 +36,13 @@ public final class Formatter {
 	}
 	
 	public static String connectString(String[] args) {
+		return connectString(args, " ");
+	}
+	
+	public static String connectString(String[] args, String splitter) {
 		String s = "";
 		for (String s1 : args) {
-			s = s + " " + s1;
+			s = s + splitter + s1;
 		}
 
 		return s.trim();

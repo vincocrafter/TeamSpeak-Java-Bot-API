@@ -11,19 +11,21 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
 
 /**
  * Enum for the preferred EventType to call Events
- * @see QueryConfig.eventCallType
- * @see QueryReader.start()
+ * @see QueryConfig#isEventCallType(EventCallType)
+ * @see QueryReader#callEvents()
  */
 
 public enum EventCallType {
 	
 	/**
-	 * is set as defaut
-	 * @see QueryConfig#setEventCallType()
-	 * @see QueryConfig#isEventCallType()
+	 * Is set as defaut
+	 * @see QueryConfig#setEventCallType
+	 * @see QueryConfig#isEventCallType
 	 */
 	
 	NEW, 

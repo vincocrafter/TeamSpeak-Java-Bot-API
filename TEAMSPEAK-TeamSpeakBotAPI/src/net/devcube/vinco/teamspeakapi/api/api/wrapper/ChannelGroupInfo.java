@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ChannelGroupInfo extends DefaultInfo {

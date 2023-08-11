@@ -22,6 +22,7 @@ import java.util.Queue;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
+import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryReader {
@@ -53,6 +54,7 @@ public class QueryReader {
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
 		resultpackets.add(new ArrayList<>());
+		FloodRate floodRate = query.getConfig().getFloodRate();
 
 		readerThread = new Thread(new Runnable() { // New Thread so async
 
@@ -90,20 +92,19 @@ public class QueryReader {
 							if (!allowed)
 								continue;
 
-							int floodRate = query.getConfig().getFloodRate().getValue();
 							resultpackets.add(new ArrayList<>());
 							resulterrors.add(new ArrayList<>());
 							writer.println(commands.peek());
-							if (floodRate > 0) {
+							if (floodRate.getValue() > 0) {
 								query.debug(DebugOutputType.QUERYREADERQUEUE, "Send Command to Server > (" + commands.peek() + ")");
-								setCommandSenderSleeping(floodRate);
+								setCommandSenderSleeping(floodRate.getValue());
 							}	
 							hover.add(commands.poll());
 							writer.flush();
 						}
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					query.debug(DebugOutputType.ERROR, "Something went wrong with the QueryReader! Exception: IOException");
 					e.printStackTrace();
 				}
 			}
@@ -140,7 +141,6 @@ public class QueryReader {
 					query.debug(DebugOutputType.ERROR, "Got an Exception from calling an event caused by " + e.getClass().getName() + "!");
 					e.printStackTrace();
 				}
-				
 			}
 		}, "EVMA");
 		eventThread.start();
@@ -155,7 +155,7 @@ public class QueryReader {
 				try {
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					
 				}
 				allowed = true;
 			}

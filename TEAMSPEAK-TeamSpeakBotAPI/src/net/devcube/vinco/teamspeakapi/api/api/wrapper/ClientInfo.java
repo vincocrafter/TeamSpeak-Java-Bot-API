@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ClientInfo extends DefaultInfo {

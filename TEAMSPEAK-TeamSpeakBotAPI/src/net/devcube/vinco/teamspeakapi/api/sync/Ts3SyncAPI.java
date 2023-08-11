@@ -48,7 +48,7 @@ import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 /**
  * Main Class to Interact with the TeamSpeakServer in any way.
- * Extends its basic Methods from the Ts3BasicAPI an calls them.
+ * Extends its basic Methods from the Ts3BasicAPI and calls them.
  * @see Ts3BasicAPI
  * 
  */
@@ -91,6 +91,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 	public void selectVirtualServer(int serverID) {
 		selectVirtualServer(serverID, null);
+	}
+	
+	public void selectVirtualServer(int serverID, String nickName) {
+		selectVirtualServer(serverID, -1, nickName);
 	}
 
 	public void selectVirtualServer(VirtualServerInfo virtualServer) {
@@ -244,12 +248,12 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 * Method to get an ServerGroupInfo by providing an List of ServerGroups.
 	 * Use getServerGroups() only once an save it as an variable.
 	 * So if you repeat the Method for other ServerGroups the
-	 * List is not every time requested from the server.
+	 * List is not requested every time from the server.
 	 * 
 	 * @see Ts3SyncAPI#getServerGroups()
 	 * @param groupList
 	 * @param groupID
-	 * @return
+	 * @return ServerGroupInfo Class that stores information about the group with the id.
 	 */
 	
 	public ServerGroupInfo getServerGroupByID(List<ServerGroupInfo> groupList, int groupID) {
@@ -305,6 +309,18 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		}
 		return null;
 	}
+	
+	/**
+	 * Method to get an ChannelGroupInfo by providing an List of ChannelGroups.
+	 * Use getChannelGroups() only once an save it as an variable.
+	 * So if you repeat the Method for other ChannelGroups the
+	 * List is not requested every time from the server.
+	 * 
+	 * @see Ts3SyncAPI#getChannelGroups()
+	 * @param groupList
+	 * @param groupID
+	 * @return ChannelGroupInfo Class that stores information about the group with the id.
+	 */
 
 	public ChannelGroupInfo getChannelGroupByID(List<ChannelGroupInfo> groupList, int groupID) {
 		for (ChannelGroupInfo groups : groupList) {
@@ -424,7 +440,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public int getOnlineClientSize() {
-		return this.getVirtualServerInfo().getOnlineClientsSize();
+		return getVirtualServerInfo().getOnlineClientsSize();
 	}
 
 	public int getOnlineClientsRealSize() {
@@ -518,7 +534,23 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<Integer> getDatabaseIDsByChannelAndGroup(ChannelGroupInfo channelGroup, ChannelInfo channel) {
 		return getDatabaseIDsByChannelAndGroup(channelGroup.getID(), channel.getChannelID());
 	}
+	
+	/**
+	 * @see Ts3SyncAPI#getDatabaseIDsByChannelAndGroup(int, int)
+	 * @param channelGroupID
+	 * @param channelID
+	 * @return
+	 */
 
+	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, int channelID) {
+		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
+		List<Integer> getList = getDatabaseIDsByChannelAndGroup(channelGroupID, channelID);
+
+		for (int dbIDs : getList) {
+			resultList.add(getDataBaseClientInfo(dbIDs));
+		}
+		return resultList;
+	}
 
 	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, ChannelInfo channel) {
 		return getDatabaseClientInfosByChannelAndGroup(channelGroupID, channel.getChannelID());
@@ -714,7 +746,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		startVirtualServer(virtualServer.getServerID());
 	}
 
-
+	public void stopVirtualServer(int virtualServerID) {
+		stopVirtualServer(virtualServerID, null);
+	}
+	
 	public void stopVirtualServer(VirtualServerInfo virtualServer, String reasonmsg) {
 		stopVirtualServer(virtualServer.getServerID(), reasonmsg);
 	}
@@ -722,7 +757,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void stopVirtualServer(VirtualServerInfo virtualServer) {
 		stopVirtualServer(virtualServer.getServerID());
 	}
-
 	
 	public void addChannelPermission(int channelID, int permissionID, int permissionValue) {
 		addChannelPermission(channelID, permissionID, null, permissionValue);
@@ -759,6 +793,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	
 	public void addChannelPermissions(ChannelInfo channel, List<Permission> permissions) {
 		addChannelPermissions(channel.getChannelID(), permissions);
+	}
+	
+	public void addChannelClientPermission(int channelID, int clientdataBaseID, int permissionID, int permissionValue) {
+		addChannelClientPermission(channelID, clientdataBaseID, permissionID, null, permissionValue);
 	}
 	
 	public void addChannelClientPermission(int channelID, int clientdataBaseID, Permission permission) {
@@ -962,7 +1000,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public int createChannelGroup(String channelGroupName) {
 		return createChannelGroup(channelGroupName, ChannelGroupType.NORMAL);
 	}
-
+	
+	public void addChannelGroupPermission(int channelGroupID, int permissionID, int permissionValue) {
+		addChannelGroupPermission(channelGroupID, permissionID, null, permissionValue);
+	}
+	
 	public void addChannelGroupPermission(int channelGroupID, Permission permission) {
 		addChannelGroupPermission(channelGroupID, permission.getPermID(), permission.getPermValue());
 	}
@@ -1020,6 +1062,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	public void deleteChannelGroup(ChannelGroupInfo channelGroup) {
 		deleteChannelGroup(channelGroup.getID(), true);
+	}
+	
+	public void removeChannelGroupPermission(int channelGroupID, int permissionID) {
+		removeChannelGroupPermission(channelGroupID, permissionID, null);
 	}
 
 	public void removeChannelGroupPermission(int channelGroupID, Permission permission) {
@@ -1091,6 +1137,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void moveChannel(ChannelInfo channel, ChannelInfo channelParent) {
 		moveChannel(channel.getChannelID(), channelParent.getChannelID(), 0);
 	}
+	
+	public void addClientPermission(int clientDataBaseID, int permissionID, int permissionValue, boolean permSkip) {
+		addClientPermission(clientDataBaseID, permissionID, null, permissionValue, permSkip);
+	}
 
 	public void addClientPermission(int clientDataBaseID, int permissionID, int permissionValue) {
 		addClientPermission(clientDataBaseID, permissionID, permissionValue, false);
@@ -1160,7 +1210,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 		return resultList;
 	}
-
+	
+	public void removeClientPermission(int clientDataBaseID, int permissionID) {
+		removeClientPermission(clientDataBaseID, permissionID, null);
+	}
+	
 	public void removeClientPermission(int clientDataBaseID, String permissionName) {
 		removeClientPermission(clientDataBaseID, -1, permissionName);
 	}
@@ -1252,7 +1306,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		}
 		return resultList;
 	}
-
+	
+	public void kickClientFromServer(int clientID) {
+		kickClientFromServer(clientID, null);
+	}
+	
 	public void kickClientFromServer(ClientInfo client, String reason) {
 		kickClientFromServer(client.getID(), reason);
 	}
@@ -1293,6 +1351,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	
 	public void kickClientIDsFromServer(List<Integer> clientIDs) {
 		kickClientIDsFromServer(clientIDs, null);
+	}
+	
+	public void kickClientFromChannel(int clientID) {
+		kickClientFromChannel(clientID, null);
 	}
 	
 	public void kickClientFromChannel(ClientInfo client, String reason) {

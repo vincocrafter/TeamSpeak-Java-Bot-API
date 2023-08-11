@@ -29,17 +29,22 @@ public class Logger {
 	 * @param message
 	 */
 
-	public synchronized void log(int logLevel, Object message) {
-		String t = "[" + Thread.currentThread().getName() + "] ";
+	private String buildDebugMessage(int logLevel, Object message) {
+		StringBuilder logMessage = new StringBuilder();
+
+		String threadName = "[" + Thread.currentThread().getName() + "] ";
 		String time = "[" + serverQuery.getTime() + "] ";
 		String date = "";
 		if (serverQuery.getConfig().isShowDate()) {
 			date = "[" + serverQuery.getDate() + "] ";
 		}
 
-		String prefix = t + date + time;
+		logMessage.append(threadName);
+		logMessage.append(date);
+		logMessage.append(time);
+
 		String type = "";
-		
+
 		switch (logLevel) {
 		case 1:
 			type = "[INFO]";
@@ -69,9 +74,14 @@ public class Logger {
 			type = "[Other]";
 			break;
 		}
-		String msg = prefix + type + " : " + message;
+		logMessage.append(type);
+		logMessage.append(" : ");
+		logMessage.append(message);
+		return logMessage.toString();
+	}
 
-		System.out.println(msg);
+	public synchronized void log(int logLevel, Object message) {
+		System.out.println(buildDebugMessage(logLevel, message));
 	}
 
 	/**
@@ -81,49 +91,7 @@ public class Logger {
 	 * @param message
 	 */
 	public synchronized void logFile(int logLevel, String logFilePath, Object message) {
-		String t = "[" + Thread.currentThread().getName() + "] ";
-		String time = "[" + serverQuery.getTime() + "] ";
-
-		String date = "";
-		if (serverQuery.getConfig().isShowDate()) {
-			date = "[" + serverQuery.getDate() + "] ";
-		}
-
-		String prefix = t + date + time;
-		String type = "";
-		
-		switch (logLevel) {
-		case 1:
-			type = "[INFO]";
-			break;
-		case 2:
-			type = "[ERROR]";
-			break;
-		case 3:
-			type = "[WARNING]";
-			break;
-		case 4:
-			type = "[QUERY]";
-			break;
-		case 5:
-			type = "[Event Manager]";
-			break;
-		case 6:
-			type = "[QUERY WRITER]";
-			break;
-		case 7:
-			type = "[QUERY READER]";
-			break;
-		case 8:
-			type = "[QUERY READER QUEUE]";
-			break;
-		default:
-			type = "[Other]";
-			break;
-		}
-		String msg = prefix + type + " : " + message;
-
-		writeInLog(logFilePath, msg);
+		writeInLog(logFilePath, buildDebugMessage(logLevel, message));
 	}
 
 	/**

@@ -8,13 +8,12 @@ import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 public class ChannelCreateEvent extends BaseEvent {
 
 	
-
 	public ChannelCreateEvent(String[] infos, Ts3ServerQuery serverQuery) {
 		super(infos, serverQuery);
 	}
 
 	public int getClientID() {
-		return Integer.parseInt(get("invokerid"));
+		return toInt(get("invokerid"));
 	}
 
 	public String getClientName() {

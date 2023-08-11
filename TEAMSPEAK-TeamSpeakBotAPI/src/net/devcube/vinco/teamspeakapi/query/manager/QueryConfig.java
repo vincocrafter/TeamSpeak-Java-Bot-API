@@ -114,6 +114,16 @@ public class QueryConfig {
 	public boolean isDebugType(DebugType debugType) {
 		return this.debugType == debugType;
 	}
+	
+	/**
+	 * Checks debugTypes are set in the debuglist.
+	 * Used by the Query to retrieve which debugs should
+	 * be debugged.
+	 * @see QueryConfig#addDebugItem(DebugOutputType)
+	 * @see Ts3ServerQuery#debug(DebugOutputType, String)
+	 * @param debugOutputType
+	 * @return
+	 */
 
 	public boolean isInDebug(DebugOutputType debugOutputType) {
 		return debuglist.contains(debugOutputType);

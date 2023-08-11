@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
+
 public class QueryClientInfo extends DefaultInfo {
 
 	public QueryClientInfo(String[] infos) {

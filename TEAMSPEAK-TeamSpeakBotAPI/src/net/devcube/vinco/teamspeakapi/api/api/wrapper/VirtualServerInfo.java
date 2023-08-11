@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerStatus;
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class VirtualServerInfo extends DefaultInfo {

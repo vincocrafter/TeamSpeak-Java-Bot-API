@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class PrivilegeKeyInfo extends DefaultInfo {
 

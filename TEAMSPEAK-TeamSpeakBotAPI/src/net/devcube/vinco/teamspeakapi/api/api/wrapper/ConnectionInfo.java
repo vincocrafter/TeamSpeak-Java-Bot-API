@@ -1,5 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
+
 public class ConnectionInfo extends DefaultInfo {
 
 	public ConnectionInfo(String[] infos) {
