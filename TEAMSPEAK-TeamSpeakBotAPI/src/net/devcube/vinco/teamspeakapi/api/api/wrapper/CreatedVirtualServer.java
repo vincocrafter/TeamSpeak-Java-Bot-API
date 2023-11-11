@@ -23,8 +23,12 @@ public class CreatedVirtualServer extends DefaultInfo {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public int getID() {
+	public int getServerID() {
 		return toInt(get("sid"));
+	}
+	
+	public int getID() {
+		return getServerID();
 	}
 	
 	public int getPort() {

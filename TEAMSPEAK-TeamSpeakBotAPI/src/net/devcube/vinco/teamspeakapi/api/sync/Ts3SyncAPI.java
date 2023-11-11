@@ -23,6 +23,7 @@ import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownClientInf
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientProperty;
+import net.devcube.vinco.teamspeakapi.api.api.property.EventType;
 import net.devcube.vinco.teamspeakapi.api.api.property.InstanceProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.LogLevel;
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
@@ -38,6 +39,7 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.ClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedQueryLogin;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.DataBaseClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.FileInfo;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.OfflineMessageInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.Permission;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.PrivilegeKeyInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
@@ -175,10 +177,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	/**
-	 * Method to get an overview for the Permissions of
+	 * Method to get an overview for the permissions of
 	 * the Query Client.
-	 * Does not include Channel specific Permissions, because
-	 * the Client could be (not) in that Channel or could leave it.
+	 * Does not include channel/client specific permissions, because
+	 * this may not be the most important ones for a query client.
 	 * @return List of PermissionIDs containing every ID only once.
 	 */
 	
@@ -192,9 +194,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 			}
 		}
 
-		for (Permission clientPerms : getClientPermissions(dbID)) {
-			perms.add(clientPerms.getPermID());
-		}
 		return perms;
 	}
 
@@ -337,18 +336,18 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	
 	public List<DataBaseClientInfo> getClientDBList() {
-		return getDatabaseClients();
+		return getDataBaseClients();
 	}
 
 	public List<DataBaseClientInfo> getDataBaseClientInfos() {
-		return getDatabaseClients();
+		return getDataBaseClients();
 	}
 	
 	/**
 	 * Uses the ClientDataBaseIDs of clientdblist and gets the information for each databaseclient
 	 * seperate with getDataBaseClientInfo().
 	 * 
-	 * @see Ts3SyncAPI#getDataBaseClientInfo(int)
+	 * @see Ts3SyncAPI#getDataBaseClient(int)
 	 * 
 	 * @return
 	 */
@@ -358,7 +357,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		String[] clients = query.getWriter().executeReadCommand("clientdblist")[0].split(TS_INFO_SEPERATOR);
 		for (String client : clients) {
 			int cldbid = Integer.parseInt(get(client, "cldbid="));
-			resultList.add(getDataBaseClientInfo(cldbid));
+			resultList.add(getDataBaseClient(cldbid));
 		}
 		return resultList;
 	}
@@ -392,7 +391,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		if (clientinfo != null) {
 			return clientinfo;
 		} else {
-			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the Information of the Player");
+			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the information of this player");
 		}
 	}
 
@@ -444,12 +443,12 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public int getOnlineClientsRealSize() {
-		return (int) getClients().stream().filter(clients -> !clients.isServerQueryClient()).count();
+		return (int) getClients().stream().filter(clients -> clients.isUser()).count();
 	}
 
 	
 	public DataBaseClientInfo getDataBaseClientInfo(ClientInfo client) {
-		return getDataBaseClientInfo(client.getClientDataBaseID());
+		return getDataBaseClient(client.getClientDataBaseID());
 	}
 
 	public ChannelInfo getChannelInfo(int channelID) throws UnknownChannelInfoException {
@@ -488,7 +487,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
 
 		for (int dbIDs : getDatabaseIDsByServerGroup(servergroupID)) {
-			resultList.add(getDataBaseClientInfo(dbIDs));
+			resultList.add(getDataBaseClient(dbIDs));
 		}
 		return resultList;
 	}
@@ -513,7 +512,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		Map<Integer, List<Integer>> getMap = getDatabaseIDsByChannelGroup(channelgroupID);
 
 		for (int dbIDs : getMap.keySet()) {
-			DataBaseClientInfo dbClInfo = getDataBaseClientInfo(dbIDs);
+			DataBaseClientInfo dbClInfo = getDataBaseClient(dbIDs);
 			resultMap.put(dbClInfo, getMap.get(dbIDs));
 		}
 		return resultMap;
@@ -547,7 +546,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		List<Integer> getList = getDatabaseIDsByChannelAndGroup(channelGroupID, channelID);
 
 		for (int dbIDs : getList) {
-			resultList.add(getDataBaseClientInfo(dbIDs));
+			resultList.add(getDataBaseClient(dbIDs));
 		}
 		return resultList;
 	}
@@ -632,6 +631,13 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<VirtualServerInfo> getOfflineVirtualServers() {
 		return getVirtualServersOffline();
 	}
+	
+	/**
+	 * Lists all virtual servers regardless of the machine id.
+	 * Different from Ts3BasicAPI#getVirtualServers().
+	 * @see  Ts3BasicAPI#getVirtualServers()
+	 * @return List of all virtual servers.
+	 */
 
 	public List<VirtualServerInfo> getVirtualServersAll() {
 		return getVirtualServersByCommand("serverlist -uid -all");
@@ -641,52 +647,52 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return getVirtualServersAll();
 	}
 
-	public void addBan(String ip, String name, String clientUUID, String myTSID, long banTime) {
-		addBan(ip, name, clientUUID, myTSID, banTime, null);
+	public int addBan(String ip, String name, String clientUUID, String myTSID, long banTime) {
+		return addBan(ip, name, clientUUID, myTSID, banTime, null);
 	}
 
-	public void addBan(String ip, String clientUUID, long banTime, String banReason) {
-		addBan(ip, null, clientUUID, null, banTime, banReason);
+	public int addBan(String ip, String clientUUID, long banTime, String banReason) {
+		return addBan(ip, null, clientUUID, null, banTime, banReason);
 	}
 
-	public void addBan(String ip, String clientUUID, long banTime) {
-		addBan(ip, null, clientUUID, null, banTime, null);
+	public int addBan(String ip, String clientUUID, long banTime) {
+		return addBan(ip, null, clientUUID, null, banTime, null);
 	}
 
-	public void addBan(String clientUUID, long banTime, String banReason) {
-		addBan(null, null, clientUUID, null, banTime, banReason);
+	public int addBan(String clientUUID, long banTime, String banReason) {
+		return addBan(null, null, clientUUID, null, banTime, banReason);
 	}
 
-	public void addBan(String clientUUID, long banTime) {
-		addBan(null, null, clientUUID, null, banTime, null);
+	public int addBan(String clientUUID, long banTime) {
+		return addBan(null, null, clientUUID, null, banTime, null);
 	}
 
-	public void addBanIP(String ip, long banTime, String banReason) {
-		addBan(ip, null, null, null, banTime, banReason);
+	public int addBanIP(String ip, long banTime, String banReason) {
+		return addBan(ip, null, null, null, banTime, banReason);
 	}
 
-	public void addBanIP(String ip, long banTime) {
-		addBan(ip, null, null, null, banTime, null);
+	public int addBanIP(String ip, long banTime) {
+		return addBan(ip, null, null, null, banTime, null);
 	}
 
-	public void banClient(ClientInfo client, long banTime, String banReason) {
-		banClient(client.getID(), banTime, banReason);
+	public int[] banClient(ClientInfo client, long banTime, String banReason) {
+		return banClient(client.getID(), banTime, banReason);
 	}
 
-	public void banClient(int clientID, long banTime) {
-		banClient(clientID, banTime, null);
+	public int[] banClient(int clientID, long banTime) {
+		return banClient(clientID, banTime, null);
 	}
 
-	public void banClient(ClientInfo client, long banTime) {
-		banClient(client.getID(), banTime);
+	public int[] banClient(ClientInfo client, long banTime) {
+		return banClient(client.getID(), banTime);
 	}
 
-	public void banClient(int clientID) {
-		banClient(clientID, -1);
+	public int[] banClient(int clientID) {
+		return banClient(clientID, -1);
 	}
 
-	public void banClient(ClientInfo client) {
-		banClient(client.getID());
+	public int[] banClient(ClientInfo client) {
+		return banClient(client.getID());
 	}
 	
 	public void banClients(List<ClientInfo> clients, long banTime, String banReason) {
@@ -720,6 +726,25 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void banClientIDs(List<Integer> clientIDs, long banTime) {
 		banClientIDs(clientIDs, banTime, null);
 	}
+	
+	public BanInfo getBanInfo(int banID) {
+		for (BanInfo bans : getBans()) {
+			if (bans.getID() == banID) {
+				return bans;
+			}
+		}
+		return null;
+	}
+	
+	public BanInfo getBanInfo(List<BanInfo> bannedClients, int banID) {
+		for (BanInfo bans : bannedClients) {
+			if (bans.getID() == banID) {
+				return bans;
+			}
+		}
+		return null;
+	}
+	
 	
 	public void unbanClient(String clientUUID) {
 		for (BanInfo bans : getBans()) {
@@ -1199,13 +1224,13 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 
 	public DataBaseClientInfo getDataBaseClientInfoByUUID(String clientUUID) {
-		return getDataBaseClientInfo(getDataBaseClientIDByUUID(clientUUID));
+		return getDataBaseClient(getDataBaseClientIDByUUID(clientUUID));
 	}
 
 	public List<DataBaseClientInfo> getDataBaseClientInfosByName(String clientLastName) {
 		List<DataBaseClientInfo> resultList = new ArrayList<>();
 		for (Integer ids : getDataBaseClientIDsByName(clientLastName)) {
-			resultList.add(getDataBaseClientInfo(ids));
+			resultList.add(getDataBaseClient(ids));
 		}
 
 		return resultList;
@@ -1441,7 +1466,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 			if (addedList.contains(clDBID)) {
 				dbClInfo = resultMap.keySet().stream().filter(info -> info.getClientDataBaseID() == clDBID).findFirst().get();
 			} else {
-				dbClInfo = getDataBaseClientInfo(clDBID);
+				dbClInfo = getDataBaseClient(clDBID);
 				addedList.add(clDBID);
 			}
 			resultMap.put(dbClInfo, searchList.get(clDBID));
@@ -1479,6 +1504,17 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	public List<FileInfo> getChannelFilesByPath(ChannelInfo channel, String filePath) {
 		return getChannelFilesByPath(channel.getChannelID(), channel.getPassword(), filePath);
+	}
+	
+	/**
+	 * If you want a list of all files of a specified channel.
+	 * "/" is the path for the default folder of a channel.
+	 * @param channel
+	 * @return
+	 */
+	
+	public List<FileInfo> getChannelFiles(ChannelInfo channel) {
+		return getChannelFilesByPath(channel.getChannelID(), channel.getPassword(), "/");
 	}
 
 	public void renameFile(ChannelInfo channel, String oldFilePath, String newFilePath) {
@@ -1567,16 +1603,20 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<CreatedQueryLogin> getQueryLogins(String pattern, int start) {
 		return getQueryLogins(pattern, start, -1);
 	}
-
+	
+	public void sendTextMessage(TextMessageType messageType, ClientInfo client, String message) {
+		sendTextMessage(messageType, client.getClientID(), message);
+	}
+	
 	public void sendClientMessage(TextMessageType messageType, int clientID, String message) {
 		sendTextMessage(messageType, clientID, message);
 	}
 	
-	public void sendClientTextMessage(TextMessageType messageType, int clientID, String message) {
-		sendTextMessage(messageType, clientID, message);
+	public void sendClientMessage(TextMessageType messageType, ClientInfo client, String message) {
+		sendTextMessage(messageType, client.getClientID(), message);
 	}
 	
-	
+
 	public void deleteVirtualServer(VirtualServerInfo virtualServer) {
 		deleteVirtualServer(virtualServer.getID());
 	}
@@ -1587,8 +1627,8 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		editVirtualServer(prop);
 	}
 
-	public int createServerGroup(String serverGroupNamee) {
-		return createServerGroup(serverGroupNamee, ServerGroupType.NORMAL);
+	public int createServerGroup(String serverGroupName) {
+		return createServerGroup(serverGroupName, ServerGroupType.NORMAL);
 	}
 
 	public void addClientToServerGroup(int groupID, DataBaseClientInfo dataBaseClient) {
@@ -1919,5 +1959,17 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	
-
+	public void registerEvent(EventType eventType) {
+		registerEvent(eventType, -1);
+	}
+	
+	
+	public void stopServerProcess() {
+		stopServerProcess(null);
+	}
+	
+	public void deleteOfflineMessage(OfflineMessageInfo offlineMessage) {
+		deleteOfflineMessage(offlineMessage.getMessageID());
+	}
+	
 }

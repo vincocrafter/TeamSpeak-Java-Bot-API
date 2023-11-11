@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManager;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientProperty;
+import net.devcube.vinco.teamspeakapi.api.api.property.EventType;
 import net.devcube.vinco.teamspeakapi.api.api.property.InstanceProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupLevel;
@@ -50,31 +52,35 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.TempPasswordInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.VirtualServerInfo;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 
 /**
  * Reduced Version of the Ts3SyncAPI. Just every Method with its basic Data
- * Types. Not much Methodoverriding, just for a better
- * overview.
+ * Types. Not much Methodoverriding, just for a better overview.
  * 
  */
 
 public class Ts3BasicAPI {
 
 	protected Ts3ServerQuery query;
+	protected QueryConfig config;
+	protected CacheManager cache;
 	private boolean connected = false;
 	protected static String TS_INFO_SEPERATOR = "\\|";
 
 	/**
 	 * Initiation of the Sync API
 	 * 
-	 * @param Serverquery
-	 *                        class
+	 * @param query
+	 *                  Serverquery class
 	 */
 	public Ts3BasicAPI(Ts3ServerQuery query) {
 		this.query = query;
+		this.config = query.getConfig();
+		this.cache = query.getCache();
 	}
 
-	protected String get(String stringFrom, String splitter) {
+	public String get(String stringFrom, String splitter) {
 		return stringFrom.split(splitter)[1].split(" ")[0];
 	}
 
@@ -96,20 +102,21 @@ public class Ts3BasicAPI {
 	 */
 	public void connectTeamSpeakQuery(int serverID, String nickName) {
 		if (!isConnected()) {
-			selectVirtualServer(serverID,-1, nickName); // select the virtualServer, the query client should connect to
+			selectVirtualServer(serverID, -1, nickName); // select the virtualServer, the query client should connect to
 			query.debug(DebugOutputType.QUERY, "Query connected sucessfully ");
 			setConnected(true);
 		} else {
 			query.debug(DebugOutputType.QUERY, "Query is already conncted");
 		}
 	}
-	
-	
-	
+
 	/**
-	 * Connects the query to the virtual server
-	 * @param serverID ID of the virtual Server
-	 * @param nickName is optional (if null, not used)
+	 * Connects the query to the virtual server. Starts caching for the first time.
+	 * 
+	 * @param serverID
+	 *                     ID of the virtual Server
+	 * @param nickName
+	 *                     is optional (if null, not used)
 	 */
 
 	public void selectVirtualServer(int serverID, int serverPort, String nickName) {
@@ -122,6 +129,16 @@ public class Ts3BasicAPI {
 		String res = query.getWriter().executeReadErrorCommand(commandBuilder.toString());
 		if (TSError.isError(res, TSError.INSUFFICIENT_CLIENT_PERMISSIONS)) {
 			query.debug(DebugOutputType.ERROR, "Use Command failed! Insufficient client permissions!");
+			return;
+		}
+
+		/**
+		 * Starts chache updater for the first time. After selecting the virtual server.
+		 */
+
+		if (!query.getConfig().getCachingList().isEmpty()) {
+			this.cache = query.getCache();
+			query.getCache().prepareCache();
 		}
 	}
 
@@ -148,7 +165,14 @@ public class Ts3BasicAPI {
 	 */
 
 	public QueryClientInfo getQueryInfo() {
-		return new QueryClientInfo(query.getWriter().executeReadCommand("whoami")[0].split(" "));
+		String info;
+		if (config.isQueryCached()) {
+			info = cache.getQueryProperties();
+		} else {
+			info = query.getWriter().executeReadCommand("whoami")[0];
+		}
+
+		return new QueryClientInfo(info.split(" "));
 	}
 
 	public int getVirtualServerIDByPort(int port) {
@@ -165,9 +189,14 @@ public class Ts3BasicAPI {
 
 	public List<Permission> getPermissionList() {
 		List<Permission> resultList = new ArrayList<Permission>();
-		String[] permissions = query.getWriter().executeReadCommand("permissionlist")[0].split(TS_INFO_SEPERATOR);
-		for (String permission : permissions) {
+		String[] permissions;
+		if (config.isPermissionCached()) {
+			permissions = cache.getPermissionsList().split(TS_INFO_SEPERATOR);
+		} else {
+			permissions = query.getWriter().executeReadCommand("permissionlist")[0].split(TS_INFO_SEPERATOR);
+		}
 
+		for (String permission : permissions) {
 			int permID = Integer.parseInt(get(permission, "permid="));
 			String permName = get(permission, "permname=");
 			String permDes = "";
@@ -222,14 +251,20 @@ public class Ts3BasicAPI {
 
 	public List<ServerGroupInfo> getServerGroups() {
 		List<ServerGroupInfo> resultList = new ArrayList<ServerGroupInfo>();
-		String[] result = query.getWriter().executeReadCommand("servergrouplist");
-		if (TSError.isError(result[1], TSError.DATABASE_EMPTY_RESULT)) {
-			query.debug(DebugOutputType.WARNING, "Database was empty for command : 'servergrouplist'");
-			return resultList;
+
+		String serverGroups;
+		if (config.isGroupsCached()) {
+			serverGroups = cache.getServerGroupsList();
+		} else {
+			String[] result = query.getWriter().executeReadCommand("servergrouplist");
+			if (TSError.isError(result[1], TSError.DATABASE_EMPTY_RESULT)) {
+				query.debug(DebugOutputType.WARNING, "Database was empty for command : 'servergrouplist'");
+				return resultList;
+			}
+			serverGroups = result[0];
 		}
 
-		String[] servergroups = result[0].split(TS_INFO_SEPERATOR);
-		for (String groups : servergroups) {
+		for (String groups : serverGroups.split(TS_INFO_SEPERATOR)) {
 			resultList.add(new ServerGroupInfo(groups.split(" ")));
 		}
 
@@ -272,15 +307,28 @@ public class Ts3BasicAPI {
 
 	public List<ChannelGroupInfo> getChannelGroups() {
 		List<ChannelGroupInfo> resultList = new ArrayList<ChannelGroupInfo>();
-		String[] clients = query.getWriter().executeReadCommand("channelgrouplist")[0].split(TS_INFO_SEPERATOR);
-		for (String client : clients) {
+		String channelGroups;
+		if (config.isGroupsCached()) {
+			channelGroups = cache.getChannelGroupsList();
+		} else {
+			channelGroups = query.getWriter().executeReadCommand("channelgrouplist")[0];
+		}
+
+		for (String client : channelGroups.split(TS_INFO_SEPERATOR)) {
 			resultList.add(new ChannelGroupInfo(client.split(" ")));
 		}
 		return resultList;
 	}
 
 	public VirtualServerInfo getServerInfo() {
-		return new VirtualServerInfo(query.getWriter().executeReadCommand("serverinfo")[0].split(" "));
+		String information;
+		if (config.isVirtualServerCached()) {
+			information = cache.getVirtualServerProperties();
+		} else {
+			information = query.getWriter().executeReadCommand("serverinfo")[0];
+		}
+
+		return new VirtualServerInfo(information.split(" "));
 	}
 
 	public ConnectionInfo getConnectionInfo() {
@@ -309,9 +357,15 @@ public class Ts3BasicAPI {
 	 * @return List with Information about each Client in the Database.
 	 */
 
-	public List<DataBaseClientInfo> getDatabaseClients() {
+	public List<DataBaseClientInfo> getDataBaseClients() {
 		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
-		String[] clients = query.getWriter().executeReadCommand("clientdblist")[0].split(TS_INFO_SEPERATOR);
+		String[] clients;
+		if (config.isDataBaseCached()) {
+			clients = cache.getDBClientsList().split(TS_INFO_SEPERATOR);
+		} else {
+			clients = query.getWriter().executeReadCommand("clientdblist")[0].split(TS_INFO_SEPERATOR);
+		}
+
 		for (String client : clients) {
 			resultList.add(new DataBaseClientInfo(client.replace("cldbid", "client_database_id").split(" ")));
 		}
@@ -360,7 +414,13 @@ public class Ts3BasicAPI {
 	}
 
 	public ClientInfo getClient(int clientID) {
-		String information = query.getWriter().executeReadCommand("clientinfo clid=" + clientID)[0];
+		String information;
+		if (config.isClientsCached()) {
+			information = cache.getClientInfo(clientID);
+		} else {
+			information = query.getWriter().executeReadCommand("clientinfo clid=" + clientID)[0];
+		}
+
 		if (information.isEmpty())
 			return null;
 
@@ -379,17 +439,23 @@ public class Ts3BasicAPI {
 
 	public List<ClientInfo> getClients() {
 		List<ClientInfo> resultList = new ArrayList<ClientInfo>();
-		StringBuilder commandBuilder = new StringBuilder("clientlist");
-		commandBuilder.append(" -uid");
-		commandBuilder.append(" -away");
-		commandBuilder.append(" -voice");
-		commandBuilder.append(" -times");
-		commandBuilder.append(" -groups");
-		commandBuilder.append(" -info");
-		commandBuilder.append(" -country");
-		commandBuilder.append(" -ip");
-		commandBuilder.append(" -badges");
-		String[] clients = query.getWriter().executeReadCommand(commandBuilder.toString())[0].split(TS_INFO_SEPERATOR);
+		String[] clients;
+		if (config.isClientsCached()) {
+			clients = cache.getClientsList().split(TS_INFO_SEPERATOR);
+		} else {
+			StringBuilder commandBuilder = new StringBuilder("clientlist");
+			commandBuilder.append(" -uid");
+			commandBuilder.append(" -away");
+			commandBuilder.append(" -voice");
+			commandBuilder.append(" -times");
+			commandBuilder.append(" -groups");
+			commandBuilder.append(" -info");
+			commandBuilder.append(" -country");
+			commandBuilder.append(" -ip");
+			commandBuilder.append(" -badges");
+			clients = query.getWriter().executeReadCommand(commandBuilder.toString())[0].split(TS_INFO_SEPERATOR);
+		}
+
 		for (String client : clients) {
 			int clientID = Integer.parseInt(get(client, "clid="));
 			resultList.add(new ClientInfo(client.concat(" clid=" + clientID).split(" ")));
@@ -397,8 +463,14 @@ public class Ts3BasicAPI {
 		return resultList;
 	}
 
-	public DataBaseClientInfo getDataBaseClientInfo(int clientDataBaseID) {
-		String information = query.getWriter().executeReadCommand("clientdbinfo cldbid=" + clientDataBaseID)[0];
+	public DataBaseClientInfo getDataBaseClient(int clientDataBaseID) {
+		String information;
+		if (config.isDataBaseCached()) {
+			information = cache.getDBClientInfo(clientDataBaseID);
+		} else {
+			information = query.getWriter().executeReadCommand("clientdbinfo cldbid=" + clientDataBaseID)[0];
+		}
+
 		if (information.isEmpty())
 			return null;
 
@@ -406,12 +478,16 @@ public class Ts3BasicAPI {
 	}
 
 	public ChannelInfo getChannel(int channelID) {
-		String information = query.getWriter().executeReadCommand("channelinfo cid=" + channelID)[0];
+		String information;
+		if (config.isChannelsCached()) {
+			information = cache.getChannelInfo(channelID);
+		} else {
+			information = query.getWriter().executeReadCommand("channelinfo cid=" + channelID)[0];
+		}
+
 		if (information.isEmpty())
 			return null;
-		ChannelInfo chInfo = new ChannelInfo(information.split(" "));
-		chInfo.addInfo("cid", String.valueOf(channelID));
-		return chInfo;
+		return new ChannelInfo(information.concat(" cid=" + channelID).split(" "));
 	}
 
 	public List<ChannelInfo> getChannelsByName(String channelName) {
@@ -448,6 +524,15 @@ public class Ts3BasicAPI {
 	 */
 
 	public List<ChannelInfo> getChannels() {
+		if (config.isChannelsCached()) {
+			List<ChannelInfo> resultList = new ArrayList<ChannelInfo>();
+			String[] channels = cache.getChannelsList().split(TS_INFO_SEPERATOR);
+			for (String channel : channels) {
+				resultList.add(new ChannelInfo(channel.split(" ")));
+			}
+			return resultList;
+		}
+
 		StringBuilder commandBuilder = new StringBuilder("channellist");
 		commandBuilder.append(" -topic");
 		commandBuilder.append(" -flags");
@@ -618,8 +703,10 @@ public class Ts3BasicAPI {
 	public List<BanInfo> getBans() {
 		List<BanInfo> resultList = new ArrayList<BanInfo>();
 		String[] result = query.getWriter().executeReadCommand("banlist");
-		if (TSError.isError(result[1], TSError.DATABASE_EMPTY_RESULT))
+		if (TSError.isError(result[1], TSError.DATABASE_EMPTY_RESULT)) {
+			query.debug(DebugOutputType.WARNING, "Database was empty for command : 'banlist'");
 			return resultList;
+		}
 
 		for (String ban : result[0].split(TS_INFO_SEPERATOR)) {
 			resultList.add(new BanInfo(ban.split(" ")));
@@ -643,22 +730,29 @@ public class Ts3BasicAPI {
 	public String getVersion() {
 		return query.getWriter().executeReadCommand("version")[0];
 	}
-	
+
 	/**
-	 * Adds a bandrule to the server, every argument is
-	 * optional, but you should use at least one.
-	 * Be aware that you could ban more clients than indeeded.
+	 * Adds a bandrule to the server, every argument is optional, but you should use
+	 * at least one. Be aware that you could ban more clients than indeeded.
 	 * 
 	 * 
-	 * @param ip is optional (if null not used)
-	 * @param name is optional (if null not used)
-	 * @param clientUUID is optional (if null not used)
-	 * @param myTSID is optional (if null not used)
-	 * @param banTime is optional (if -2 not used)
-	 * @param banReason is optional (if null not used)
+	 * @param ip
+	 *                       is optional (if null not used)
+	 * @param name
+	 *                       is optional (if null not used)
+	 * @param clientUUID
+	 *                       is optional (if null not used)
+	 * @param myTSID
+	 *                       is optional (if null not used)
+	 * @param banTime
+	 *                       is optional (if -2 not used)
+	 * @param banReason
+	 *                       is optional (if null not used)
+	 * 
+	 * @return ID of the ban.
 	 */
-	
-	public void addBan(String ip, String name, String clientUUID, String myTSID, long banTime, String banReason) {
+
+	public int addBan(String ip, String name, String clientUUID, String myTSID, long banTime, String banReason) {
 		StringBuilder commandBuilder = new StringBuilder("banadd");
 		if (ip != null)
 			commandBuilder.append(" ip=" + ip);
@@ -673,23 +767,35 @@ public class Ts3BasicAPI {
 		if (banReason != null)
 			commandBuilder.append(" banreason=" + Formatter.toTsFormat(banReason));
 
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
+		return Integer.parseInt(query.getWriter().executeReadCommand(commandBuilder.toString())[0].split("=")[1]);
 	}
-	
+
 	/**
 	 * Bans a client from the server.
-	 * @param clientID ID of the client.
-	 * @param banTime Time the client should be banned.
-	 * @param banReason is optional (if null not used)
+	 * 
+	 * @param clientID
+	 *                      ID of the client.
+	 * @param banTime
+	 *                      Time the client should be banned.
+	 * @param banReason
+	 *                      is optional (if null not used)
+	 * 
+	 * @return Array of banIDs {clientBanID, ipBanID}
 	 */
-	
-	public void banClient(int clientID, long banTime, String banReason) {
+
+	public int[] banClient(int clientID, long banTime, String banReason) {
 		StringBuilder commandBuilder = new StringBuilder();
 		commandBuilder.append("banclient time=" + banTime);
 		if (banReason != null)
 			commandBuilder.append(" banreason=" + Formatter.toTsFormat(banReason));
 		commandBuilder.append(" clid=" + clientID);
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
+
+		String res = query.getWriter().executeReadCommand(commandBuilder.toString())[0]
+				.replace("banid=", "").replace("\n", ",");
+		int banIDclient = Integer.parseInt(res.split(",")[0]);
+		int banIDip = Integer.parseInt(res.split(",")[1]);
+		
+		return new int[] {banIDclient, banIDip};
 	}
 
 	public void removeBan(int banID) {
@@ -703,14 +809,15 @@ public class Ts3BasicAPI {
 	public void startVirtualServer(int virtualServerID) {
 		query.getWriter().executeReadErrorCommand("serverstart sid=" + virtualServerID);
 	}
-	
+
 	/**
 	 * Stops a specified virtual server.
 	 * 
 	 * @param virtualServerID
-	 * @param reasonmsg is optional (if null not used)
+	 * @param reasonmsg
+	 *                            is optional (if null not used)
 	 */
-	
+
 	public void stopVirtualServer(int virtualServerID, String reasonmsg) {
 		StringBuilder commandBuilder = new StringBuilder("serverstop");
 		commandBuilder.append(" sid=" + virtualServerID);
@@ -720,23 +827,33 @@ public class Ts3BasicAPI {
 		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
 	}
 
-	public void stopServerProcess() {
-		query.getWriter().executeReadCommand("serverprocessstop");
+	public void stopServerProcess(String reasonmsg) {
+		StringBuilder cmdBuilder = new StringBuilder("serverprocessstop");
+		if (reasonmsg != null) {
+			cmdBuilder.append(" reasonmsg=" + Formatter.toTsFormat(reasonmsg));
+		}
+
+		query.getWriter().executeReadCommand(cmdBuilder.toString());
 	}
 
 	public void resetPermissions() {
 		query.getWriter().executeReadCommand("permreset");
 	}
-	
+
 	/**
-	 * Adds a specified channel a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Adds a specified channel a permission. Use the permissionid or the
+	 * permissionname to identify the permission.
 	 * 
-	 * @param channelID Channel which should get the permission
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
-	 * @param permissionValue Value which the permission should have
+	 * @param channelID
+	 *                            Channel which should get the permission
+	 * @param permissionID
+	 *                            ID to identify the permission, could be optional
+	 *                            (if -1 not used)
+	 * @param permissionName
+	 *                            Name to identify the permission, could be optional
+	 *                            (if null not used)
+	 * @param permissionValue
+	 *                            Value which the permission should have
 	 */
 
 	public void addChannelPermission(int channelID, int permissionID, String permissionName, int permissionValue) {
@@ -750,19 +867,26 @@ public class Ts3BasicAPI {
 
 		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
 	}
-	
+
 	/**
-	 * Adds a specified client in a specified channel a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Adds a specified client in a specified channel a permission. Use the
+	 * permissionid or the permissionname to identify the permission.
 	 * 
-	 * @param channelID Channel in which the client should get the permission
-	 * @param clientdataBaseID Client which should get the permission
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
-	 * @param permissionValue Value which the permission should have
+	 * @param channelID
+	 *                             Channel in which the client should get the
+	 *                             permission
+	 * @param clientdataBaseID
+	 *                             Client which should get the permission
+	 * @param permissionID
+	 *                             ID to identify the permission, could be optional
+	 *                             (if -1 not used)
+	 * @param permissionName
+	 *                             Name to identify the permission, could be
+	 *                             optional (if null not used)
+	 * @param permissionValue
+	 *                             Value which the permission should have
 	 */
-	
+
 	public void addChannelClientPermission(int channelID, int clientdataBaseID, int permissionID, String permissionName, int permissionValue) {
 		StringBuilder commandBuilder = new StringBuilder("channelclientaddperm");
 		commandBuilder.append(" cid=" + channelID);
@@ -775,16 +899,22 @@ public class Ts3BasicAPI {
 
 		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
 	}
-	
+
 	/**
-	 * Removes a specified client in a specified channel a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Removes a specified client in a specified channel a permission. Use the
+	 * permissionid or the permissionname to identify the permission.
 	 * 
-	 * @param channelID Channel in which the permission should be removed from the client
-	 * @param clientdataBaseID Client which should be removed the permission
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
+	 * @param channelID
+	 *                             Channel in which the permission should be removed
+	 *                             from the client
+	 * @param clientdataBaseID
+	 *                             Client which should be removed the permission
+	 * @param permissionID
+	 *                             ID to identify the permission, could be optional
+	 *                             (if -1 not used)
+	 * @param permissionName
+	 *                             Name to identify the permission, could be
+	 *                             optional (if null not used)
 	 */
 
 	public void removeChannelClientPermission(int channelID, int clientdataBaseID, int permissionID, String permissionName) {
@@ -818,17 +948,21 @@ public class Ts3BasicAPI {
 	public void deleteChannel(int channelID, boolean force) {
 		query.getWriter().executeReadErrorCommand("channeldelete cid=" + channelID + " force=" + Formatter.toInt(force));
 	}
-	
+
 	/**
-	 * Removes a specified channel a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Removes a specified channel a permission. Use the permissionid or the
+	 * permissionname to identify the permission.
 	 * 
-	 * @param channelID Channel which the permission should  be removed from
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
+	 * @param channelID
+	 *                           Channel which the permission should be removed from
+	 * @param permissionID
+	 *                           ID to identify the permission, could be optional
+	 *                           (if -1 not used)
+	 * @param permissionName
+	 *                           Name to identify the permission, could be optional
+	 *                           (if null not used)
 	 */
-	
+
 	public void removeChannelPermission(int channelID, int permissionID, String permissionName) {
 		StringBuilder commandBuilder = new StringBuilder("channeldelperm");
 		if (channelID != -1)
@@ -857,18 +991,23 @@ public class Ts3BasicAPI {
 		String command = "channelgroupadd name=" + Formatter.toTsFormat(channelGroupName) + " type=" + channelGroupType.getValue();
 		return Integer.parseInt(query.getWriter().executeReadCommand(command)[0].split("cgid=")[1]);
 	}
-	
+
 	/**
-	 * Adds a specified channelgroup a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Adds a specified channelgroup a permission. Use the permissionid or the
+	 * permissionname to identify the permission.
 	 * 
-	 * @param channelGroupID ChannelGroup which should get the permission
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
-	 * @param permissionValue Value which the permission should have
+	 * @param channelGroupID
+	 *                            ChannelGroup which should get the permission
+	 * @param permissionID
+	 *                            ID to identify the permission, could be optional
+	 *                            (if -1 not used)
+	 * @param permissionName
+	 *                            Name to identify the permission, could be optional
+	 *                            (if null not used)
+	 * @param permissionValue
+	 *                            Value which the permission should have
 	 */
-	
+
 	public void addChannelGroupPermission(int channelGroupID, int permissionID, String permissionName, int permissionValue) {
 		StringBuilder commandBuilder = new StringBuilder("channelgroupaddperm");
 		commandBuilder.append(" cgid=" + channelGroupID);
@@ -894,17 +1033,22 @@ public class Ts3BasicAPI {
 	public void deleteChannelGroup(int channelGroupID, boolean force) {
 		query.getWriter().executeReadErrorCommand("channelgroupdel cgid=" + channelGroupID + " force=" + Formatter.toInt(force));
 	}
-	
+
 	/**
-	 * Removes a specified channelgroup a permission.
-	 * Use the permissionid or the permissionname
-	 * to identify the permission.
+	 * Removes a specified channelgroup a permission. Use the permissionid or the
+	 * permissionname to identify the permission.
 	 * 
-	 * @param channelGroupID ChannelGroup which the permission should be removed from
-	 * @param permissionID ID to identify the permission, could be optional (if -1 not used)
-	 * @param permissionName Name to identify the permission, could be optional (if null not used)
+	 * @param channelGroupID
+	 *                           ChannelGroup which the permission should be removed
+	 *                           from
+	 * @param permissionID
+	 *                           ID to identify the permission, could be optional
+	 *                           (if -1 not used)
+	 * @param permissionName
+	 *                           Name to identify the permission, could be optional
+	 *                           (if null not used)
 	 */
-	
+
 	public void removeChannelGroupPermission(int channelGroupID, int permissionID, String permissionName) {
 		StringBuilder commandBuilder = new StringBuilder("channelgroupdelperm");
 		commandBuilder.append(" cgid=" + channelGroupID);
@@ -1101,7 +1245,13 @@ public class Ts3BasicAPI {
 		List<FileInfo> resultList = new ArrayList<>();
 		String command = "ftgetfilelist cid=" + channelID + " cpw=" + channelPassword + " path=" + Formatter.toTsFormat(filePath);
 
-		String[] information = query.getWriter().executeReadErrorCommand(command).split(TS_INFO_SEPERATOR);
+		String[] result = query.getWriter().executeReadCommand(command);
+		String[] information = result[0].split(TS_INFO_SEPERATOR);
+		if (TSError.isError(result[1], TSError.DATABASE_EMPTY_RESULT)) {
+			query.debug(DebugOutputType.WARNING, "Database was empty for command : '" + command + "'");
+			return resultList;
+		}
+
 		for (String info : information) {
 			resultList.add(new FileInfo(info.split(" ")));
 		}
@@ -1188,8 +1338,11 @@ public class Ts3BasicAPI {
 	public List<PermissionAssignmentInfo> getAssignmentsOfPermission(int permissionID) {
 		List<PermissionAssignmentInfo> resultList = new ArrayList<>();
 
-		String[] info = query.getWriter().executeReadCommand("permfind permid=" + permissionID)[0].split(TS_INFO_SEPERATOR);
-		for (String perms : info) {
+		String info = query.getWriter().executeReadCommand("permfind permid=" + permissionID)[0];
+		if (info.isEmpty())
+			return resultList;
+
+		for (String perms : info.split(TS_INFO_SEPERATOR)) {
 			resultList.add(new PermissionAssignmentInfo(perms.split(" ")));
 		}
 
@@ -1199,8 +1352,11 @@ public class Ts3BasicAPI {
 	public List<PermissionAssignmentInfo> getAssignmentsOfPermission(String permissionName) {
 		List<PermissionAssignmentInfo> resultList = new ArrayList<>();
 
-		String[] info = query.getWriter().executeReadCommand("permfind permsid=" + Formatter.toTsFormat(permissionName))[0].split(TS_INFO_SEPERATOR);
-		for (String perms : info) {
+		String info = query.getWriter().executeReadCommand("permfind permsid=" + Formatter.toTsFormat(permissionName))[0];
+		if (info.isEmpty())
+			return resultList;
+
+		for (String perms : info.split(TS_INFO_SEPERATOR)) {
 			resultList.add(new PermissionAssignmentInfo(perms.split(" ")));
 		}
 
@@ -1267,10 +1423,11 @@ public class Ts3BasicAPI {
 	}
 
 	public CreatedQueryLogin createQueryLogin(String loginName, int clientDBID) {
-		String command = "queryloginadd client_login_name=" + loginName;
+		StringBuilder command = new StringBuilder("queryloginadd");
+		command.append(" client_login_name=" + loginName);
 		if (clientDBID != -1)
-			command = command + " cldbid=" + clientDBID;
-		String information = query.getWriter().executeReadCommand(command)[0];
+			command.append(" cldbid=" + clientDBID);
+		String information = query.getWriter().executeReadCommand(command.toString())[0];
 		if (information.isEmpty())
 			return null;
 		return new CreatedQueryLogin(information.split(" "));
@@ -1312,7 +1469,13 @@ public class Ts3BasicAPI {
 			String setValue = Formatter.toTsFormat(virtualServerProperties.get(prop));
 			commandBuilder.append(" " + propName + "=" + setValue);
 		}
-		String information = query.getWriter().executeReadCommand(commandBuilder.toString())[0];
+		String[] result = query.getWriter().executeReadCommand(commandBuilder.toString());
+		if (TSError.isError(result[1], TSError.VIRTUALSERVER_LIMIT_REACHED)) {
+			query.debug(DebugOutputType.ERROR, "Limit of virtual servers reached by command: 'servercreate'");
+			return null;
+		}
+		
+		String information = result[0];
 		if (information.isEmpty())
 			return null;
 
@@ -1445,6 +1608,19 @@ public class Ts3BasicAPI {
 
 	public void setClientChannelGroup(int channelGroupID, int channelID, int clientDBID) {
 		query.getWriter().executeReadErrorCommand("setclientchannelgroup cgid=" + channelGroupID + " cid=" + channelID + " cldbid=" + clientDBID);
+	}
+
+	public void registerEvent(EventType eventType, int channelID) {
+		StringBuilder cmdBuilder = new StringBuilder("servernotifyregister");
+		cmdBuilder.append(" event=" + eventType.getValue());
+		if (channelID != -1)
+			cmdBuilder.append(" id=" + channelID);
+
+		query.getWriter().executeReadErrorCommand(cmdBuilder.toString());
+	}
+
+	public void unRegisterAllEvents() {
+		query.getWriter().executeReadErrorCommand("servernotifyunregister");
 	}
 
 	/**

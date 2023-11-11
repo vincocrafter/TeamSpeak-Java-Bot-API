@@ -17,10 +17,13 @@ import java.lang.management.OperatingSystemMXBean;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManager;
 import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
+import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
@@ -44,15 +47,16 @@ public class Ts3ServerQuery {
 	private QueryReader reader;
 	private QueryWriter writer;
 	private QueryConfig config = new QueryConfig(this);
-
+	private CacheManager cache;
+	
 	private Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
 	private Ts3AsycAPI asycAPI = new Ts3AsycAPI(this);
-	private Ts3BasicAPI basicAPI = new Ts3BasicAPI(this);
+	private Ts3BasicAPI basicAPI;
 	
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
 	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
-
+	
 	/**
 	 * Connect's the Socket to the Server
 	 * 
@@ -69,9 +73,12 @@ public class Ts3ServerQuery {
 	 */
 
 	public void connect(String hostname, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
-		socket = new Socket(hostname, port);
-		reader = new QueryReader(this, socket);
-		writer = new QueryWriter(this, socket);
+		this.socket = new Socket(hostname, port);
+		this.reader = new QueryReader(this, socket);
+		this.writer = new QueryWriter(this, socket);
+		this.cache = new CacheManager(this);
+		this.basicAPI = new Ts3BasicAPI(this);
+		
 		reader.start(); // starts the reader Thread
 
 		// retrive the first meesages from the server
@@ -148,7 +155,14 @@ public class Ts3ServerQuery {
 		writer.executeReadErrorCommand("servernotifyregister event=tokenused");
 		debug(DebugOutputType.QUERY, "Registered all Events");
 	}
-
+	
+	public void checkQueryPermissions() {
+		Set<Integer> queryPermissions = syncAPI.getQueryPermissions();
+		TSPermission.checkQueryConnectPermissions(queryPermissions);
+		TSPermission.checkQueryActionPermissions(queryPermissions);
+		TSPermission.checkQueryInformationPermissions(queryPermissions);
+	}
+	
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */
@@ -213,7 +227,14 @@ public class Ts3ServerQuery {
 	public Logger getLogger() {
 		return logger;
 	}
-
+	
+	/**
+	 * @return the cache
+	 */
+	public CacheManager getCache() {
+		return cache;
+	}
+	
 	public String getTime() {
 		String format = "";
 		if (config.isShowTimeMilliseconds()) {
@@ -298,6 +319,11 @@ public class Ts3ServerQuery {
 		case ERROR:
 			if (config.isErrorDebug() || config.isEverything()) {
 				logLevel = Logger.ERROR;
+			}
+			break;
+		case CACHEMANAGER:
+			if (config.isCacheManagerDebug() || config.isEverything()) {
+				logLevel = Logger.CACHE_MANAGER;
 			}
 			break;
 		default:

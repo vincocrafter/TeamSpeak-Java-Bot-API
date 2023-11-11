@@ -15,27 +15,27 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getName() {
-		return Formatter.toNormalFormat(get("client_nickname"));
+		return getNickName();
 	}
 
 	public String getNickName() {
-		return getName();
+		return Formatter.toNormalFormat(get("client_nickname"));
 	}
 
 	public String getUUID() {
-		return get("client_unique_identifier");
+		return getClientUUID();
 	}
 	
 	public String getClientUUID() {
-		return getUUID();
+		return get("client_unique_identifier");
 	}
 
 	public int getID() {
-		return toInt(get("clid"));
+		return getClientID();
 	}
 
 	public int getClientID() {
-		return getID();
+		return toInt(get("clid"));
 	}
 	
 	public int getClientDataBaseID() {

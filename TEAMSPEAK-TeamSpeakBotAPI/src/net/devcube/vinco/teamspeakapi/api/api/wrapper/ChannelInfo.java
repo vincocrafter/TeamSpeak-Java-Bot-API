@@ -11,7 +11,6 @@ public class ChannelInfo extends DefaultInfo {
 		super(infos);
 	}
 
-	
 	public int getChannelID() {
 		return toInt(get("cid"));
 	}
@@ -89,8 +88,13 @@ public class ChannelInfo extends DefaultInfo {
 	}
 	
 	public String getFilePath() {
-		return Formatter.toNormalFormat(get("channel_filepath"));
+		return get("channel_filepath");
 	}
+	
+	/**
+	 * Formatted to a normal String format using the Formatter.
+	 * @return
+	 */
 	
 	public String getFilePathStr() {
 		return Formatter.toNormalFormat(get("channel_filepath"));

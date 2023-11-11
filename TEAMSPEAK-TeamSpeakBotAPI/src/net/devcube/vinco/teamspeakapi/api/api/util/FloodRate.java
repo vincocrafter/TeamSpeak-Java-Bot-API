@@ -33,7 +33,4 @@ public final class FloodRate {
 	public int getValue() {
 		return this.i;
 	}
-
-
-	
 }

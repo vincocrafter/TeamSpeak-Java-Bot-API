@@ -10,13 +10,22 @@ public class ServerGroupInfo extends DefaultInfo {
 		super(infos);
 	}
 
-	public int getID() {
+	public int getServerGroupID() {
 		return toInt(get("sgid"));
 	}
+	
+	public int getID() {
+		return getServerGroupID();
+	}
 
-	public String getName() {
+	public String getServerGroupName() {
 		return Formatter.toNormalFormat(get("name"));
 	}
+	
+	public String getName() {
+		return getServerGroupName();
+	}
+	
 
 	private int getTypeID() {
 		return toInt(get("type"));

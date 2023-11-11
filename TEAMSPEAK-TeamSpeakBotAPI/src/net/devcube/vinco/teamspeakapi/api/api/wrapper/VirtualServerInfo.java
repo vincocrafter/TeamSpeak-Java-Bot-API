@@ -22,7 +22,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public String getServerName() {
-		return get("virtualserver_name");
+		return Formatter.toNormalFormat(get("virtualserver_name"));
 	}
 	
 	public String getName() {
@@ -132,7 +132,8 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 	
 	public int getPrioritySpeakerDimmModificator() {
-		return toInt(get("virtualserver_priority_speaker_dimm_modificator"));
+		String info = get("virtualserver_priority_speaker_dimm_modificator");
+		return toInt(info.substring(0, info.indexOf(".")));
 	}
 	
 	public int getClientConnections() {
@@ -310,10 +311,7 @@ public class VirtualServerInfo extends DefaultInfo {
 		s.append("ID=" + getServerID() + ", ");
 		s.append("UUID=" + getServerUUID() + ", ");
 		s.append("MaxClientsOnline=" + getMaxclients() + ", ");
-		s.append("OnlineClients=" + getOnlineClientsSize() + ", ");
-		s.append("Channels=" + getChannels() + ", ");
-		s.append("OnlineTime=" + getOnlineTime() + ", ");
-		s.append("CreatedDate=" + getCreatingDate());
+		s.append("OnlineClients=" + getOnlineClientsSize());
 		s.append("]");
 		return s.toString();
 	}

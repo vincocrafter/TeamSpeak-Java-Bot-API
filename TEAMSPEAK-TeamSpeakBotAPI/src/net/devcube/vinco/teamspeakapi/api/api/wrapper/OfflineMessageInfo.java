@@ -12,6 +12,10 @@ public class OfflineMessageInfo extends DefaultInfo {
 	public int getMessageID() {
 		return toInt(get("msgid"));
 	}
+	
+	public int getID() {
+		return getMessageID();
+	}
 
 	public String getClientUUID() {
 		return get("cluid");

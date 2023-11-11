@@ -46,7 +46,7 @@ public class ClientJoinEvent extends BaseEvent {
 		return toBol(toInt(get("client_is_recording")));
 	}
 	
-	public int getClChannelGroupID() {
+	public int getClientChannelGroupID() {
 		return toInt(get("client_channel_group"));
 	}
 	

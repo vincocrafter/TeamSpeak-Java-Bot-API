@@ -9,7 +9,7 @@
  * 
  * Uhrzeit : 12:56:36
  */
-package net.devcube.vinco.teamspeakapi.api.api.util;
+package net.devcube.vinco.teamspeakapi.api.api.property;
 
 import java.util.ArrayList;
 import java.util.List;

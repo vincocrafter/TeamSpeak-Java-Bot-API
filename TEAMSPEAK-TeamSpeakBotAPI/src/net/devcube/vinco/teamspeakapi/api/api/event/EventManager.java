@@ -213,26 +213,37 @@ public class EventManager {
 	 */
 
 	public synchronized void callNewEvent(String[] infos) {
-		BaseEvent event = getEventByName(infos);
 		String eventName = infos[0];
 
 		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
-
 		for (TsEvent registeredEvents : events) {
-			for (Method meth : registeredEvents.getClass().getDeclaredMethods()) {
-				if (meth.isAnnotationPresent(EventHandler.class)) { // Check
-					for (AnnotatedType ann1 : meth.getAnnotatedParameterTypes()) {
-						if (ann1.getType().getTypeName().equals(event.getClass().getName())) { // Check for parameter name is equal to the
-							// (Base)Event Class Name
-							// Example -> public void test(PrivilegeKeyUsedEvent ev) {
-							// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
-							try {
-								meth.invoke(registeredEvents, getEventByName(infos));
-							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() 
-										+ "' caused by " + e.getCause().getClass().getName() + "!");
-								e.printStackTrace();
-							}
+			callNewEventClass(infos, registeredEvents);
+		}
+	}
+	
+	/**
+	 * Split Methods to call specified Event at any point for specific class.
+	 * 
+	 * @param infos Eventinformation given by the query
+	 * @param registeredEvent Eventclass which should be invoked
+	 */
+	
+	public void callNewEventClass(String[] infos, TsEvent registeredEvent) {
+		BaseEvent event = getEventByName(infos);
+		
+		for (Method meth : registeredEvent.getClass().getDeclaredMethods()) {
+			if (meth.isAnnotationPresent(EventHandler.class)) { // Check
+				for (AnnotatedType ann1 : meth.getAnnotatedParameterTypes()) {
+					if (ann1.getType().getTypeName().equals(event.getClass().getName())) { // Check for parameter name is equal to the
+						// (Base)Event Class Name
+						// Example -> public void test(PrivilegeKeyUsedEvent ev) {
+						// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
+						try {
+							meth.invoke(registeredEvent, getEventByName(infos));
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() 
+									+ "' caused by " + e.getCause().getClass().getName() + "!");
+							e.printStackTrace();
 						}
 					}
 				}
@@ -244,7 +255,7 @@ public class EventManager {
 	 * Returners Different (BaseEvent)Classes depending by the given information.
 	 * Only called by the callNewEvent Method
 	 * 
-	 * @param String[]
+	 * @param infos
 	 *                     eventInformation
 	 */
 

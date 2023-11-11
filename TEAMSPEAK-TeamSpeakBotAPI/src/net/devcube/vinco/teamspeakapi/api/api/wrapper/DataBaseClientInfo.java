@@ -16,7 +16,11 @@ public class DataBaseClientInfo extends DefaultInfo {
 	public int getClientDataBaseID() {
 		return toInt(get("client_database_id"));
 	}
-
+	
+	public int getID() {
+		return getClientDataBaseID();
+	}
+	
 	public String getClientName() {
 		return Formatter.toNormalFormat(get("client_nickname"));
 	}

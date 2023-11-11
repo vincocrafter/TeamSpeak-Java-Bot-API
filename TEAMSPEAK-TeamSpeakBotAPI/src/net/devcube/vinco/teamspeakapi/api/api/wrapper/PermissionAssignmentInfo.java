@@ -39,14 +39,23 @@ public class PermissionAssignmentInfo extends DefaultInfo {
 	}
 	
 	public int getPermValue() {
+		if (get("v") == null)
+			return -1;
+		
 		return toInt(get("v"));
 	}
 	
 	public boolean isNegated() {
+		if (get("n") == null)
+			return false;
+		
 		return toBol(get("n"));
 	}
 	
 	public boolean isSkip() {
+		if (get("s") == null)
+			return false;
+		
 		return toBol(get("s"));
 	}
 	

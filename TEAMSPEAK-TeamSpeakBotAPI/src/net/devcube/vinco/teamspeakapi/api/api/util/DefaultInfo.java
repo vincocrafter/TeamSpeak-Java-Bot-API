@@ -1,44 +1,56 @@
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
+import java.util.HashMap;
+
 public class DefaultInfo {
 
-	String[] infos;
-
+	private String[] infos;
+	private HashMap<String, String> splitInfos = new HashMap<>();
+	
 	public DefaultInfo(String[] infos) {
 		this.infos = infos;
-	}
-
-	public void printInfos() {
-		System.out.println(Formatter.connectString(infos));
-	}
-
-	protected String get(int i) {
-		try {
-			String s = this.infos[i];
-			return s.substring(s.indexOf("=") + 1, s.length());
-		} catch (ArrayIndexOutOfBoundsException e) {
-			e.printStackTrace();
-			return "";
+		for (String info : infos) {
+			String key = info.split("=")[0];
+			String value = "";
+			if (info.split("=").length > 1) {
+				value = info.split("=")[1];
+			}
+			
+			splitInfos.put(key, value);
 		}
 	}
 	
+	
+	/*
 	public String get(String valueName) {
         for (String s : this.infos) {
             String[] split = s.split("=");
-            if(split[0].equals(valueName)){
+            if(split[0].equals(valueName)) {
             	return split.length < 2 ? null : split[1];
             }
         }
         return "";
     }
+    */
+    
+	public String get(String valueName) {
+		return splitInfos.get(valueName);
+	}
 	
 	public void addInfo(String key, String value) {
-		String fInfos = Formatter.connectString(this.infos) + " " + key + "=" + value;
-		this.infos = fInfos.split(" ");
+		splitInfos.put(key, value);
 	}
 	
 	public String[] getInfos() {
 		return this.infos;
+	}
+	
+	public String getRawInfos() {
+		return Formatter.connectString(infos);
+	}
+	
+	public void printRawInfos() {
+		System.out.println(getRawInfos());
 	}
 
 	protected int toInt(String s) {

@@ -9,11 +9,11 @@ public class QueryClientInfo extends DefaultInfo {
 	}
 
 	public String getNickName() {
-		return getName();
+		return get("client_nickname");
 	}
 
 	public String getName() {
-		return get("client_nickname");
+		return getNickName();
 	}
 
 	public String getUUID() {
@@ -21,11 +21,11 @@ public class QueryClientInfo extends DefaultInfo {
 	}
 
 	public int getID() {
-		return toInt(get("client_id"));
+		return getClientID();
 	}
 	
 	public int getClientID() {
-		return getID();
+		return toInt(get("client_id"));
 	}
 	
 	public int getChannelID() {

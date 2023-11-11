@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManagerUpdater;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
@@ -114,17 +115,33 @@ public class QueryReader {
 
 	private void callEvents(String msg) {
 		String[] infos = msg.split(" ");
+		
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				if (!query.getConfig().getCachingList().isEmpty()) {
+					query.debug(DebugOutputType.CACHEMANAGER, "Calling eventupdater for event " + infos[0]);
+					query.getEventManager().callNewEventClass(infos, new CacheManagerUpdater());
+				}
+				
+			}
+		}, "CHMA").start();
+		
+		
 		/*
 		 * Decide which EventCall you prefer here the new one it is also the default one
 		 * 
 		 * @see QueryConfig#isEventCallType()
 		 */
+		
 		eventThread = new Thread(new Runnable() {
 
 			@SuppressWarnings("deprecation")
 			@Override
 			public void run() {
-				try {
+				try {					
 					if (query.getConfig().isEventCallType(EventCallType.NEW)) { // New one
 						query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
 						query.getEventManager().callNewEvent(infos);
@@ -271,7 +288,6 @@ public class QueryReader {
 		StringBuilder resPackets = new StringBuilder();
 		for (String result : resultpackets.peek()) {
 			resPackets.append(result + System.lineSeparator());
-
 		}
 
 		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
@@ -294,11 +310,8 @@ public class QueryReader {
 		StringBuilder resErrors = new StringBuilder();
 		for (String result : resulterrors.peek()) {
 			resErrors.append(result + System.lineSeparator());
-
 		}
-
+		
 		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
-	}
-
-	
+	}	
 }

@@ -11,6 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import java.math.BigInteger;
+
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class InstanceInfo extends DefaultInfo {
@@ -31,12 +33,12 @@ public class InstanceInfo extends DefaultInfo {
 		return toInt(get("serverinstance_filetransfer_port"));
 	}
 	
-	public long getMaxDownloadTotalBandwidth() {
-		return toLong(get("serverinstance_max_download_total_bandwidth"));
+	public BigInteger getMaxDownloadTotalBandwidth() {
+		return new BigInteger(get("serverinstance_max_download_total_bandwidth"));
 	}
 	
-	public long getMaxUploadTotalBandwidth() {
-		return toLong(get("serverinstance_max_upload_total_bandwidth"));
+	public BigInteger getMaxUploadTotalBandwidth() {
+		return new BigInteger(get("serverinstance_max_upload_total_bandwidth"));
 	}
 	
 	public int getGuestServerQueryGroup() {

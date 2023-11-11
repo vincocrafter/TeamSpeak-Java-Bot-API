@@ -41,15 +41,15 @@ public class BanInfo extends DefaultInfo {
 		return toInt(get("duration"));
 	}
 
-	public String getBannerName() {
+	public String getInvokerName() {
 		return Formatter.toNormalFormat(get("invokername"));
 	}
 
-	public int getBannerClientDataBaseID() {
+	public int getInvokerClientDataBaseID() {
 		return toInt(get("invokercldbid"));
 	}
 
-	public String getBannerClientUUID() {
+	public String getInvokerClientUUID() {
 		return get("invokeruid");
 	}
 

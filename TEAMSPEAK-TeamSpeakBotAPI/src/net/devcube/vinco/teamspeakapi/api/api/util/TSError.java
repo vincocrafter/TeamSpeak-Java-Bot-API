@@ -14,10 +14,10 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 public enum TSError {
 
 	QUERY_INVALID_LOGIN(520), // error id=520 msg=invalid\\sloginname\\sor\\spassword
+	CHANNEL_NAME_IS_ALEARY_IN_USE(771), // error id=771 msg=channel\sname\sis\salready\sin\suse
 	DATABASE_EMPTY_RESULT(1281), // error id=1281 msg=database\\sempty\\sresult\\sset
 	INSUFFICIENT_CLIENT_PERMISSIONS(2568), // error id=2568 msg=insufficient\\sclient\\spermissions failed_permid=156
-	CHANNEL_NAME_IS_ALEARY_IN_USE(771); // error id=771 msg=channel\sname\sis\salready\sin\suse
-
+	VIRTUALSERVER_LIMIT_REACHED(2816);//error id=2816 msg=virtualserver\slimit\sreached
 	private int i = 0;
 
 	private TSError(int i) {

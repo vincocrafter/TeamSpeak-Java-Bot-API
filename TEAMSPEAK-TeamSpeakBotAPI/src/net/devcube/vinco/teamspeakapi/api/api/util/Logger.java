@@ -16,6 +16,8 @@ public class Logger {
 	public static final int QUERY_WRITER = 6;
 	public static final int QUERY_READER = 7;
 	public static final int QUERY_READER_QUEUE = 8;
+	public static final int CACHE_MANAGER = 9;
+	
 	private Ts3ServerQuery serverQuery;
 
 	public Logger(Ts3ServerQuery serverQuery) {
@@ -59,7 +61,7 @@ public class Logger {
 			type = "[QUERY]";
 			break;
 		case 5:
-			type = "[Event Manager]";
+			type = "[EVENT MANAGER]";
 			break;
 		case 6:
 			type = "[QUERY WRITER]";
@@ -70,8 +72,11 @@ public class Logger {
 		case 8:
 			type = "[QUERY READER QUEUE]";
 			break;
+		case 9:
+			type = "[CACHE MANAGER]";
+			break;
 		default:
-			type = "[Other]";
+			type = "[OTHER]";
 			break;
 		}
 		logMessage.append(type);

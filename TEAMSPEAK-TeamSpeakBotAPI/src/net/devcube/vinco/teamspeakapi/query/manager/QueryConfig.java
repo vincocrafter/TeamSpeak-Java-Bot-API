@@ -12,7 +12,9 @@
 package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.CacheType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
@@ -42,7 +44,9 @@ public class QueryConfig {
 	 * 
 	 * @see Ts3ServerQuery#debug()
 	 */
-	private ArrayList<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
+	private List<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
+	
+	private List<CacheType> cacheList = new ArrayList<CacheType>();
 	
 	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
 	
@@ -98,10 +102,9 @@ public class QueryConfig {
 	 * 
 	 * @return the debuglist
 	 */
-	public ArrayList<DebugOutputType> getDebuglist() {
+	public List<DebugOutputType> getDebuglist() {
 		return debuglist;
 	}
-
 
 	public void addDebugItem(DebugOutputType debugOutputType) {
 		debuglist.add(debugOutputType);
@@ -167,6 +170,68 @@ public class QueryConfig {
 
 	public boolean isQueryWriterDebug() {
 		return isInDebug(DebugOutputType.QUERYWRITER);
+	}
+	
+	public boolean isCacheManagerDebug() {
+		return isInDebug(DebugOutputType.CACHEMANAGER);
+	}
+	
+	/**
+	 * Get a list of all selected Types of debugging
+	 * 
+	 * @return the debuglist
+	 */
+	public List<CacheType> getCachingList() {
+		return cacheList;
+	}
+
+	public void addCacheItem(CacheType cacheType) {
+		cacheList.add(cacheType);
+	}
+
+	public void removeCacheItem(CacheType cacheType) {
+		cacheList.remove(cacheType);
+	}
+
+	/**
+	 * Checks cacheTypes are set in the cachelist.
+	 * Used by the Query to retrieve which Objects should
+	 * be cached.
+	 * @see QueryConfig#addCacheItem(CacheType)
+	 * @param cacheType
+	 * @return
+	 */
+
+	public boolean isInCache(CacheType cacheType) {
+		return cacheList.contains(cacheType);
+	}
+	
+	public boolean isClientsCached() {
+		return isInCache(CacheType.CLIENTS);
+	}
+	
+	public boolean isChannelsCached() {
+		return isInCache(CacheType.CHANNELS);
+	}
+	
+	public boolean isGroupsCached() {
+		return isInCache(CacheType.GROUPS);
+	}
+	
+	public boolean isDataBaseCached() {
+		return isInCache(CacheType.DATABASE);
+	}
+	
+	public boolean isPermissionCached() {
+		return isInCache(CacheType.PERMISSION);
+	}
+	
+	public boolean isQueryCached() {
+		return isInCache(CacheType.QUERY);
+	}
+	
+	public boolean isVirtualServerCached() {
+		return isInCache(CacheType.VIRTUALSERVER);
 	}
 
 	/**

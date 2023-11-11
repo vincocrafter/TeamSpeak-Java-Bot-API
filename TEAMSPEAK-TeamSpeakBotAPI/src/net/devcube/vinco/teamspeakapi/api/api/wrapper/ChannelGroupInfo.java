@@ -11,19 +11,19 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	public int getID() {
-		return toInt(get("cgid"));
+		return getChannelGroupID();
 	}
 	
 	public int getChannelGroupID() {
-		return getID();
+		return toInt(get("cgid"));
 	}
 	
 	public String getName() {
-		return Formatter.toNormalFormat(get("name"));
+		return getChannelGroupName();
 	}
 
 	public String getChannelGroupName() {
-		return getName();
+		return Formatter.toNormalFormat(get("name"));
 	}
 	
 	private int getTypeID() {
@@ -49,7 +49,7 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	public int getNameMode() {
-		return toInt("namemode");
+		return toInt(get("namemode"));
 	}
 	
 	public int getNeededModifyPower() {

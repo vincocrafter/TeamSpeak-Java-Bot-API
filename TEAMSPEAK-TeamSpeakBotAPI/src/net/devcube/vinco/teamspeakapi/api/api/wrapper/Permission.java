@@ -1,46 +1,16 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
+
 public class Permission {
 
-	String permName = "";
-	String permDesc = "";
-	int permID = -1;
-	int permValue = 0;
-	boolean negated = false;
-	boolean skip = false;
-
-	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip) {
-		this.permName = permName;
-		this.permID = permID;
-		this.permValue = permValue;
-		this.negated = negated;
-		this.skip = skip;
-	}
-
-	public Permission(int permID, int permValue, boolean negated, boolean skip) {
-		this(null, permID, permValue, negated, skip);
-	}
-
-	public Permission(String permName, int permValue, boolean negated, boolean skip) {
-		this(permName, -1, permValue, negated, skip);
-	}
-
-	public Permission(String permName, int permID, int permValue) {
-		this(permName, permID, permValue, false, false);
-	}
-
-	public Permission(int permID, int permValue) {
-		this(null, permID, permValue, false, false);
-	}
-
-	public Permission(String permName, int permValue) {
-		this(permName, -1, permValue, false, false);
-	}
-
-	public Permission(int permID, String permName) {
-		this(permName, permID, 0, false, false);
-	}
-
+	private String permName = "";
+	private String permDesc = "";
+	private int permID = -1;
+	private int permValue = 0;
+	private boolean negated = false;
+	private boolean skip = false;
+	
 	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip, String permDesc) {
 		this.permName = permName;
 		this.permID = permID;
@@ -48,6 +18,38 @@ public class Permission {
 		this.negated = negated;
 		this.skip = skip;
 		this.permDesc = permDesc;
+	}
+
+	public Permission(int permID, int permValue, boolean negated, boolean skip) {
+		this(null, permID, permValue, negated, skip, null);
+	}
+	
+	public Permission(TSPermission permission, int permValue, boolean negated, boolean skip) {
+		this(null, permission.getValue(), permValue, negated, skip, null);
+	}
+	
+	public Permission(String permName, int permValue, boolean negated, boolean skip) {
+		this(permName, -1, permValue, negated, skip, null);
+	}
+
+	public Permission(String permName, int permID, int permValue) {
+		this(permName, permID, permValue, false, false, null);
+	}
+
+	public Permission(int permID, int permValue) {
+		this(null, permID, permValue, false, false, null);
+	}
+	
+	public Permission(TSPermission permission, int permValue) {
+		this(null, permission.getValue(), permValue, false, false, null);
+	}
+
+	public Permission(String permName, int permValue) {
+		this(permName, -1, permValue, false, false, null);
+	}
+
+	public Permission(int permID, String permName) {
+		this(permName, permID, 0, false, false, null);
 	}
 
 	public Permission(String permName, int permID, String permDesc) {
@@ -74,7 +76,7 @@ public class Permission {
 		return this.permValue;
 	}
 
-	public String getPermDesc() {
+	public String getPermDescription() {
 		return this.permDesc;
 	}
 

@@ -26,7 +26,7 @@ public enum DebugOutputType {
 	 *  
 	 *  @see QueryReader
 	 */
-	QUERYREADERQUEUE,
+	QUERYREADERQUEUE, CACHEMANAGER,
 	
 	//to select debug for a specific Event
 	E_CHANNEL_CREATED, E_CHANNEL_DELETED, E_CHANNEL_DESCRIPTION_EDITED, E_CHANNEL_EDITED, E_CHANNEL_PASSWORD_CHANGED,
