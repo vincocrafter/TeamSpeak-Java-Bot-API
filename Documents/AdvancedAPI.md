@@ -1,27 +1,27 @@
 # Using the Advanced API
 Some tricks and tipps to improve the performance of your Code.
-All Methods shown are provided the `Ts3SyncAPI` Class *(from net.devcube.vinco.teamspeakapi.api.sync)*.
+All methods shown are provided the `Ts3SyncAPI` class *(from net.devcube.vinco.teamspeakapi.api.sync)*.
 For simplicity the arguments are not shown, use the help of your
-IDEA or Documentation in the Code.
+IDEA or documentation in the code.
 
 ## 1. Getting Lists
 
-Be aware how much or what information you actually need in your Case, otherwise
+Be aware how much or what information you actually need in your case, otherwise
 it needs much more time to retrieve unused information.
 
 For reference also see: https://yat.qa/ressourcen/variablen-parameter/
 (Client/Channel-Variables -> ~list,~info)
 ### A. Client List
 Using `getOnlineClients()` or `getClients()` only provides
-the information from the List of Clients and contains less information 
-about every single Client compared to `getClient()`.
-But the Method send only one Command to the Server which is much faster.
+the information from the list of clients and contains less information 
+about every single client compared to `getClient()`.
+But the method send only one command to the server which is much faster.
 
 Using `getOnlineClientsDetailed()` or `getClientsDetailed()` provides
-the information from `getClient()` for every Client. It provides
+the information from `getClient()` for every client. It provides
 more information compared to above. But instead send much more
-Commands to the Server, because for every single Client
-a Command is executed to retrieve the information about it.
+commands to the server, because for every single client
+a command is executed to retrieve the information about it.
 
 ### B. Channel List
 Same as above for getting Clients.

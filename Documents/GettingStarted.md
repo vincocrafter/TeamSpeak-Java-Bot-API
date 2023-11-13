@@ -282,8 +282,12 @@ public class OtherExampleEventOld extends TsEventAdapter {
 [**Q**] Then what is the Ts3BasicAPI Class?
 
 For a better overview you could use the `Ts3BasicAPI` Class *(from net.devcube.vinco.teamspeakapi.api.sync)*.
-This Class only provides Method with the primitive Data Types and not much Method overriding, so it is
+This Class only provides Methods with the primitive Data Types and not much method overriding, so it is
 easier to start with.
+
+The `Ts3SyncAPI` Class extends from the `Ts3BasicAPI` Class, because of this every method in the `Ts3SyncAPI`
+will use a method from the `Ts3BasicAPI`. The `Ts3SyncAPI` Class is only an extension with some special Methods
+shown in [AdvancedAPI usage](AdvancedAPI.md).
 
 ## List of things you should only touch if you know what you are doing
 - Ts3ServerQuery.debug()

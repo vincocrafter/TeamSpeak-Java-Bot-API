@@ -42,6 +42,7 @@ query.getConfig().addDebugItem(DebugOutputType.QUERYREADER); // Query reading in
 query.getConfig().addDebugItem(DebugOutputType.QUERYREADERQUEUE);
 // Query Queue management for Packets | more precise than QUERYREADER for seeing how Packets are handled, but no debug for Events included
 query.getConfig().addDebugItem(DebugOutputType.QUERYWRITER); // Query outputs, executed Commands
+query.getConfig().addDebugItem(DebugOutputType.CACHEMANAGER); // Actions done by the cache manager which handles storing data
 ```
 
 **Select which Type of Event related debug you want to see in your Debug-Log:**
@@ -63,7 +64,6 @@ query.getConfig().addDebugItem(DebugOutputType.E_PRIVILEGEKEY_USED);
 query.getConfig().addDebugItem(DebugOutputType.E_SERVER_EDITED);
 query.getConfig().addDebugItem(DebugOutputType.E_TEXT_MESSAGE);
 ```
-
 **Select which Type of Display you want for your Debug-Log:**
 ```java
 // Select, if the debugging should be written in the Console or in a File

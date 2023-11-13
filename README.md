@@ -25,14 +25,14 @@ public class Test {
 }
 ```
 ## Getting Started:
-See [How to start with the API](GettingStarted.md).
+See [How to start with the API](Documents/GettingStarted.md).
 
 ## How to use debugging:
-See [How to debug with the API](Debugging.md) or [Advanced Debugging](AdvancedDebugging.md).\
-Or see [Example Log](ExampleDebugLog.md).
+See [How to debug with the API](Documents/Debugging.md) or [Advanced Debugging](Documents/AdvancedDebugging.md).\
+Or see [Example Log](Documents/ExampleDebugLog.md).
 
 ## Getting advanced Information:
-See [AdvancedAPI usage](AdvancedAPI.md).
+See [AdvancedAPI usage](Documents/AdvancedAPI.md).
 
 ## FloodRate:
 The Floodrate for the TsAPI is set to 0 ms per default (`FloodRate.DEFAULT_TSAPI`).\
