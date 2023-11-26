@@ -64,7 +64,7 @@ public class QueryReader {
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					PrintWriter writer = new PrintWriter(socket.getOutputStream());
-					while (socket.isConnected()) { // <-- while loop here
+					while (socket != null && socket.isConnected()) { // <-- while loop here
 						if (reader.ready()) {
 							String msg = rl(reader);
 							if (isError(msg)) {// Error handeling
@@ -181,12 +181,15 @@ public class QueryReader {
 	}
 	
 	
-	public void stopThreads() {
-		readerThread.interrupt();
+	public synchronized void stopThreads() {
+		commands.clear();
+		
 		if (eventThread != null)
 			eventThread.interrupt();
 		if (sleepThread != null)
 			sleepThread.interrupt();
+		this.socket = null;
+		readerThread.interrupt();
 	}
 	
 	private boolean isError(String rs) {
@@ -274,9 +277,10 @@ public class QueryReader {
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + resultpackets.peek().size());
 
 		StringBuilder resPackets = new StringBuilder();
-		for (String result : resultpackets.poll()) {
-			resPackets.append(result + System.lineSeparator());
-		}
+		resultpackets.poll().forEach(result -> {
+			resPackets.append(result);
+			resPackets.append(System.lineSeparator());
+		});
 
 		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
 	}
@@ -286,9 +290,10 @@ public class QueryReader {
 	 */
 	public synchronized String nextSavePacket() {
 		StringBuilder resPackets = new StringBuilder();
-		for (String result : resultpackets.peek()) {
-			resPackets.append(result + System.lineSeparator());
-		}
+		resultpackets.peek().forEach(result -> {
+			resPackets.append(result);
+			resPackets.append(System.lineSeparator());
+		});
 
 		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
 	}
@@ -296,9 +301,10 @@ public class QueryReader {
 	public synchronized String nextError() {
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: " + resulterrors.peek().size());
 		StringBuilder resErrors = new StringBuilder();
-		for (String result : resulterrors.poll()) {
-			resErrors.append(result + System.lineSeparator());
-		}
+		resulterrors.poll().forEach(result -> {
+			resErrors.append(result);
+			resErrors.append(System.lineSeparator());
+		});
 
 		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
 	}
@@ -308,9 +314,10 @@ public class QueryReader {
 	 */
 	public synchronized String nextSaveError() {
 		StringBuilder resErrors = new StringBuilder();
-		for (String result : resulterrors.peek()) {
-			resErrors.append(result + System.lineSeparator());
-		}
+		resulterrors.peek().forEach(result -> {
+			resErrors.append(result);
+			resErrors.append(System.lineSeparator());
+		});
 		
 		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
 	}	

@@ -48,15 +48,15 @@ public class Ts3ServerQuery {
 	private QueryWriter writer;
 	private QueryConfig config = new QueryConfig(this);
 	private CacheManager cache;
-	
+
 	private Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
 	private Ts3AsycAPI asycAPI = new Ts3AsycAPI(this);
 	private Ts3BasicAPI basicAPI;
-	
+
 	private EventManager eventManager = new EventManager(this);
 	private Logger logger = new Logger(this);
 	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
-	
+
 	/**
 	 * Connect's the Socket to the Server
 	 * 
@@ -73,31 +73,20 @@ public class Ts3ServerQuery {
 	 */
 
 	public void connect(String hostname, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
+		connect(hostname, port);
+		login(username, password);
+		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
+		if (defaultchannelID != -1)
+			syncAPI.goToChannel(defaultchannelID);
+		registerAllEvents();
+	}
+
+	public void connect(String hostname, int port) throws IOException {
 		this.socket = new Socket(hostname, port);
 		this.reader = new QueryReader(this, socket);
 		this.writer = new QueryWriter(this, socket);
 		this.cache = new CacheManager(this);
 		this.basicAPI = new Ts3BasicAPI(this);
-		
-		reader.start(); // starts the reader Thread
-
-		// retrive the first meesages from the server
-		while (reader.getResultPackets().peek().size() < 2);
-		reader.nextPacket();
-
-		login(username, password);
-		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
-		if (defaultchannelID != -1)
-			syncAPI.goToChannel(defaultchannelID);
-		socket.setKeepAlive(true);
-		keepAliveThread.start(); // starts KeepAlivThread
-		registerAllEvents();
-	}
-
-	public void connect(String hostname, int port) throws IOException {
-		socket = new Socket(hostname, port);
-		reader = new QueryReader(this, socket);
-		writer = new QueryWriter(this, socket);
 		reader.start(); // starts the reader Thread
 
 		// retrive the first meesages from the server
@@ -119,6 +108,9 @@ public class Ts3ServerQuery {
 		if (TSError.isError(res, TSError.QUERY_INVALID_LOGIN)) {
 			debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
 			throw new QueryLoginException("Invalid loginname or password!");
+		} else if (TSError.isError(res, TSError.CONNECTION_FAILED_BANNED)) {
+			debug(DebugOutputType.ERROR, "Login failed! Queryclient is banned!");
+			throw new QueryLoginException("Queryclient is banned!");
 		} else {
 			debug(DebugOutputType.QUERY, "Logged in sucessfully");
 		}
@@ -132,7 +124,8 @@ public class Ts3ServerQuery {
 	public void stopQuery() {
 		debug(DebugOutputType.QUERY, "Stopping Query");
 		keepAliveThread.interrupt();
-		writer.executeReadErrorCommand("quit");
+		getSyncAPI().unRegisterAllEvents();
+		getSyncAPI().quit();
 		try {
 			socket.close();
 		} catch (IOException e) {
@@ -155,14 +148,14 @@ public class Ts3ServerQuery {
 		writer.executeReadErrorCommand("servernotifyregister event=tokenused");
 		debug(DebugOutputType.QUERY, "Registered all Events");
 	}
-	
+
 	public void checkQueryPermissions() {
 		Set<Integer> queryPermissions = syncAPI.getQueryPermissions();
 		TSPermission.checkQueryConnectPermissions(queryPermissions);
 		TSPermission.checkQueryActionPermissions(queryPermissions);
 		TSPermission.checkQueryInformationPermissions(queryPermissions);
 	}
-	
+
 	/**
 	 * @returns the Usage of the Processor in percent
 	 */
@@ -213,7 +206,7 @@ public class Ts3ServerQuery {
 	public Ts3BasicAPI getBasicAPI() {
 		return basicAPI;
 	}
-	
+
 	/**
 	 * @return the eventManager
 	 */
@@ -227,14 +220,14 @@ public class Ts3ServerQuery {
 	public Logger getLogger() {
 		return logger;
 	}
-	
+
 	/**
 	 * @return the cache
 	 */
 	public CacheManager getCache() {
 		return cache;
 	}
-	
+
 	public String getTime() {
 		String format = "";
 		if (config.isShowTimeMilliseconds()) {
@@ -244,7 +237,7 @@ public class Ts3ServerQuery {
 		}
 		SimpleDateFormat simpledateformat = new SimpleDateFormat(format);
 		Date date = new Date();
-		
+
 		return simpledateformat.format(date);
 	}
 
@@ -261,10 +254,11 @@ public class Ts3ServerQuery {
 	}
 
 	/**
-	 * New debug Method for more specified debugging and logging.
-	 * Uses QueryConfig for console and/or file debugging.
+	 * New debug Method for more specified debugging and logging. Uses QueryConfig
+	 * for console and/or file debugging.
 	 * 
-	 * @param type Type of the debugmessage
+	 * @param type
+	 *                  Type of the debugmessage
 	 * @param debug
 	 *                  message
 	 * @see DebugOutputType

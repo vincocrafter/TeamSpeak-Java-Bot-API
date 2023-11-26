@@ -54,10 +54,8 @@ public class FileInfo extends DefaultInfo {
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("File[");
 		resultBuilder.append("ChannelID=" + getChannelID());
-		resultBuilder.append(",Path=" + getPath());
 		resultBuilder.append(",Name=" + getName());
 		resultBuilder.append(",Size=" + getSize());
-		resultBuilder.append(",Type=" + getFileType());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

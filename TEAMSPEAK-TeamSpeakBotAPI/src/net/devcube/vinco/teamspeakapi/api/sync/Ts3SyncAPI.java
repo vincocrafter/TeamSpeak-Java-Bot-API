@@ -31,16 +31,17 @@ import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupLevel;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.TextMessageType;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerProperty;
-import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.BanInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedQueryLogin;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedSnapshot;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.DataBaseClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.FileInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.OfflineMessageInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.Permission;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.PermissionAssignmentInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.PrivilegeKeyInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
@@ -67,13 +68,12 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		super(query);
 	}
 
-	
 	public String getFullHelp() {
 		StringBuilder resultBuilder = new StringBuilder();
 		String help = getHelp();
 		resultBuilder.append(help);
 
-		String[] splitHelp = help.split("\n");
+		String[] splitHelp = help.split(System.lineSeparator());
 		for (int i = 11; i <= 149; i++) {
 			String command = splitHelp[i].replace(" ", "").split(TS_INFO_SEPERATOR)[0];
 			if (command.isEmpty() || command.equalsIgnoreCase("help"))
@@ -107,7 +107,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		selectVirtualServer(virtualServer.getServerID(), nickName);
 	}
 
-	
 	public void pokeClient(ClientInfo client, String message) {
 		pokeClient(client.getID(), message);
 	}
@@ -125,39 +124,16 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void moveClients(List<ClientInfo> clients, int channelID) {
-		StringBuilder commandBuilder = new StringBuilder("clientmove");
-		for (ClientInfo moveClient : clients) {
-			commandBuilder.append(" clid=" + moveClient.getClientID());
-			commandBuilder.append("|");
-		}
-		int lenght = commandBuilder.toString().length();
-		
-		commandBuilder.delete(lenght - 1, lenght);
-		commandBuilder.append(" cid=" + channelID);
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
+		moveClientIDs(getClientIDs(clients), channelID);
 	}
 	
 	public void moveClients(List<ClientInfo> clients, ChannelInfo channelInfo) {
 		moveClients(clients, channelInfo.getChannelID());
 	}
 	
-	public void moveClientIDs(List<Integer> clientIDs, int channelID) {
-		StringBuilder commandBuilder = new StringBuilder("clientmove");
-		for (int moveClientID : clientIDs) {
-			commandBuilder.append(" clid=" + moveClientID);
-			commandBuilder.append("|");
-		}
-		int lenght = commandBuilder.toString().length();
-		
-		commandBuilder.delete(lenght - 1, lenght);
-		commandBuilder.append(" cid=" + channelID);
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString());
-	}
-	
 	public void moveClientIDs(List<Integer> clientIDs, ChannelInfo channelInfo) {
 		moveClientIDs(clientIDs, channelInfo.getChannelID());
 	}
-	
 	
 	/**
 	 * Switches the channel of the query bot
@@ -187,12 +163,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Set<Integer> getQueryPermissions() {
 		Set<Integer> perms = new HashSet<>();
 		int dbID = getQueryInfo().getDataBaseID();
-
-		for (Integer servergroups : getServerGroupIDsByClient(dbID)) {
-			for (Permission permissions : getServerGroupPermissions(servergroups)) {
-				perms.add(permissions.getPermID());
-			}
-		}
+		
+		getServerGroupIDsByClient(dbID).forEach(servergroups -> {
+			perms.addAll(getPermissionIDs(getServerGroupPermissions(servergroups)));
+		});
 
 		return perms;
 	}
@@ -209,7 +183,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return getClientPermissions(client.getClientDataBaseID());
 	}
 
-	
 	public List<Permission> getServerGroupPermissions(ServerGroupInfo serverGroup) {
 		return getServerGroupPermissions(serverGroup.getID());
 	}
@@ -256,12 +229,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 	
 	public ServerGroupInfo getServerGroupByID(List<ServerGroupInfo> groupList, int groupID) {
-		for (ServerGroupInfo groups : groupList) {
-			if (groups.getID() == groupID) {
-				return groups;
-			}
-		}
-		return null;
+		if (groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().isEmpty())
+			return null;
+		
+		return groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().get();
 	}
 
 	public List<Integer> getServerGroupIDsByClient(DataBaseClientInfo dataBaseClient) {
@@ -275,11 +246,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<ServerGroupInfo> getServerGroupsByClient(int clientDBID) {
 		List<ServerGroupInfo> resultList = new ArrayList<ServerGroupInfo>();
 		List<ServerGroupInfo> serverGroups = getServerGroups();
-
-		for (int groupID : getServerGroupIDsByClient(clientDBID)) {
+		
+		getServerGroupIDsByClient(clientDBID).forEach(groupID -> {
 			resultList.add(getServerGroupByID(serverGroups, groupID));
-		}
-
+		});
 		return resultList;
 	}
 
@@ -298,7 +268,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<String> getServerGroupNamesByClient(ClientInfo client) {
 		return getServerGroupNamesByClient(client.getClientDataBaseID());
 	}
-
 
 	public ChannelGroupInfo getChannelGroupByID(int groupID) {
 		for (ChannelGroupInfo groups : getChannelGroups()) {
@@ -322,25 +291,26 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public ChannelGroupInfo getChannelGroupByID(List<ChannelGroupInfo> groupList, int groupID) {
-		for (ChannelGroupInfo groups : groupList) {
-			if (groups.getID() == groupID) {
-				return groups;
-			}
-		}
-		return null;
+		if (groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().isEmpty())
+			return null;
+		
+		return groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().get();
 	}
 
 	public VirtualServerInfo getVirtualServerInfo() {
 		return getServerInfo();
 	}
 
-	
 	public List<DataBaseClientInfo> getClientDBList() {
-		return getDataBaseClients();
+		return getDataBaseClients(-1, -1);
 	}
 
+	public List<DataBaseClientInfo> getDataBaseClients() {
+		return getDataBaseClients(-1, -1);
+	}
+	
 	public List<DataBaseClientInfo> getDataBaseClientInfos() {
-		return getDataBaseClients();
+		return getDataBaseClients(-1, -1);
 	}
 	
 	/**
@@ -353,13 +323,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 	
 	public List<DataBaseClientInfo> getClientDBListDetailed() {
-		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
-		String[] clients = query.getWriter().executeReadCommand("clientdblist")[0].split(TS_INFO_SEPERATOR);
-		for (String client : clients) {
-			int cldbid = Integer.parseInt(get(client, "cldbid="));
-			resultList.add(getDataBaseClient(cldbid));
-		}
-		return resultList;
+		return getDataBaseClientsByDBIDs(getDataBaseClientIDs());
 	}
 	
 	public List<DataBaseClientInfo> getDataBaseClientsDetailed() {
@@ -394,7 +358,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the information of this player");
 		}
 	}
-
+	
 	public ClientInfo getClientByUUID(String clientUUID) {
 		return getClient(getClientIDByUUID(clientUUID));
 	}
@@ -404,7 +368,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		if (info == null) {
 			throw new UnknownClientInfoException("Client with UUID: " + clientUUID + " was not found");
 		}
-
 		return info;
 	}
 	
@@ -422,16 +385,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public List<ClientInfo> getClientsDetailed() {
-		List<ClientInfo> resultList = new ArrayList<ClientInfo>();
-
-		String[] clients = query.getWriter().executeReadCommand("clientlist -voice")[0].split(TS_INFO_SEPERATOR);
-		for (String client : clients) {
-			int clientID = Integer.parseInt(get(client, "clid="));
-			ClientInfo cInfo = getClient(clientID);
-			cInfo.addInfo("client_flag_talking", client.split("client_flag_talking")[1]);
-			resultList.add(cInfo);
-		}
-		return resultList;
+		return getClientsByIDs(getClientIDs());
 	}
 
 	public List<ClientInfo> getOnlineClientsDetailed() {
@@ -446,11 +400,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return (int) getClients().stream().filter(clients -> clients.isUser()).count();
 	}
 
-	
 	public DataBaseClientInfo getDataBaseClientInfo(ClientInfo client) {
 		return getDataBaseClient(client.getClientDataBaseID());
 	}
-
+	
 	public ChannelInfo getChannelInfo(int channelID) throws UnknownChannelInfoException {
 		ChannelInfo clientinfo = getChannel(channelID);
 		if (clientinfo != null) {
@@ -460,7 +413,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		}
 	}
 
-	
 	public List<ChannelInfo> getChannelsDetailed() {
 		List<ChannelInfo> resultList = new ArrayList<ChannelInfo>();
 		for (ChannelInfo channel : getChannelsByCommand("channellist")) {
@@ -484,18 +436,12 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public List<DataBaseClientInfo> getDatabaseClientInfosByServerGroup(int servergroupID) {
-		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
-
-		for (int dbIDs : getDatabaseIDsByServerGroup(servergroupID)) {
-			resultList.add(getDataBaseClient(dbIDs));
-		}
-		return resultList;
+		return getDataBaseClientsByDBIDs(getDatabaseIDsByServerGroup(servergroupID));
 	}
 
 	public List<DataBaseClientInfo> getDatabaseClientInfosByServerGroup(ServerGroupInfo serverGroup) {
 		return getDatabaseClientInfosByServerGroup(serverGroup.getID());
 	}
-
 
 	public Map<Integer, List<Integer>> getDatabaseIDsByChannelGroup(ChannelGroupInfo channelGroup) {
 		return getDatabaseIDsByChannelGroup(channelGroup.getID());
@@ -510,11 +456,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Map<DataBaseClientInfo, List<Integer>> getDatabaseClientInfosByChannelGroup(int channelgroupID) {
 		Map<DataBaseClientInfo, List<Integer>> resultMap = new HashMap<>();
 		Map<Integer, List<Integer>> getMap = getDatabaseIDsByChannelGroup(channelgroupID);
-
-		for (int dbIDs : getMap.keySet()) {
-			DataBaseClientInfo dbClInfo = getDataBaseClient(dbIDs);
-			resultMap.put(dbClInfo, getMap.get(dbIDs));
-		}
+		getDataBaseClientsByDBIDs(new ArrayList<>(getMap.keySet())).forEach(dbClient -> {
+			resultMap.put(dbClient, getMap.get(dbClient.getClientDataBaseID()));
+		});
+	
 		return resultMap;
 	}
 
@@ -542,13 +487,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, int channelID) {
-		List<DataBaseClientInfo> resultList = new ArrayList<DataBaseClientInfo>();
-		List<Integer> getList = getDatabaseIDsByChannelAndGroup(channelGroupID, channelID);
-
-		for (int dbIDs : getList) {
-			resultList.add(getDataBaseClient(dbIDs));
-		}
-		return resultList;
+		return getDataBaseClientsByDBIDs(getDatabaseIDsByChannelAndGroup(channelGroupID, channelID));
 	}
 
 	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, ChannelInfo channel) {
@@ -562,7 +501,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(ChannelGroupInfo channelGroup, ChannelInfo channel) {
 		return getDatabaseClientInfosByChannelAndGroup(channelGroup.getID(), channel.getChannelID());
 	}
-
 
 	public Map<Integer, List<Integer>> getChannelGroupsByDatabaseClient(DataBaseClientInfo dataBaseClient) {
 		return getChannelGroupsByDatabaseID(dataBaseClient.getClientDataBaseID());
@@ -582,9 +520,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		Map<ChannelGroupInfo, List<Integer>> resultMap = new HashMap<>();
 		List<ChannelGroupInfo> channelGroups = getChannelGroups();
 		Map<Integer, List<Integer>> getMap = getChannelGroupsByDatabaseID(clientDataBaseID);
-		for (int cgID : getMap.keySet()) {
-			resultMap.put(getChannelGroupByID(channelGroups, cgID), getMap.get(cgID));
-		}
+		getMap.keySet().forEach(cgIDs -> resultMap.put(getChannelGroupByID(channelGroups, cgIDs), getMap.get(cgIDs)));
 		return resultMap;
 	}
 
@@ -595,7 +531,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Map<ChannelGroupInfo, List<Integer>> getChannelGroupInfosByClient(ClientInfo client) {
 		return getChannelGroupInfosByDatabaseID(client.getClientDataBaseID());
 	}
-
 
 	public Map<Integer, List<Integer>> getChannelGroupsByChannel(ChannelInfo channel) {
 		return getChannelGroupsByChannelID(channel.getChannelID());
@@ -611,19 +546,15 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		Map<ChannelGroupInfo, List<Integer>> resultMap = new HashMap<>();
 		Map<Integer, List<Integer>> getMap = getChannelGroupsByChannelID(channelID);
 		List<ChannelGroupInfo> channelGroups = getChannelGroups();
-
-		for (int dbIDs : getMap.keySet()) {
-			resultMap.put(getChannelGroupByID(channelGroups, dbIDs), getMap.get(dbIDs));
-		}
+		
+		getMap.keySet().forEach(dbIDs -> resultMap.put(getChannelGroupByID(channelGroups, dbIDs), getMap.get(dbIDs)));
 		return resultMap;
 	}
 
-	
 	public List<PrivilegeKeyInfo> getTokenList() {
 		return getPrivilegeKeys();
 	}
 
-	
 	public List<VirtualServerInfo> getVirtualServersOffline() {
 		return getVirtualServersByCommand("serverlist -uid -onlyoffline");
 	}
@@ -688,43 +619,31 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public int[] banClient(int clientID) {
-		return banClient(clientID, -1);
+		return banClient(clientID, 0);
 	}
 
 	public int[] banClient(ClientInfo client) {
 		return banClient(client.getID());
 	}
 	
-	public void banClients(List<ClientInfo> clients, long banTime, String banReason) {
-		StringBuilder commandBuilder = new StringBuilder("banclient");
-		commandBuilder.append(" time=" + banTime);
-		if (banReason != null)
-			commandBuilder.append(" banreason=" + Formatter.toTsFormat(banReason));
-		for (ClientInfo banClient : clients) {
-			commandBuilder.append(" clid=" + banClient.getID());
-			commandBuilder.append("|");			
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+	public void banClients(List<ClientInfo> clients) {
+		banClientIDs(getClientIDs(clients), 0);
 	}
 	
 	public void banClients(List<ClientInfo> clients, long banTime) {
-		banClients(clients, banTime, null);
+		banClientIDs(getClientIDs(clients), banTime);
 	}
 	
-	public void banClientIDs(List<Integer> clientIDs, long banTime, String banReason) {
-		StringBuilder commandBuilder = new StringBuilder("banclient");
-		commandBuilder.append(" time=" + banTime);
-		if (banReason != null)
-			commandBuilder.append(" banreason=" + Formatter.toTsFormat(banReason));
-		for (int banClientID : clientIDs) {
-			commandBuilder.append(" clid=" + banClientID);
-			commandBuilder.append("|");			
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+	public void banClients(List<ClientInfo> clients, long banTime, String banReason) {
+		banClientIDs(getClientIDs(clients), banTime, banReason);
 	}
-	
+
 	public void banClientIDs(List<Integer> clientIDs, long banTime) {
 		banClientIDs(clientIDs, banTime, null);
+	}
+	
+	public void banClientIDs(List<Integer> clientIDs) {
+		banClientIDs(clientIDs, 0);
 	}
 	
 	public BanInfo getBanInfo(int banID) {
@@ -744,7 +663,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		}
 		return null;
 	}
-	
 	
 	public void unbanClient(String clientUUID) {
 		for (BanInfo bans : getBans()) {
@@ -766,7 +684,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		removeAllBans();
 	}
 
-	
 	public void startVirtualServer(VirtualServerInfo virtualServer) {
 		startVirtualServer(virtualServer.getServerID());
 	}
@@ -803,19 +720,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		addChannelPermission(channel.getChannelID(), permission.getPermID(), permission.getPermValue());
 	}
 	
-	public void addChannelPermissions(int channelID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channeladdperm");
-		commandBuilder.append(" cid=" + channelID);
-		for (Permission addPerm : permissions) {
-			if (addPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + addPerm.getPermID());
-			if (addPerm.getPermValue() != -1)
-				commandBuilder.append(" permvalue=" + addPerm.getPermValue());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-	
 	public void addChannelPermissions(ChannelInfo channel, List<Permission> permissions) {
 		addChannelPermissions(channel.getChannelID(), permissions);
 	}
@@ -848,21 +752,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		addChannelClientPermission(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permission.getPermID(), permission.getPermValue());
 	}
 	
-	public void addChannelClientPermissions(int channelID, int clientdataBaseID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channelclientaddperm");
-		commandBuilder.append(" cid=" + channelID);
-		commandBuilder.append(" cldbid=" + clientdataBaseID);
-		
-		for (Permission addPerm : permissions) {
-			if (addPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + addPerm.getPermID());
-			if (addPerm.getPermValue() != -1)
-				commandBuilder.append(" permvalue=" + addPerm.getPermValue());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-	
 	public void addChannelClientPermissions(int channelID, DataBaseClientInfo dbClientInfo, List<Permission> permissions) {
 		addChannelClientPermissions(channelID, dbClientInfo.getClientDataBaseID(), permissions);
 	}
@@ -875,7 +764,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		addChannelClientPermissions(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permissions);
 	}
 	
-
 	public void removeChannelClientPermission(int channelID, int clientdataBaseID, int permissionID) {
 		removeChannelClientPermission(channelID, clientdataBaseID, permissionID, null);
 	}
@@ -905,16 +793,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeChannelClientPermissions(int channelID, int clientdataBaseID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channelclientdelperm");
-		commandBuilder.append(" cid=" + channelID);
-		commandBuilder.append(" cldbid=" + clientdataBaseID);
-		
-		for (Permission remPerm : permissions) {
-			if (remPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + remPerm.getPermID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeChannelClientPermissions(channelID, clientdataBaseID, getPermissionIDs(permissions), new ArrayList<>());
 	}
 	
 	public void removeChannelClientPermissions(int channelID, DataBaseClientInfo dbClientInfo, List<Permission> permissions) {
@@ -929,7 +808,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		removeChannelClientPermissions(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permissions);
 	}
 	
-
+	public List<PermissionAssignmentInfo> getPermOverview(int clientDBID, int channelID) {
+		return getPermOverview(clientDBID, channelID, 0);
+	}
+	
 	public int createChannel(String channelName) {
 		return createChannel(channelName, new HashMap<>());
 	}
@@ -975,35 +857,17 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeChannelPermissions(int channelID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channeldelperm");
-		commandBuilder.append(" cid=" + channelID);
-
-		for (Permission remPerm : permissions) {
-			if (remPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + remPerm.getPermID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeChannelPermissions(channelID, getPermissionIDs(permissions), new ArrayList<>());
 	}
 
-	
 	public void removeChannelPermissions(ChannelInfo channel, List<Permission> permissions) {
 		removeChannelPermissions(channel.getChannelID(), permissions);
 	}
 	
 	public void removeChannelPermissionIDs(int channelID, List<Integer> permissionIDs) {
-		StringBuilder commandBuilder = new StringBuilder("channeldelperm");
-		commandBuilder.append(" cid=" + channelID);
-
-		for (int remPermID : permissionIDs) {
-			if (remPermID != -1)
-				commandBuilder.append(" permid=" + remPermID);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeChannelPermissions(channelID, permissionIDs, new ArrayList<>());
 	}
 
-	
 	public void removeChannelPermissionIDs(ChannelInfo channel, List<Integer> permissions) {
 		removeChannelPermissionIDs(channel.getChannelID(), permissions);
 	}
@@ -1045,22 +909,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void addChannelGroupPermission(ChannelGroupInfo channelGroup, Permission permission) {
 		addChannelGroupPermission(channelGroup.getChannelGroupID(), permission.getPermID(), permission.getPermValue());
 	}
-	
-	public void addChannelGroupPermissions(int channelGroupID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channelgroupaddperm");
-		commandBuilder.append(" cgid=" + channelGroupID);
 
-		for (Permission addPerm : permissions) {
-			if (addPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + addPerm.getPermID());
-			if (addPerm.getPermValue() != -1)
-				commandBuilder.append(" permvalue=" + addPerm.getPermValue());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-
-	
 	public void addChannelGroupPermissions(ChannelGroupInfo channelGroup, List<Permission> permissions) {
 		addChannelGroupPermissions(channelGroup.getChannelGroupID(), permissions);
 	}
@@ -1105,36 +954,18 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		removeChannelGroupPermission(channelGroup.getID(), permission.getPermID());
 	}
 	
-	public void removeChannelGroupPermissions(int channelID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("channelgroupdelperm");
-		commandBuilder.append(" cid=" + channelID);
-
-		for (Permission remPerm : permissions) {
-			if (remPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + remPerm.getPermID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+	public void removeChannelGroupPermissions(int channelGroupID, List<Permission> permissions) {
+		removeChannelGroupPermissions(channelGroupID, getPermissionIDs(permissions), new ArrayList<>());
 	}
 
-	
 	public void removeChannelGroupPermissions(ChannelGroupInfo channelGroup, List<Permission> permissions) {
 		removeChannelGroupPermissions(channelGroup.getChannelGroupID(), permissions);
 	}
 	
-	public void removeChannelGroupPermissionIDs(int channelID, List<Integer> permissionIDs) {
-		StringBuilder commandBuilder = new StringBuilder("channelgroupdelperm");
-		commandBuilder.append(" cid=" + channelID);
-
-		for (int remPermID : permissionIDs) {
-			if (remPermID != -1)
-				commandBuilder.append(" permid=" + remPermID);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+	public void removeChannelGroupPermissionIDs(int channelGroupID, List<Integer> permissionIDs) {
+		removeChannelGroupPermissions(channelGroupID, permissionIDs, new ArrayList<>());
 	}
 
-	
 	public void removeChannelGroupPermissionIDs(ChannelGroupInfo channelGroup, List<Integer> permissions) {
 		removeChannelGroupPermissionIDs(channelGroup.getChannelGroupID(), permissions);
 	}
@@ -1187,28 +1018,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		addClientPermission(dataBaseClient.getClientDataBaseID(), permission.getPermID(), permission.getPermValue(), permission.isSkip());
 	}
 	
-	public void addClientPermissions(int clientDataBaseID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("clientaddperm");
-		commandBuilder.append(" cldbid=" + clientDataBaseID);
-
-		for (Permission addPerm : permissions) {
-			if (addPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + addPerm.getPermID());
-			if (addPerm.getPermValue() != -1)
-				commandBuilder.append(" permvalue=" + addPerm.getPermValue());
-			if (addPerm.isSkip())
-				commandBuilder.append(" permskip=" + Formatter.toInt(addPerm.isSkip()));
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-
-	
 	public void addClientPermissions(DataBaseClientInfo dataBaseClient, List<Permission> permissions) {
 		addChannelGroupPermissions(dataBaseClient.getClientDataBaseID(), permissions);
 	}
 	
-
 	public void deleteDataBaseClient(DataBaseClientInfo dataBaseClient) {
 		deleteDataBaseClient(dataBaseClient.getClientDataBaseID());
 	}
@@ -1217,23 +1030,16 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		deleteDataBaseClient(client.getClientDataBaseID());
 	}
 
-	
 	public void editDataBaseClient(DataBaseClientInfo dataBaseClient, String description) {
 		editDataBaseClient(dataBaseClient.getClientDataBaseID(), description);
 	}
-
 
 	public DataBaseClientInfo getDataBaseClientInfoByUUID(String clientUUID) {
 		return getDataBaseClient(getDataBaseClientIDByUUID(clientUUID));
 	}
 
 	public List<DataBaseClientInfo> getDataBaseClientInfosByName(String clientLastName) {
-		List<DataBaseClientInfo> resultList = new ArrayList<>();
-		for (Integer ids : getDataBaseClientIDsByName(clientLastName)) {
-			resultList.add(getDataBaseClient(ids));
-		}
-
-		return resultList;
+		return getDataBaseClientsByDBIDs(getDataBaseClientIDsByName(clientLastName));
 	}
 	
 	public void removeClientPermission(int clientDataBaseID, int permissionID) {
@@ -1269,35 +1075,17 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeClientPermissions(int clientDataBaseID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("clientdelperm");
-		commandBuilder.append(" cldbid=" + clientDataBaseID);
-
-		for (Permission remPerm : permissions) {
-			if (remPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + remPerm.getPermID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeClientPermissions(clientDataBaseID, getPermissionIDs(permissions), new ArrayList<>());
 	}
 
-	
 	public void removeClientPermissions(DataBaseClientInfo dataBaseClient, List<Permission> permissions) {
 		removeClientPermissions(dataBaseClient.getClientDataBaseID(), permissions);
 	}
 	
 	public void removeClientPermissionIDs(int clientDataBaseID, List<Integer> permissionIDs) {
-		StringBuilder commandBuilder = new StringBuilder("clientdelperm");
-		commandBuilder.append(" cldbid=" + clientDataBaseID);
-
-		for (int remPermID : permissionIDs) {
-			if (remPermID != -1)
-				commandBuilder.append(" permid=" + remPermID);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeClientPermissions(clientDataBaseID, permissionIDs, new ArrayList<>());
 	}
 
-	
 	public void removeClientPermissionIDs(DataBaseClientInfo dataBaseClient, List<Integer> permissions) {
 		removeClientPermissionIDs(dataBaseClient.getClientDataBaseID(), permissions);
 	}
@@ -1317,21 +1105,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public List<ClientInfo> getClientsByName(String clientName) {
-		List<ClientInfo> resultList = new ArrayList<>();
-		for (int clientIDs : getClientIDsByName(clientName)) {
-			resultList.add(getClient(clientIDs));
-		}
-		return resultList;
+		return getClientsByIDs(getClientIDsByName(clientName));
 	}
 
-	public List<ClientInfo> getClientInfosByName(String clientName) throws UnknownClientInfoException {
-		List<ClientInfo> resultList = new ArrayList<>();
-		for (int clientIDs : getClientIDsByName(clientName)) {
-			resultList.add(getClientInfo(clientIDs));
-		}
-		return resultList;
-	}
-	
 	public void kickClientFromServer(int clientID) {
 		kickClientFromServer(clientID, null);
 	}
@@ -1345,37 +1121,15 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void kickClientsFromServer(List<ClientInfo> clients, String reason) {
-		StringBuilder commandBuilder = new StringBuilder("clientkick");
-		commandBuilder.append(" reasonid=5");
-		if (reason != null)
-			commandBuilder.append(" reasonmsg=" + Formatter.toTsFormat(reason));
-		
-		for (ClientInfo kickClients : clients) {
-			commandBuilder.append(" clid=" + kickClients.getClientID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		kickClientIDs(getClientIDs(clients), 5, reason);
 	}
 	
 	public void kickClientsFromServer(List<ClientInfo> clients) {
 		kickClientsFromServer(clients, null);
 	}
 	
-	public void kickClientIDsFromServer(List<Integer> clientIDs, String reason) {
-		StringBuilder commandBuilder = new StringBuilder("clientkick");
-		commandBuilder.append(" reasonid=5");
-		if (reason != null)
-			commandBuilder.append(" reasonmsg=" + Formatter.toTsFormat(reason));
-		
-		for (int kickClientIDs : clientIDs) {
-			commandBuilder.append(" clid=" + kickClientIDs);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-	
 	public void kickClientIDsFromServer(List<Integer> clientIDs) {
-		kickClientIDsFromServer(clientIDs, null);
+		kickClientIDs(clientIDs, 5, null);
 	}
 	
 	public void kickClientFromChannel(int clientID) {
@@ -1391,37 +1145,15 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void kickClientsFromChannel(List<ClientInfo> clients, String reason) {
-		StringBuilder commandBuilder = new StringBuilder("clientkick");
-		commandBuilder.append(" reasonid=4");
-		if (reason != null)
-			commandBuilder.append(" reasonmsg=" + Formatter.toTsFormat(reason));
-		
-		for (ClientInfo kickClients : clients) {
-			commandBuilder.append(" clid=" + kickClients.getClientID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		kickClientIDs(getClientIDs(clients), 4, reason);
 	}
 	
 	public void kickClientsFromChannel(List<ClientInfo> clients) {
 		kickClientsFromChannel(clients, null);
 	}
 	
-	public void kickClientIDsFromChannel(List<Integer> clientIDs, String reason) {
-		StringBuilder commandBuilder = new StringBuilder("clientkick");
-		commandBuilder.append(" reasonid=4");
-		if (reason != null)
-			commandBuilder.append(" reasonmsg=" + Formatter.toTsFormat(reason));
-		
-		for (int kickClientIDs : clientIDs) {
-			commandBuilder.append(" clid=" + kickClientIDs);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-	
 	public void kickClientIDsFromChannel(List<Integer> clientIDs) {
-		kickClientIDsFromChannel(clientIDs, null);
+		kickClientIDs(clientIDs, 4, null);
 	}
 
 	public void addComplain(DataBaseClientInfo dataBaseClient, String message) {
@@ -1458,23 +1190,14 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	public Map<DataBaseClientInfo, List<String>> searchDBClientCustomInfo(String ident, String pattern) {
 		Map<DataBaseClientInfo, List<String>> resultMap = new HashMap<>();
-		List<Integer> addedList = new ArrayList<>();
-
 		Map<Integer, List<String>> searchList = searchDBIDsCustomInfo(ident, pattern);
-		for (int clDBID : searchList.keySet()) {
-			DataBaseClientInfo dbClInfo;
-			if (addedList.contains(clDBID)) {
-				dbClInfo = resultMap.keySet().stream().filter(info -> info.getClientDataBaseID() == clDBID).findFirst().get();
-			} else {
-				dbClInfo = getDataBaseClient(clDBID);
-				addedList.add(clDBID);
-			}
-			resultMap.put(dbClInfo, searchList.get(clDBID));
-		}
+		getDataBaseClientsByDBIDs(new ArrayList<>(searchList.keySet())).forEach(client -> {
+			resultMap.put(client, searchList.get(client.getClientDataBaseID()));
+		});
+
 		return resultMap;
 	}
 
-	
 	public void setCustomInfo(DataBaseClientInfo dataBaseClient, String ident, String value) {
 		setCustomInfo(dataBaseClient.getClientDataBaseID(), ident, value);
 	}
@@ -1483,12 +1206,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		setCustomInfo(client.getClientDataBaseID(), ident, value);
 	}
 
-	
 	public void deleteCustomInfo(DataBaseClientInfo dataBaseClient, String ident) {
 		deleteCustomInfo(dataBaseClient.getClientDataBaseID(), ident);
 	}
-
-	
 
 	public void createFileDirectory(ChannelInfo channel, String dirName) {
 		createFileDirectory(channel.getChannelID(), channel.getPassword(), dirName);
@@ -1497,11 +1217,15 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void deleteFile(ChannelInfo channel, String fileName) {
 		deleteFile(channel.getChannelID(), channel.getPassword(), fileName);
 	}
-
+	
+	public void deleteFiles(ChannelInfo channel, List<String> fileNames) {
+		deleteFiles(channel.getID(), channel.getPassword(), fileNames);
+	}
+	
 	public FileInfo getFileInfo(ChannelInfo channel, String fileName) {
 		return getFileInfo(channel.getChannelID(), channel.getPassword(), fileName);
 	}
-
+	
 	public List<FileInfo> getChannelFilesByPath(ChannelInfo channel, String filePath) {
 		return getChannelFilesByPath(channel.getChannelID(), channel.getPassword(), filePath);
 	}
@@ -1521,7 +1245,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		renameFile(channel.getChannelID(), channel.getPassword(), oldFilePath, newFilePath);
 	}
 
-	
 	public void moveFile(ChannelInfo channel, String oldFilePath, ChannelInfo newchannel, String newFilePath) {
 		moveFile(channel.getChannelID(), channel.getPassword(), oldFilePath, newchannel.getChannelID(), newchannel.getPassword(), newFilePath);
 	}
@@ -1536,7 +1259,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		editInstance(prop);
 	}
 
-	
 	public void addToLog(LogLevel logLevel, String logMessage) {
 		addToLog(logLevel.getValue(), logMessage);
 	}
@@ -1565,12 +1287,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return getLog(lines, false, false, beginPos);
 	}
 
-	
 	public void readOfflineMessage(int offlineMessageID) {
 		updateOfflineMessageFlag(offlineMessageID, true);
 	}
 
-	
 	public String createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID) {
 		return createPrivilegeKey(keyType, groupID, channelID, null);
 	}
@@ -1583,7 +1303,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		usePrivilegeKey(privilegeKey.getKey());
 	}
 
-	
 	public CreatedQueryLogin createQueryLogin(String loginName) {
 		return createQueryLogin(loginName, -1);
 	}
@@ -1616,7 +1335,14 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		sendTextMessage(messageType, client.getClientID(), message);
 	}
 	
-
+	public void sendChannelMessage(String message) {
+		sendTextMessage(TextMessageType.CHANNEL, -1, message);
+	}
+	
+	public void sendServerMessage(String message) {
+		sendTextMessage(TextMessageType.SERVER, -1, message);
+	}
+	
 	public void deleteVirtualServer(VirtualServerInfo virtualServer) {
 		deleteVirtualServer(virtualServer.getID());
 	}
@@ -1652,13 +1378,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void addClientsToServerGroup(int serverGroupID, List<ClientInfo> clients) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupaddclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (ClientInfo addClients : clients) {
-			commandBuilder.append(" cldbid=" + addClients.getClientDataBaseID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		addClientDBIDsToServerGroup(serverGroupID, getDataBaseClientIDsByClients(clients));
 	}
 	
 	public void addClientsToServerGroup(ServerGroupInfo serverGroup, List<ClientInfo> clients) {
@@ -1666,27 +1386,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void addDBClientsToServerGroup(int serverGroupID, List<DataBaseClientInfo> dataBaseClients) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupaddclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (DataBaseClientInfo addClients : dataBaseClients) {
-			commandBuilder.append(" cldbid=" + addClients.getClientDataBaseID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		addClientDBIDsToServerGroup(serverGroupID, getDataBaseClientIDs(dataBaseClients));
 	}
 	
 	public void addDBClientsToServerGroup(ServerGroupInfo serverGroup, List<DataBaseClientInfo> dataBaseClients) {
 		addDBClientsToServerGroup(serverGroup.getID(), dataBaseClients);
-	}
-	
-	public void addClientDBIDsToServerGroup(int serverGroupID, List<Integer> dataBaseClientIDs) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupaddclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (int clDBIDs : dataBaseClientIDs) {
-			commandBuilder.append(" cldbid=" + clDBIDs);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
 	}
 	
 	public void addClientDBIDsToServerGroup(ServerGroupInfo serverGroup, List<Integer> dataBaseClientIDs) {
@@ -1713,22 +1417,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		addServerGroupPermission(group.getID(), permission.getPermID(), permission.getPermValue());
 	}
 	
-	public void addServerGroupPermissions(int serverGroupID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupaddperm");
-		commandBuilder.append(" sgid=" + serverGroupID);
-
-		for (Permission addPerm : permissions) {
-			if (addPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + addPerm.getPermID());
-			if (addPerm.getPermValue() != -1)
-				commandBuilder.append(" permvalue=" + addPerm.getPermValue());
-			commandBuilder.append(" permnegated=" + Formatter.toInt(addPerm.isNegated()));
-			commandBuilder.append(" permskip=" + Formatter.toInt(addPerm.isSkip()));
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
-	}
-
 	public void addServerGroupPermissions(ServerGroupInfo serverGroup, List<Permission> permissions) {
 		addServerGroupPermissions(serverGroup.getID(), permissions);
 	}
@@ -1740,7 +1428,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void addServerGroupAutoPermission(ServerGroupLevel groupLevel, Permission permission) {
 		addServerGroupAutoPermission(groupLevel, permission.getPermID(), permission.getPermValue());
 	}
-
 
 	public void removeServerGroupAutoPermission(ServerGroupLevel groupLevel, int permissionID) {
 		removeServerGroupAutoPermission(groupLevel, permissionID, null);
@@ -1795,13 +1482,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeClientsFromServerGroup(int serverGroupID, List<ClientInfo> clients) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupdelclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (ClientInfo addClients : clients) {
-			commandBuilder.append(" cldbid=" + addClients.getClientDataBaseID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeClientDBIDsFromServerGroup(serverGroupID, getDataBaseClientIDsByClients(clients));
 	}
 	
 	public void removeClientsFromServerGroup(ServerGroupInfo serverGroup, List<ClientInfo> clients) {
@@ -1809,27 +1490,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeDBClientsFromServerGroup(int serverGroupID, List<DataBaseClientInfo> dataBaseClients) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupdelclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (DataBaseClientInfo addClients : dataBaseClients) {
-			commandBuilder.append(" cldbid=" + addClients.getClientDataBaseID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeClientDBIDsFromServerGroup(serverGroupID, getDataBaseClientIDs(dataBaseClients));
 	}
 	
 	public void removeDBClientsFromServerGroup(ServerGroupInfo serverGroup, List<DataBaseClientInfo> dataBaseClients) {
 		removeDBClientsFromServerGroup(serverGroup.getID(), dataBaseClients);
-	}
-	
-	public void removeClientDBIDsFromServerGroup(int serverGroupID, List<Integer> dataBaseClientIDs) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupdelclient");
-		commandBuilder.append(" sgid=" + serverGroupID);
-		for (int clDBIDs : dataBaseClientIDs) {
-			commandBuilder.append(" cldbid=" + clDBIDs);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
 	}
 	
 	public void removeClientDBIDsFromServerGroup(ServerGroupInfo serverGroup, List<Integer> dataBaseClientIDs) {
@@ -1862,15 +1527,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeServerGroupPermissions(int serverGroupID, List<Permission> permissions) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupdelperm");
-		commandBuilder.append(" sgid=" + serverGroupID);
-
-		for (Permission remPerm : permissions) {
-			if (remPerm.getPermID() != -1)
-				commandBuilder.append(" permid=" + remPerm.getPermID());
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeServerGroupPermissions(serverGroupID, getPermissionIDs(permissions), new ArrayList<>());
 	}
 	
 	public void removeServerGroupPermissions(ServerGroupInfo serverGroup, List<Permission> permissions) {
@@ -1878,15 +1535,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void removeServerGroupPermissionIDs(int serverGroupID, List<Integer> permissionIDs) {
-		StringBuilder commandBuilder = new StringBuilder("servergroupdelperm");
-		commandBuilder.append(" sgid=" + serverGroupID);
-
-		for (int remPermID : permissionIDs) {
-			if (remPermID != -1)
-				commandBuilder.append(" permid=" + remPermID);
-			commandBuilder.append("|");
-		}
-		query.getWriter().executeReadErrorCommand(commandBuilder.toString().substring(0, commandBuilder.toString().length() - 1));
+		removeServerGroupPermissions(serverGroupID, permissionIDs, new ArrayList<>());
 	}
 	
 	public void removeServerGroupPermissionIDs(ServerGroupInfo serverGroup, List<Integer> permissionIDs) {
@@ -1904,7 +1553,6 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void deleteVirtualServerTempPassword(TempPasswordInfo tempPassword) {
 		deleteVirtualServerTempPassword(tempPassword.getPassword());
 	}
-
 	
 	public void setClientChannelGroup(int channelGroupID, ChannelInfo channel, int clientDBID) {
 		setClientChannelGroup(channelGroupID, channel.getChannelID(), clientDBID);
@@ -1958,11 +1606,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		usePrivilegeKey(token);
 	}
 
-	
 	public void registerEvent(EventType eventType) {
 		registerEvent(eventType, -1);
 	}
-	
 	
 	public void stopServerProcess() {
 		stopServerProcess(null);
@@ -1972,4 +1618,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		deleteOfflineMessage(offlineMessage.getMessageID());
 	}
 	
+	public CreatedSnapshot createSnapshot() {
+		return createSnapshot(null);
+	}
 }

@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDeletedEvent;
@@ -39,7 +38,6 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 public class EventManager {
 
 	Ts3ServerQuery query;
-	Timer timer = new Timer();
 	private List<TsEvent> events = new ArrayList<TsEvent>();
 
 	public EventManager(Ts3ServerQuery query) {
@@ -208,7 +206,7 @@ public class EventManager {
 	/**
 	 * New Method of calling Events, using Annotations
 	 * 
-	 * @param String[]
+	 * @param infos String[]
 	 *                     eventInformation
 	 */
 
@@ -216,9 +214,7 @@ public class EventManager {
 		String eventName = infos[0];
 
 		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
-		for (TsEvent registeredEvents : events) {
-			callNewEventClass(infos, registeredEvents);
-		}
+		events.forEach(registeredEvents -> callNewEventClass(infos, registeredEvents));
 	}
 	
 	/**

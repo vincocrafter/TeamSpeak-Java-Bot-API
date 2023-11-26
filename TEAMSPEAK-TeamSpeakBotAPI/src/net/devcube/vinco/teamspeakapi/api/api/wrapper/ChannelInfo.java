@@ -43,7 +43,6 @@ public class ChannelInfo extends DefaultInfo {
 		return toInt(get("channel_codec_quality"));
 	}
 
-	
 	public ChannelCodec getCodec() {
 		int codec = toInt(get("channel_codec"));
 		

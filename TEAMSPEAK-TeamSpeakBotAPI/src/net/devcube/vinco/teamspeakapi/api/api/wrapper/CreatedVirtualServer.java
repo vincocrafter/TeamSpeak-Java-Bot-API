@@ -41,7 +41,7 @@ public class CreatedVirtualServer extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		StringBuilder resultBuilder = new StringBuilder("CreateVirtualServer[");
+		StringBuilder resultBuilder = new StringBuilder("CreatedVirtualServer[");
 		resultBuilder.append("ID=" + getID());
 		resultBuilder.append(",Port=" + getPort());
 		resultBuilder.append(",Key=" + getKey());

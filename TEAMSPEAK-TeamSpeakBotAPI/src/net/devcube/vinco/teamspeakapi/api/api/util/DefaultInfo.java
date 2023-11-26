@@ -41,6 +41,10 @@ public class DefaultInfo {
 		splitInfos.put(key, value);
 	}
 	
+	public HashMap<String, String> getSplitMap() {
+		return new HashMap<>(splitInfos);
+	}
+	
 	public String[] getInfos() {
 		return this.infos;
 	}

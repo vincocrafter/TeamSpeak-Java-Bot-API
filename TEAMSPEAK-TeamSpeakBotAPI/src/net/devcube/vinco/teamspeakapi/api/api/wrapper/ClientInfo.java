@@ -9,7 +9,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ClientInfo extends DefaultInfo {
 
-
 	public ClientInfo(String[] infos) {
 		super(infos);
 	}
@@ -25,9 +24,9 @@ public class ClientInfo extends DefaultInfo {
 	public String getUUID() {
 		return getClientUUID();
 	}
-	
+
 	public String getClientUUID() {
-		return get("client_unique_identifier");
+		return get("client_unique_identifier").concat("=");
 	}
 
 	public int getID() {
@@ -37,7 +36,7 @@ public class ClientInfo extends DefaultInfo {
 	public int getClientID() {
 		return toInt(get("clid"));
 	}
-	
+
 	public int getClientDataBaseID() {
 		return toInt(get("client_database_id"));
 	}
@@ -192,11 +191,7 @@ public class ClientInfo extends DefaultInfo {
 		String s = Formatter.toNormalFormat(get("client_default_channel"));
 		return s.isEmpty() ? 0 : toInt(s);
 	}
-	
-	public boolean isClientTalking() {
-		return toBol(get("client_flag_talking"));
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Client[Name=" + getName() + ",ID=" + getID() + ",UUID=" + getUUID() + "]";

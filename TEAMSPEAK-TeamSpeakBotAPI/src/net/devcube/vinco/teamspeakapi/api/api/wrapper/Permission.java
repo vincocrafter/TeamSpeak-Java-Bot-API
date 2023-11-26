@@ -19,7 +19,11 @@ public class Permission {
 		this.skip = skip;
 		this.permDesc = permDesc;
 	}
-
+	
+	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip) {
+		this(permName, permID, permValue, negated, skip, null);
+	}
+	
 	public Permission(int permID, int permValue, boolean negated, boolean skip) {
 		this(null, permID, permValue, negated, skip, null);
 	}
@@ -71,7 +75,11 @@ public class Permission {
 	public int getPermID() {
 		return this.permID;
 	}
-
+	
+	public int getID() {
+		return getPermID();
+	}
+	
 	public int getPermValue() {
 		return this.permValue;
 	}
