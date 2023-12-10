@@ -72,6 +72,7 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	@EventHandler
 	public void onClientLeave(ClientLeaveEvent e) {
 		e.getServerQuery().getCache().updateClientListCache(); //only update clientlist info
+		e.getServerQuery().getCache().updateDBClientCache(e.getSyncAPI().getClientDataBaseIDByUUID(e.getSyncAPI().getClientUUIDByID(e.getClientID()))); //only update databaseinfo of client
 		e.getServerQuery().getCache().cacheRemoveClient(e.getClientID());
 	}
 	

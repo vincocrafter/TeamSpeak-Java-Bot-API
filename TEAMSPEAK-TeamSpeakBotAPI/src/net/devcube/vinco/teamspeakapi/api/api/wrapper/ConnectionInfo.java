@@ -7,6 +7,10 @@ public class ConnectionInfo extends DefaultInfo {
 	public ConnectionInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public ConnectionInfo(String infos) {
+		super(infos);
+	}
 
 	public int getFileTransfersBandwidthSend() {
 		return toInt(get("connection_filetransfer_bandwidth_sent"));

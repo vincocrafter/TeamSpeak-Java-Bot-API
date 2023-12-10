@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownChannelInfoException;
@@ -61,7 +62,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	/**
 	 * Initiation of the Sync API
 	 * 
-	 * @param Serverquery
+	 * @param query
 	 *                        class
 	 */
 	public Ts3SyncAPI(Ts3ServerQuery query) {
@@ -75,7 +76,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 		String[] splitHelp = help.split(System.lineSeparator());
 		for (int i = 11; i <= 149; i++) {
-			String command = splitHelp[i].replace(" ", "").split(TS_INFO_SEPERATOR)[0];
+			String command = splitHelp[i].replace(" ", "").split(TS_INFO_SEPARATOR)[0];
 			if (command.isEmpty() || command.equalsIgnoreCase("help"))
 				continue;
 			resultBuilder.append("help " + command + System.lineSeparator());
@@ -88,7 +89,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	/**
 	 * Selects the virtual server to connect to
 	 * 
-	 * @param serverid
+	 * @param serverID
 	 *                     of the virtual server
 	 */
 	public void selectVirtualServer(int serverID) {
@@ -229,10 +230,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 	
 	public ServerGroupInfo getServerGroupByID(List<ServerGroupInfo> groupList, int groupID) {
-		if (groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().isEmpty())
+		Optional<ServerGroupInfo> result = groupList.stream().filter(groups -> groups.getID() == groupID).findFirst();
+		if (result.isEmpty())
 			return null;
 		
-		return groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().get();
+		return result.get();
 	}
 
 	public List<Integer> getServerGroupIDsByClient(DataBaseClientInfo dataBaseClient) {
@@ -291,10 +293,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public ChannelGroupInfo getChannelGroupByID(List<ChannelGroupInfo> groupList, int groupID) {
-		if (groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().isEmpty())
+		Optional<ChannelGroupInfo> result = groupList.stream().filter(groups -> groups.getID() == groupID).findFirst();
+		if (result.isEmpty())
 			return null;
 		
-		return groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().get();
+		return result.get();
 	}
 
 	public VirtualServerInfo getVirtualServerInfo() {
@@ -626,24 +629,24 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return banClient(client.getID());
 	}
 	
-	public void banClients(List<ClientInfo> clients) {
-		banClientIDs(getClientIDs(clients), 0);
+	public List<Integer> banClients(List<ClientInfo> clients) {
+		return banClientIDs(getClientIDs(clients), 0);
 	}
 	
-	public void banClients(List<ClientInfo> clients, long banTime) {
-		banClientIDs(getClientIDs(clients), banTime);
+	public List<Integer> banClients(List<ClientInfo> clients, long banTime) {
+		return banClientIDs(getClientIDs(clients), banTime);
 	}
 	
-	public void banClients(List<ClientInfo> clients, long banTime, String banReason) {
-		banClientIDs(getClientIDs(clients), banTime, banReason);
+	public List<Integer> banClients(List<ClientInfo> clients, long banTime, String banReason) {
+		return banClientIDs(getClientIDs(clients), banTime, banReason);
 	}
 
-	public void banClientIDs(List<Integer> clientIDs, long banTime) {
-		banClientIDs(clientIDs, banTime, null);
+	public List<Integer> banClientIDs(List<Integer> clientIDs, long banTime) {
+		return banClientIDs(clientIDs, banTime, null);
 	}
 	
-	public void banClientIDs(List<Integer> clientIDs) {
-		banClientIDs(clientIDs, 0);
+	public List<Integer> banClientIDs(List<Integer> clientIDs) {
+		return banClientIDs(clientIDs, 0);
 	}
 	
 	public BanInfo getBanInfo(int banID) {
@@ -849,7 +852,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void removeChannelAllPermissions(int channelID) {
-		removeChannelPermission(channelID, -1, null);
+		removeChannelPermissions(channelID, getChannelPermissions(channelID));
 	}
 
 	public void removeChannelAllPermissions(ChannelInfo channel) {
@@ -1082,6 +1085,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		removeClientPermissions(dataBaseClient.getClientDataBaseID(), permissions);
 	}
 	
+	public void removeClientPermissions(ClientInfo client, List<Permission> permissions) {
+		removeClientPermissions(client.getClientDataBaseID(), permissions);
+	}
+	
 	public void removeClientPermissionIDs(int clientDataBaseID, List<Integer> permissionIDs) {
 		removeClientPermissions(clientDataBaseID, permissionIDs, new ArrayList<>());
 	}
@@ -1089,7 +1096,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void removeClientPermissionIDs(DataBaseClientInfo dataBaseClient, List<Integer> permissions) {
 		removeClientPermissionIDs(dataBaseClient.getClientDataBaseID(), permissions);
 	}
-	
+
 	public void editClient(ClientInfo client, Map<ClientProperty, String> clientProperties) {
 		editClient(client.getID(), clientProperties);
 	}

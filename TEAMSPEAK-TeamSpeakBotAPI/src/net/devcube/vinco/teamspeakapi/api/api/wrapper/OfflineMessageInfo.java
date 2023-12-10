@@ -8,6 +8,10 @@ public class OfflineMessageInfo extends DefaultInfo {
 	public OfflineMessageInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public OfflineMessageInfo(String infos) {
+		super(infos);
+	}
 
 	public int getMessageID() {
 		return toInt(get("msgid"));

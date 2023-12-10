@@ -22,7 +22,10 @@ public class InstanceInfo extends DefaultInfo {
 	 */
 	public InstanceInfo(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public InstanceInfo(String infos) {
+		super(infos);
 	}
 	
 	public int getDataBaseVersion() {

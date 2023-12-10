@@ -8,7 +8,11 @@ public class DataBaseClientInfo extends DefaultInfo {
 	public DataBaseClientInfo(String[] infos) {
 		super(infos);
 	}
-
+	
+	public DataBaseClientInfo(String infos) {
+		super(infos);
+	}
+	
 	public String getClientUUID() {
 		return get("client_unique_identifier");
 	}

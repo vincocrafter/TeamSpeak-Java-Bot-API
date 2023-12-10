@@ -8,6 +8,10 @@ public class BanInfo extends DefaultInfo {
 	public BanInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public BanInfo(String infos) {
+		super(infos);
+	}
 
 	public int getID() {
 		return getBanID();

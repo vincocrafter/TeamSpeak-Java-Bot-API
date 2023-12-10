@@ -8,7 +8,11 @@ public class PrivilegeKeyInfo extends DefaultInfo {
 	public PrivilegeKeyInfo(String[] infos) {
 		super(infos);
 	}
-
+	
+	public PrivilegeKeyInfo(String infos) {
+		super(infos);
+	}
+	
 	public String getKey() {
 		return get("token");
 	}

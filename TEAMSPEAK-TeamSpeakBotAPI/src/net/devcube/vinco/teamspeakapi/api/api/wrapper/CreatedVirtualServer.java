@@ -23,6 +23,10 @@ public class CreatedVirtualServer extends DefaultInfo {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public CreatedVirtualServer(String infos) {
+		super(infos);
+	}
+	
 	public int getServerID() {
 		return toInt(get("sid"));
 	}

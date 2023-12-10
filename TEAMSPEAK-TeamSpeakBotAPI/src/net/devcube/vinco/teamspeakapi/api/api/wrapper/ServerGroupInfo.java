@@ -10,6 +10,10 @@ public class ServerGroupInfo extends DefaultInfo {
 		super(infos);
 	}
 
+	public ServerGroupInfo(String infos) {
+		super(infos);
+	}
+	
 	public int getServerGroupID() {
 		return toInt(get("sgid"));
 	}

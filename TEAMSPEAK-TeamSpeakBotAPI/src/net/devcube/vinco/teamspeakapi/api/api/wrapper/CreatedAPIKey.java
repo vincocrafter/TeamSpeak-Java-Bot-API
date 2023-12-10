@@ -21,7 +21,13 @@ public class CreatedAPIKey extends DefaultInfo {
 	 */
 	public CreatedAPIKey(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * @param infos
+	 */
+	public CreatedAPIKey(String infos) {
+		super(infos);
 	}
 
 	public String getAPIKey() {

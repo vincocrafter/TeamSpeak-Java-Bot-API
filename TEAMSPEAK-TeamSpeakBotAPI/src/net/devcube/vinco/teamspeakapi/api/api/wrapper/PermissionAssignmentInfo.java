@@ -22,6 +22,10 @@ public class PermissionAssignmentInfo extends DefaultInfo {
 		super(infos);
 	}
 	
+	public PermissionAssignmentInfo(String infos) {
+		super(infos);
+	}
+	
 	public int getTier() {
 		return toInt(get("t"));
 	}

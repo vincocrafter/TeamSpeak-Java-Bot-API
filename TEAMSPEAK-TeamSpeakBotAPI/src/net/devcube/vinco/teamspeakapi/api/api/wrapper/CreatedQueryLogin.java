@@ -21,7 +21,13 @@ public class CreatedQueryLogin extends DefaultInfo {
 	 */
 	public CreatedQueryLogin(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * @param infos
+	 */
+	public CreatedQueryLogin(String infos) {
+		super(infos);
 	}
 	
 	public int getClientDataBaseID() {

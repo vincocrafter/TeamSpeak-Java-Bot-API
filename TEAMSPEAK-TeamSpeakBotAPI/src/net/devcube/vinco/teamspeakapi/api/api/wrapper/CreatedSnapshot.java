@@ -22,6 +22,13 @@ public class CreatedSnapshot extends DefaultInfo {
 		super(infos);
 	}
 	
+	/**
+	 * @param infos
+	 */
+	public CreatedSnapshot(String infos) {
+		super(infos);
+	}
+	
 	public int getVersion() {
 		return toInt(get("version"));
 	}

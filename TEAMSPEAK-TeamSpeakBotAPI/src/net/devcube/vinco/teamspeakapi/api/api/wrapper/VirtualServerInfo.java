@@ -12,7 +12,11 @@ public class VirtualServerInfo extends DefaultInfo {
 	public VirtualServerInfo(String[] infos) {
 		super(infos);
 	}
-
+	
+	public VirtualServerInfo(String infos) {
+		super(infos);
+	}
+	
 	public String getServerUUID() {
 		return get("virtualserver_unique_identifier");
 	}

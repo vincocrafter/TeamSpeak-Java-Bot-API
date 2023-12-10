@@ -13,13 +13,20 @@ public class DefaultInfo {
 			String key = info.split("=")[0];
 			String value = "";
 			if (info.split("=").length > 1) {
-				value = info.split("=")[1];
+				value = info.split("=")[1].replace(System.lineSeparator(), "");
 			}
 			
 			splitInfos.put(key, value);
 		}
 	}
 	
+	public DefaultInfo(String infos, String splitter) {
+		this(infos.split(splitter));
+	}
+	
+	public DefaultInfo(String infos) {
+		this(infos, " ");
+	}
 	
 	/*
 	public String get(String valueName) {

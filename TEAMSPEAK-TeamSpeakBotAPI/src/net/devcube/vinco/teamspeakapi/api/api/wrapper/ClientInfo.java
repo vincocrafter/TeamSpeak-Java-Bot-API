@@ -12,6 +12,10 @@ public class ClientInfo extends DefaultInfo {
 	public ClientInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public ClientInfo(String infos) {
+		super(infos);
+	}
 
 	public String getName() {
 		return getNickName();
@@ -161,6 +165,10 @@ public class ClientInfo extends DefaultInfo {
 
 	public boolean isTalker() {
 		return toBol(get("client_is_talker"));
+	}
+	
+	public boolean canTalk() {
+		return isTalker();
 	}
 
 	public boolean isPrioritySpeaker() {

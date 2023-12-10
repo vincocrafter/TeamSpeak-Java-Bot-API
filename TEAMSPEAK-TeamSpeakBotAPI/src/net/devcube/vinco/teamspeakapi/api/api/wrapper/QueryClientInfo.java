@@ -8,6 +8,13 @@ public class QueryClientInfo extends DefaultInfo {
 		super(infos);
 	}
 
+	/**
+	 * @param infos
+	 */
+	public QueryClientInfo(String infos) {
+		super(infos);
+	}
+
 	public String getNickName() {
 		return get("client_nickname");
 	}

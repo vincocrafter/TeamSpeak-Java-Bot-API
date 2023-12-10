@@ -21,7 +21,10 @@ public class FileTransferInfo extends DefaultInfo {
 	 */
 	public FileTransferInfo(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public FileTransferInfo(String infos) {
+		super(infos);
 	}
 
 	public int getClientID() {

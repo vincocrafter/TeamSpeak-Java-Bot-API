@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManagerUpdater;
+import net.devcube.vinco.teamspeakapi.api.api.util.Command;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
@@ -31,11 +31,9 @@ public class QueryReader {
 	private Ts3ServerQuery query;
 	private Socket socket;
 
-	private Queue<String> commands = new LinkedList<>();
-	private Queue<String> hover = new LinkedList<>();
+	private Queue<Command> commands = new LinkedList<>();
+	private Queue<Command> hover = new LinkedList<>();
 
-	private Queue<ArrayList<String>> resultpackets = new LinkedList<>();
-	private Queue<ArrayList<String>> resulterrors = new LinkedList<>();
 	private boolean allowed = true;
 
 	private Thread readerThread;
@@ -54,7 +52,6 @@ public class QueryReader {
 
 	public void start() {
 		query.debug(DebugOutputType.QUERYREADER, "Starting listening in QueryReader");
-		resultpackets.add(new ArrayList<>());
 		FloodRate floodRate = query.getConfig().getFloodRate();
 
 		readerThread = new Thread(new Runnable() { // New Thread so async
@@ -70,19 +67,21 @@ public class QueryReader {
 							if (isError(msg)) {// Error handeling
 								query.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
 								query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
-								resulterrors.peek().add(msg);
 								if (!hover.isEmpty())
-									hover.poll();
+									hover.poll().setError(msg);
 								continue;
 							}
 							if (isEvent(msg)) { // Event here
 								callEvents(msg);
 								continue;
 							}
-
-							query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
-							query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
-							resultpackets.peek().add(msg);
+							
+							if (!hover.isEmpty()) {
+								query.debug(DebugOutputType.QUERYREADER, "Added to Packets: " + msg);
+								query.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Packets: " + msg);
+								hover.peek().getPackets().add(msg);
+							}
+								
 						} else { // Execute Commands here
 							if (!hover.isEmpty())
 								continue;
@@ -93,12 +92,10 @@ public class QueryReader {
 							if (!allowed)
 								continue;
 
-							resultpackets.add(new ArrayList<>());
-							resulterrors.add(new ArrayList<>());
-							writer.println(commands.peek());
+							writer.println(commands.peek().getCommand());
 							if (floodRate.getValue() > 0) {
-								query.debug(DebugOutputType.QUERYREADERQUEUE, "Send Command to Server > (" + commands.peek() + ")");
 								setCommandSenderSleeping(floodRate.getValue());
+								query.debug(DebugOutputType.QUERYREADERQUEUE, "Send Command to Server > (" + commands.peek().getCommand() + ")");
 							}	
 							hover.add(commands.poll());
 							writer.flush();
@@ -196,6 +193,10 @@ public class QueryReader {
 		return rs.startsWith("error");
 	}
 
+	private boolean isEvent(String rs) {
+		return rs.startsWith("notify");
+	}
+	
 	private String rl(BufferedReader reader) throws IOException {
 		StringBuilder line = new StringBuilder();
 		int c;
@@ -206,10 +207,6 @@ public class QueryReader {
 		}
 		return line.toString();
 	}
-
-	private boolean isEvent(String rs) {
-		return rs.startsWith("notify");
-	}
 	
 	/**
 	 * @return the readerThread
@@ -218,39 +215,16 @@ public class QueryReader {
 		return readerThread;
 	}
 
-	/**
-	 * @return the hover
-	 */
-	public Queue<String> getHover() {
-		return hover;
-	}
 
 	/**
 	 * @return the commands
 	 */
-	public synchronized Queue<String> getCommands() {
-		return commands;
+	public Queue<Command> getCommands() {
+		return new LinkedList<>(commands);
 	}
-
-	/**
-	 * @return the resultpackets
-	 */
-	public synchronized Queue<ArrayList<String>> getResultPackets() {
-		return resultpackets;
-	}
-
-	/**
-	 * @return the resultpackets
-	 */
-	public synchronized Queue<ArrayList<String>> getResultErrors() {
-		return resulterrors;
-	}
-
-	/**
-	 * @return the socket
-	 */
-	public Socket getSocket() {
-		return socket;
+	
+	public synchronized void addCommand(Command command) {
+		commands.add(command);
 	}
 
 	/**
@@ -261,64 +235,4 @@ public class QueryReader {
 		this.socket = socket;
 	}
 
-	public synchronized boolean isCommandFinished() {
-		return hover.isEmpty() && resulterrors.peek() != null && !resulterrors.peek().isEmpty();
-	}
-
-	public synchronized boolean isAsyncCommandAllowed() {
-		return hover.isEmpty() && commands.isEmpty() && resulterrors.isEmpty() && resultpackets.isEmpty();
-	}
-
-	public synchronized boolean isCommandFinished(String command) {
-		return !hover.contains(command) && !commands.contains(command) && resulterrors.peek() != null && !resulterrors.peek().isEmpty();
-	}
-
-	public synchronized String nextPacket() {
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + resultpackets.peek().size());
-
-		StringBuilder resPackets = new StringBuilder();
-		resultpackets.poll().forEach(result -> {
-			resPackets.append(result);
-			resPackets.append(System.lineSeparator());
-		});
-
-		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
-	}
-
-	/**
-	 * See Java Documentation to poll and peek
-	 */
-	public synchronized String nextSavePacket() {
-		StringBuilder resPackets = new StringBuilder();
-		resultpackets.peek().forEach(result -> {
-			resPackets.append(result);
-			resPackets.append(System.lineSeparator());
-		});
-
-		return resPackets.toString().isEmpty() ? resPackets.toString() : resPackets.substring(0, resPackets.toString().length() - 1);
-	}
-
-	public synchronized String nextError() {
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: " + resulterrors.peek().size());
-		StringBuilder resErrors = new StringBuilder();
-		resulterrors.poll().forEach(result -> {
-			resErrors.append(result);
-			resErrors.append(System.lineSeparator());
-		});
-
-		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
-	}
-
-	/**
-	 * See Java Documentation to poll and peek
-	 */
-	public synchronized String nextSaveError() {
-		StringBuilder resErrors = new StringBuilder();
-		resulterrors.peek().forEach(result -> {
-			resErrors.append(result);
-			resErrors.append(System.lineSeparator());
-		});
-		
-		return resErrors.toString().isEmpty() ? resErrors.toString() : resErrors.substring(0, resErrors.toString().length() - 1);
-	}	
 }

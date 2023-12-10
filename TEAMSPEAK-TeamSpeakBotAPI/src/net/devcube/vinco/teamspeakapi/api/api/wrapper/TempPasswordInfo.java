@@ -21,7 +21,10 @@ public class TempPasswordInfo extends DefaultInfo {
 	 */
 	public TempPasswordInfo(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public TempPasswordInfo(String infos) {
+		super(infos);
 	}
 	
 	public String getInvokerName() {

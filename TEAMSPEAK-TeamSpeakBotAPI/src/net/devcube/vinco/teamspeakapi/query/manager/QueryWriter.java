@@ -17,7 +17,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.Command;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
@@ -28,9 +35,12 @@ public class QueryWriter {
 	private OutputStream outputStream;
 	private PrintWriter writer;
 
+	long timeout = -1;
+
 	public QueryWriter(Ts3ServerQuery query, Socket socket) {
 		this.query = query;
 		this.socket = socket;
+		timeout = query.getConfig().getConnectionTimeout();
 
 		try {
 			this.outputStream = socket.getOutputStream();
@@ -69,19 +79,18 @@ public class QueryWriter {
 	}
 
 	/**
-	 *  All commands executed here and send to the server
+	 * All commands executed here and send to the server
+	 * 
 	 * @param command
 	 */
-	private void executeCommand(String command) {
-		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command + ")");		 
-		query.getReader().getCommands().add(command);
-		//writer.println(command);
-		//writer.flush();
+	private void executeCommand(Command command) {
+		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command.getCommand() + ")");
+		query.getReader().addCommand(command);
 	}
-	
+
 	/**
-	 * Now -> Default use for Command sending instead of executeCommand()
-	 * Same as below, but some Commands are only getting an Error as answer
+	 * Now -> Default use for Command sending instead of executeCommand() Same as
+	 * below, but some Commands are only getting an Error as answer
 	 * 
 	 * @param command
 	 * @return {Errors}
@@ -89,7 +98,11 @@ public class QueryWriter {
 	public String executeReadErrorCommand(String command) {
 		return executeReadCommand(command)[1];
 	}
-	
+
+	public String executeReadErrorCommand(StringBuilder command) {
+		return executeReadErrorCommand(command.toString());
+	}
+
 	/**
 	 * Idea of sending a Command and reading the following Message from the Server
 	 * 
@@ -97,33 +110,93 @@ public class QueryWriter {
 	 * @return {Normal Packet, Error}
 	 */
 	public synchronized String[] executeReadCommand(String command) {
-		executeCommand(command);
-		
-		while (!query.getReader().isCommandFinished(command));
-	
-		String packets = query.getReader().nextPacket();
-		String errors = query.getReader().nextError();
-		return new String[] { packets, errors };
-	}
-	
-	/**
-	 * Möglich Werte zurückzubekommen????
-	 * return String[] ?
-	 * @param command
-	 */
-	
-	public void executeAsyncCommand(String command) {
-		new Thread(new Runnable() {
+		Command cmd = new Command(command);
+		executeCommand(cmd);
+		while (!cmd.isFinished());
+		List<String> packets = cmd.getPackets();
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
+		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+		StringBuilder resPackets = new StringBuilder();
+		packets.forEach(result -> {
+			resPackets.append(result);
+			resPackets.append(System.lineSeparator());
+		});
 
-			public void run() {
-				while(!query.getReader().isAsyncCommandAllowed());
+		return new String[] { resPackets.toString(), cmd.getError() };
+	}
+
+	public synchronized String[] executeReadCommand(StringBuilder command) {
+		return executeReadCommand(command.toString());
+	}
+
+	/**
+	 * All async commands executed here and send to the server. TODO handle problems
+	 * with getting Packets and Errors
+	 * 
+	 * Then is waited for an response.
+	 * 
+	 * @param command
+	 *                    Command that is send to the server.
+	 * @return {Normal Packet, Error}
+	 */
+
+	public String[] executeAsyncReadCommand(String command) {
+		FutureTask<String[]> task = new FutureTask<>(new Callable<String[]>() {
+
+			@Override
+			public String[] call() throws Exception {
 				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
-				query.getReader().getCommands().add(command);
-				while (!query.getReader().isCommandFinished(command));
-				query.getReader().nextPacket();
-				query.getReader().nextError();
+				Command cmd = new Command(command);
+				query.getReader().addCommand(cmd);
+				while (!cmd.isFinished());
+				List<String> packets = cmd.getPackets();
+				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
+				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+				StringBuilder resPackets = new StringBuilder();
+				packets.forEach(result -> {
+					resPackets.append(result);
+					resPackets.append(System.lineSeparator());
+				});
+
+				return new String[] { resPackets.toString(), cmd.getError() };
 			}
 
-		}, "ASYNC").start();
+		});
+		
+		new Thread(task, "ASYN").start();
+		try {
+			return task.get(timeout, TimeUnit.MILLISECONDS);
+		} catch (ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+			query.debug(DebugOutputType.ERROR, "Executing AsyncCommand > (" + command + ") caused an Exception :" + e.getCause());
+		} catch (InterruptedException e) {
+			// ignore
+		}
+		return null;
+	}
+
+	public void executeAsyncCommand(String command) {
+		FutureTask<String[]> task = new FutureTask<>(new Callable<String[]>() {
+
+			@Override
+			public String[] call() throws Exception {
+				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
+				Command cmd = new Command(command);
+				query.getReader().addCommand(cmd);
+				while (!cmd.isFinished());
+				List<String> packets = cmd.getPackets();
+				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
+				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+				StringBuilder resPackets = new StringBuilder();
+				packets.forEach(result -> {
+					resPackets.append(result);
+					resPackets.append(System.lineSeparator());
+				});
+
+				return new String[] { resPackets.toString(), cmd.getError() };
+			}
+
+		});
+		new Thread(task, "ASYN").start();
 	}
 }

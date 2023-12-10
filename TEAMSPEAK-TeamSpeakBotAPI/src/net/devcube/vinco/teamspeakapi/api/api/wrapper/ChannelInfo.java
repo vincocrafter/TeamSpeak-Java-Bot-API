@@ -10,6 +10,10 @@ public class ChannelInfo extends DefaultInfo {
 	public ChannelInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public ChannelInfo(String infos) {
+		super(infos);
+	}
 
 	public int getChannelID() {
 		return toInt(get("cid"));

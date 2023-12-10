@@ -29,11 +29,9 @@ public class KeepAliveThread extends Thread {
 	public void run() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		while (!Thread.currentThread().isInterrupted()) {
-			while(!query.getReader().isAsyncCommandAllowed());
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "" + Thread.getAllStackTraces().size());
-			
-			query.getWriter().executeReadErrorCommand("version");
+			query.getWriter().executeAsyncReadCommand("version");
 			try {
 				Thread.sleep(SLEEP);
 			} catch (InterruptedException e) {

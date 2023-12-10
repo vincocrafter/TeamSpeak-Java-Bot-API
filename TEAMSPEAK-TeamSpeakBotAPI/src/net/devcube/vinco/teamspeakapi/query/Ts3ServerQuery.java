@@ -60,7 +60,7 @@ public class Ts3ServerQuery {
 	/**
 	 * Connect's the Socket to the Server
 	 * 
-	 * @param host
+	 * @param hostname
 	 * @param port
 	 * @param username
 	 * @param password
@@ -88,10 +88,6 @@ public class Ts3ServerQuery {
 		this.cache = new CacheManager(this);
 		this.basicAPI = new Ts3BasicAPI(this);
 		reader.start(); // starts the reader Thread
-
-		// retrive the first meesages from the server
-		while (reader.getResultPackets().peek().size() < 2);
-		reader.nextPacket();
 		socket.setKeepAlive(true);
 		keepAliveThread.start(); // starts KeepAlivThread
 	}
@@ -104,7 +100,6 @@ public class Ts3ServerQuery {
 	 */
 	public void login(String username, String password) throws QueryLoginException {
 		String res = writer.executeReadErrorCommand("login " + username + " " + password);
-
 		if (TSError.isError(res, TSError.QUERY_INVALID_LOGIN)) {
 			debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
 			throw new QueryLoginException("Invalid loginname or password!");

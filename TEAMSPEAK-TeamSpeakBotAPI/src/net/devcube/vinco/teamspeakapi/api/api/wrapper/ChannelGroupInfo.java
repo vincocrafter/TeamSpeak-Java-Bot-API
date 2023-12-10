@@ -10,6 +10,10 @@ public class ChannelGroupInfo extends DefaultInfo {
 		super(infos);
 	}
 	
+	public ChannelGroupInfo(String infos) {
+		super(infos);
+	}
+	
 	public int getID() {
 		return getChannelGroupID();
 	}

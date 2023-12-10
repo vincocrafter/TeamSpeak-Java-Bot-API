@@ -8,6 +8,9 @@ public class HostInfo extends DefaultInfo {
 		super(infos);
 	}
 
+	public HostInfo(String infos) {
+		super(infos);
+	}
 
 	public int getInstanceUptime() {
 		return toInt(get("instance_uptime"));

@@ -49,6 +49,8 @@ public class QueryConfig {
 	private List<CacheType> cacheList = new ArrayList<CacheType>();
 	
 	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
+	private long connectionTimeout = 2000;
+	
 	
 	public QueryConfig(Ts3ServerQuery query) {
 		this.query = query;
@@ -233,7 +235,8 @@ public class QueryConfig {
 	public boolean isVirtualServerCached() {
 		return isInCache(CacheType.VIRTUALSERVER);
 	}
-
+	
+	
 	/**
 	 * Time in Logging with Milliseconds
 	 * 
@@ -280,5 +283,19 @@ public class QueryConfig {
 	 */
 	public void setFloodRate(FloodRate floodRate) {
 		this.floodRate = floodRate;
+	}
+	
+	/**
+	 * @param connectionTimeout the connectionTimeout to set
+	 */
+	public void setConnectionTimeout(long connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+	
+	/**
+	 * @return the connectionTimeout
+	 */
+	public long getConnectionTimeout() {
+		return connectionTimeout;
 	}
 }

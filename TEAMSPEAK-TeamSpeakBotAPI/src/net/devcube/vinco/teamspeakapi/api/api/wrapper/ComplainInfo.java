@@ -8,6 +8,10 @@ public class ComplainInfo extends DefaultInfo {
 	public ComplainInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public ComplainInfo(String infos) {
+		super(infos);
+	}
 
 	public int getTargetClientDataBaseID() {
 		return toInt(get("tcldbid"));

@@ -21,6 +21,10 @@ public class FileInfo extends DefaultInfo {
 	public FileInfo(String[] infos) {
 		super(infos);
 	}
+	
+	public FileInfo(String infos) {
+		super(infos);
+	}
 
 	public int getChannelID() {
 		return toInt(get("cid"));
