@@ -25,14 +25,15 @@ public class Test {
 }
 ```
 ## Getting Started:
-See [How to start with the API](wiki/Advanced-API).
+See [How to start with the API](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Advanced-API).
 
 ## How to use debugging:
-See [How to debug with the API](wiki/Debugging) or [Advanced Debugging](wiki/Advanced-Debugging).\
-Or see [Example Log](wiki/Example-Debug-Log).
+See [How to debug with the API](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Debugging) 
+or [Advanced Debugging](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Advanced-Debugging).\
+Or see [Example Log](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Example-Debug-Log).
 
 ## Getting advanced Information:
-See [AdvancedAPI usage](wiki/Advanced-API).
+See [AdvancedAPI usage](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Advanced-API).
 
 ## FloodRate:
 The Floodrate for the TsAPI is set to 0 ms per default (`FloodRate.DEFAULT_TSAPI`).\
