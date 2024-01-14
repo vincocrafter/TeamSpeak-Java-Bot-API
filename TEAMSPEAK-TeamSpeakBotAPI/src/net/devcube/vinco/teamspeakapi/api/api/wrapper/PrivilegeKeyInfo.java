@@ -51,10 +51,10 @@ public class PrivilegeKeyInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("PrivilegeKey[");
-		resultBuilder.append("Key=" + getKey());
-		resultBuilder.append(",Type=" + getType());
-		resultBuilder.append(",ServerGroupID=" + getServerGroup());
-		resultBuilder.append(",ChannelID=" + getChannelID());
+		resultBuilder.append("Key=").append(getKey());
+		resultBuilder.append(",Type=").append(getType());
+		resultBuilder.append(",ServerGroupID=").append(getServerGroup());
+		resultBuilder.append(",ChannelID=").append(getChannelID());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

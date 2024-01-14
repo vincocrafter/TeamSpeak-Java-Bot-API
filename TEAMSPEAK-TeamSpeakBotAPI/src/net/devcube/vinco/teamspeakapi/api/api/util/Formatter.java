@@ -51,4 +51,59 @@ public final class Formatter {
 	public static int toInt(boolean bool) {
 		return bool ? 1 : 0;
 	}
+	
+	public static String toRemeaningTime(long mills) {
+		StringBuilder result = new StringBuilder();
+		long counter = mills;
+		long seconds = 0L;
+		int minutes = 0;
+		int hours = 0;
+		int days = 0;
+		int weeks = 0;
+		int months = 0;
+		int years = 0;
+
+		while (counter >= 1000L) {
+			counter -= 1000;
+			++seconds;
+		}
+
+		while (seconds >= 60L) {
+			seconds -= 60L;
+			++minutes;
+		}
+
+		while (minutes >= 60) {
+			minutes -= 60;
+			++hours;
+		}
+
+		while (hours >= 24) {
+			hours -= 24;
+			++days;
+		}
+
+		while (days >= 7) {
+			days -= 7;
+			++weeks;
+		}
+
+		while (weeks >= 4) {
+			weeks -= 4;
+			++months;
+		}
+
+		while (months >= 12) {
+			++years;
+			months -= 12;
+		}
+		result.append(years).append(" Jahr(e), ");
+		result.append(months).append(" Monat(e), ");
+		result.append(weeks).append(" Woche(n), ");
+		result.append(days).append(" Tag(e), ");
+		result.append(hours).append(" Stunde(n), ");
+		result.append(minutes).append(" Minute(n), ");
+		result.append(seconds).append(" Sekunden");
+		return result.toString();
+	}
 }

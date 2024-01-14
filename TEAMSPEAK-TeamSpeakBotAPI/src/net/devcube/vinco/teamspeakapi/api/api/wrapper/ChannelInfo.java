@@ -125,6 +125,11 @@ public class ChannelInfo extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		return "Channel[ID=" + getChannelID() + ",Name=" + getName() + "]";
+		StringBuilder result = new StringBuilder("Channel[");
+		result.append("ID=").append(getID());
+		result.append(",Name=").append(getName());
+		result.append("]");
+		return  result.toString();
+		
 	}
 }

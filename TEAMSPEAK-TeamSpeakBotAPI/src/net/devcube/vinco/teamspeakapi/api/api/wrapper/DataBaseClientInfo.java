@@ -52,9 +52,9 @@ public class DataBaseClientInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("DataBaseClient[");
-		sb.append("UUID=" + getClientUUID() + ", ");
-		sb.append("DBID=" + getClientDataBaseID() + ", ");
-		sb.append("Name=" + getClientName());
+		sb.append("UUID=").append(getClientUUID());
+		sb.append(",DBID=").append(getClientDataBaseID());
+		sb.append(",Name=").append(getClientName());
 		sb.append("]");
 		return sb.toString();
 	}

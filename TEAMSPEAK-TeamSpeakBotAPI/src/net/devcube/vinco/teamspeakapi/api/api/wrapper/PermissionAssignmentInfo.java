@@ -66,10 +66,10 @@ public class PermissionAssignmentInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("PermissionAssignment[");
-		resultBuilder.append("Tier=" + getTier());
-		resultBuilder.append(",FirstID=" + getFirstID());
-		resultBuilder.append(",SecondID=" + getSecondID());
-		resultBuilder.append(",PermID=" + getPermID());
+		resultBuilder.append("Tier=").append(getTier());
+		resultBuilder.append(",FirstID=").append(getFirstID());
+		resultBuilder.append(",SecondID=").append(getSecondID());
+		resultBuilder.append(",PermID=").append(getPermID());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

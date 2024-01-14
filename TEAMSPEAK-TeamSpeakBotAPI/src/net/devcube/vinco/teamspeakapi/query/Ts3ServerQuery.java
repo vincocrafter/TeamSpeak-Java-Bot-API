@@ -151,14 +151,6 @@ public class Ts3ServerQuery {
 		TSPermission.checkQueryInformationPermissions(queryPermissions);
 	}
 
-	/**
-	 * @returns the Usage of the Processor in percent
-	 */
-
-	public double getProcessorUsage() {
-		OperatingSystemMXBean sys = ManagementFactory.getOperatingSystemMXBean();
-		return (sys.getSystemLoadAverage() / sys.getAvailableProcessors()) * 100;
-	}
 
 	/**
 	 * @return the Queryconfig
@@ -264,6 +256,9 @@ public class Ts3ServerQuery {
 
 	public synchronized void debug(DebugOutputType type, String debug) {
 		int logLevel = -1;
+		if (config.getDebuglist().isEmpty())
+			return;
+		
 		switch (type) {
 		case GENERAL:
 			if (config.isGeneralDebug() || config.isEverything()) {

@@ -49,7 +49,7 @@ public enum VirtualServerProperty {
    VIRTUALSERVER_WEBLIST_ENABLED("virtualserver_weblist_enabled"),
    VIRTUALSERVER_CODEC_ENCRYPTION_MODE("virtualserver_codec_encryption_mode");
 
-   String value = "";
+   private String value = "";
 
    private VirtualServerProperty(String s) {
       this.value = s;

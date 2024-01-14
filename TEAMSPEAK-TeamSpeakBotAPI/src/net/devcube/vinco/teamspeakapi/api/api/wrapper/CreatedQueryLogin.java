@@ -52,13 +52,13 @@ public class CreatedQueryLogin extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		StringBuilder resultBuilder = new StringBuilder("CreateQueryLogin[");
-		resultBuilder.append("ClientDBID=" + getClientDataBaseID());
-		resultBuilder.append(",VirtualServerID=" + getVirtualServerID());
-		resultBuilder.append(",LoginName=" + getClientLoginName());
-		resultBuilder.append(",LoginPassword=" + getClientLoginPassword());
-		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		StringBuilder result = new StringBuilder("CreateQueryLogin[");
+		result.append("ClientDBID=").append(getClientDataBaseID());
+		result.append(",VirtualServerID=").append(getVirtualServerID());
+		result.append(",LoginName=").append(getClientLoginName());
+		result.append(",LoginPassword=").append(getClientLoginPassword());
+		result.append("]");
+		return  result.toString();
 	}
 	
 }

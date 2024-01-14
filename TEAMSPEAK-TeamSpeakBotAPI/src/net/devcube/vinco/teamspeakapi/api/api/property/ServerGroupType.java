@@ -6,13 +6,13 @@ public enum ServerGroupType {
    NORMAL(1),
    QUERY(2);
 
-   private int i = 0;
+   private int value = 0;
 
    private ServerGroupType(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }

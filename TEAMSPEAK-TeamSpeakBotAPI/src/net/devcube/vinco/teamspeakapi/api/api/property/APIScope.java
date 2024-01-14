@@ -17,7 +17,7 @@ public enum APIScope {
 	WRITE("write"), 
 	READ("read");
 
-	String value = "";
+	private String value = "";
 
 	private APIScope(String s) {
 		this.value = s;

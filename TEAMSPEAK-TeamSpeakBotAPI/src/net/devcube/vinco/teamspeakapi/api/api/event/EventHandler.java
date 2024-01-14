@@ -16,7 +16,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// Annotation for the new Event System in EventManager.callNewEvent()
+/**
+ *  Annotation for the new Event System in EventManager.callNewEvent()
+ */
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

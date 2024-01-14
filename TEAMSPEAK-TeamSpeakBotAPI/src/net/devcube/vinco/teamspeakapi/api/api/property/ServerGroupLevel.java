@@ -12,13 +12,13 @@ public enum ServerGroupLevel {
    SERVER_ADMIN(45),
    ADMIN_SERVER_QUERY(50);
 
-   private int i = 0;
+   private int value = 0;
 
    private ServerGroupLevel(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }

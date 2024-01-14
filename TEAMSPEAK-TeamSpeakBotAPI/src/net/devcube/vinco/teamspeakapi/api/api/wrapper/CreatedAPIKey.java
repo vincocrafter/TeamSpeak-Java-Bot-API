@@ -72,15 +72,15 @@ public class CreatedAPIKey extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		StringBuilder resultBuilder = new StringBuilder("CreatedAPIKey[");
-		resultBuilder.append("APIKey=" + getAPIKey());
-		resultBuilder.append(",ID=" + getID());
-		resultBuilder.append(",ServerID=" + getServerID());
-		resultBuilder.append(",ClientDataBaseID=" + getClientDataBaseID());
-		resultBuilder.append(",Scope=" + getScope().getValue());
-		resultBuilder.append(",TimeLeft=" + getTimeLeft());
-		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		StringBuilder result = new StringBuilder("CreatedAPIKey[");
+		result.append("APIKey=").append(getAPIKey());
+		result.append(",ID=").append(getID());
+		result.append(",ServerID=").append(getServerID());
+		result.append(",ClientDataBaseID=").append(getClientDataBaseID());
+		result.append(",Scope=").append(getScope().getValue());
+		result.append(",TimeLeft=").append(getTimeLeft());
+		result.append("]");
+		return  result.toString();
 	}
 	
 }

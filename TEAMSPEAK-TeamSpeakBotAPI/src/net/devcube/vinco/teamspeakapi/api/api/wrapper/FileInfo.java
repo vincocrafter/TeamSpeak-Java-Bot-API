@@ -57,9 +57,9 @@ public class FileInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("File[");
-		resultBuilder.append("ChannelID=" + getChannelID());
-		resultBuilder.append(",Name=" + getName());
-		resultBuilder.append(",Size=" + getSize());
+		resultBuilder.append("ChannelID=").append(getChannelID());
+		resultBuilder.append(",Name=").append(getName());
+		resultBuilder.append(",Size=").append(getSize());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

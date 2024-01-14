@@ -99,34 +99,42 @@ public class Ts3BasicAPI {
 	 *                     nickname of the QueryBot
 	 */
 	public void connectTeamSpeakQuery(int serverID, String nickName) {
-		if (!isConnected()) {
-			selectVirtualServer(serverID, -1, nickName); // select the virtualServer, the query client should connect to
+		if (isConnected()) {
+			query.debug(DebugOutputType.QUERY, "Query is already connected");
+			return;
+		}
+
+		if (selectVirtualServer(serverID, -1, nickName)) { // select the virtualServer, the query client should connect to
 			query.debug(DebugOutputType.QUERY, "Query connected successfully ");
 			setConnected(true);
-		} else {
-			query.debug(DebugOutputType.QUERY, "Query is already connected");
 		}
 	}
 
 	/**
 	 * Connects the query to the virtual server. Starts caching for the first time.
+	 * At least the server ID or the server port have to be used.
 	 * 
 	 * @param serverID
-	 *                     ID of the virtual Server
+	 *                       ID of the virtual Server (set to -1 to ignore)
+	 * @param serverPort
+	 *                       Port of the virtual Server (set to -1 to ingore)
 	 * @param nickName
-	 *                     is optional (if null, not used)
+	 *                       is optional (if null, not used)
+	 *                      
+	 * @return Returns true if the connection to the virtual server was sucessful.
 	 */
 
-	public void selectVirtualServer(int serverID, int serverPort, String nickName) {
+	public boolean selectVirtualServer(int serverID, int serverPort, String nickName) {
 		StringBuilder cmd = new StringBuilder("use");
-		cmd.append(" sid=").append(serverID);
+		if (serverID != -1)
+			cmd.append(" sid=").append(serverID);
 		if (serverPort != -1)
 			cmd.append(" port=").append(serverPort);
 		if (nickName != null)
 			cmd.append(" client_nickname=").append(Formatter.toTsFormat(nickName));
 		String[] res = query.getWriter().executeReadCommand(cmd);
 		if (checkError(res, cmd))
-			return;
+			return false;
 		/*
 		 * Starts cache updater for the first time. After selecting the virtual server.
 		 */
@@ -134,6 +142,7 @@ public class Ts3BasicAPI {
 			this.cache = query.getCache();
 			query.getCache().prepareCache();
 		}
+		return true;
 	}
 
 	public void pokeClient(int clientID, String message) {
@@ -157,7 +166,8 @@ public class Ts3BasicAPI {
 	 * Sends a text message to all clients on all virtual servers in the Server
 	 * instance.
 	 * 
-	 * @param message Message formatted to teamspeak format
+	 * @param message
+	 *                    Message formatted to teamspeak format
 	 */
 
 	public void sendGlobalMessage(String message) {
@@ -166,6 +176,11 @@ public class Ts3BasicAPI {
 
 	public void logout() {
 		query.getWriter().executeReadErrorCommand("logout");
+
+		if (isConnected()) {
+			query.debug(DebugOutputType.QUERY, "Query logged out successfully ");
+			setConnected(false);
+		}
 	}
 
 	public void quit() {
@@ -254,7 +269,7 @@ public class Ts3BasicAPI {
 		String[] result = query.getWriter().executeReadCommand(command);
 		if (checkError(result, command))
 			return resultList;
-		
+
 		for (String permission : splitResult(result)) {
 			int permID = Integer.parseInt(get(permission, "permid="));
 			int permValue = Integer.parseInt(get(permission, "permvalue="));
@@ -311,7 +326,7 @@ public class Ts3BasicAPI {
 		String[] result = query.getWriter().executeReadCommand(cmd);
 		if (checkError(result, cmd))
 			return resultList;
-		
+
 		for (String groups : splitResult(result)) {
 			int groupID = Integer.parseInt(get(groups, "sgid="));
 			resultList.add(groupID);
@@ -358,7 +373,7 @@ public class Ts3BasicAPI {
 		} else {
 			String[] result = query.getWriter().executeReadCommand("serverinfo");
 			if (checkError(result, "serverinfo"))
-				return null;	
+				return null;
 			information = result[0];
 		}
 		return new VirtualServerInfo(information);
@@ -465,7 +480,7 @@ public class Ts3BasicAPI {
 		String[] result = query.getWriter().executeReadCommand(cmd);
 		if (checkError(result, cmd))
 			return resultList;
-		
+
 		for (String info : splitResult(result)) {
 			resultList.add(Integer.parseInt(get(info, "clid=")));
 		}
@@ -647,7 +662,7 @@ public class Ts3BasicAPI {
 			clients = splitResult(result);
 		}
 		for (String client : clients) {
-			resultList.add(new ClientInfo(client.concat(" clid=" + get(client, "clid="))));
+			resultList.add(new ClientInfo(client));
 		}
 		return resultList;
 	}
@@ -1236,8 +1251,10 @@ public class Ts3BasicAPI {
 	}
 
 	public int createChannelGroup(String channelGroupName, ChannelGroupType channelGroupType) {
-		String command = "channelgroupadd name=" + Formatter.toTsFormat(channelGroupName) + " type=" + channelGroupType.getValue();
-		return Integer.parseInt(get(query.getWriter().executeReadCommand(command)[0], "cgid="));
+		StringBuilder cmd = new StringBuilder("channelgroupadd");
+		cmd.append(" name=").append(Formatter.toTsFormat(channelGroupName));
+		cmd.append(" type=").append(channelGroupType.getValue());
+		return Integer.parseInt(get(query.getWriter().executeReadCommand(cmd)[0], "cgid="));
 	}
 
 	/**
@@ -1452,7 +1469,7 @@ public class Ts3BasicAPI {
 		String[] result = query.getWriter().executeReadCommand(cmd);
 		if (checkError(result, cmd))
 			return resultMap;
-		
+
 		for (String info : splitResult(result)) {
 			String key = Formatter.toNormalFormat(get(info, "ident="));
 			String value = Formatter.toNormalFormat(get(info, "value="));
@@ -1502,7 +1519,10 @@ public class Ts3BasicAPI {
 	}
 
 	public void deleteFiles(int channelID, String channelPassword, List<String> fileNames) {
-		StringBuilder cmd = new StringBuilder("ftdeletefile cid=" + channelID + " cpw=" + channelPassword + " ");
+		StringBuilder cmd = new StringBuilder("ftdeletefile");
+		cmd.append(" cid=").append(channelID);
+		cmd.append(" cpw=").append(channelPassword);
+		cmd.append(" ");
 		cmd.append(buildObjectArray(fileNames, "name"));
 		query.getWriter().executeReadErrorCommand(cmd);
 	}
@@ -1613,7 +1633,7 @@ public class Ts3BasicAPI {
 		String[] result = query.getWriter().executeReadCommand(cmd);
 		if (checkError(result, cmd))
 			return resultLines;
-		
+
 		for (String logLines : splitResult(result)) {
 			resultLines.add(Formatter.toNormalFormat(get(logLines, "l=")));
 		}
@@ -1737,13 +1757,13 @@ public class Ts3BasicAPI {
 	 * List existing query client logins.
 	 * 
 	 * @param pattern
-	 *                     Filter for client login name (set to null to ignore)
+	 *                        Filter for client login name (set to null to ignore)
 	 * @param startOffset
-	 *                     Integer to skip the first `n` entries (set to -1 to
-	 *                     ignore)
+	 *                        Integer to skip the first `n` entries (set to -1 to
+	 *                        ignore)
 	 * @param duration
-	 *                     Integer to only return the first `n` entries (set to -1
-	 *                     to ignore)
+	 *                        Integer to only return the first `n` entries (set to
+	 *                        -1 to ignore)
 	 * @return List of Query logins
 	 */
 
@@ -2014,10 +2034,13 @@ public class Ts3BasicAPI {
 	public void deleteAPIKey(int keyID) {
 		query.getWriter().executeReadErrorCommand("apikeydel id=" + keyID);
 	}
-	
+
 	/**
 	 * Lists all apikeys owned by the user.
-	 * @param clientDBID ClientDataBaseID (use -1 to ingore, use 0 to list all clients)
+	 * 
+	 * @param clientDBID
+	 *                        ClientDataBaseID (use -1 to ingore, use 0 to list all
+	 *                        clients)
 	 * @param startOffset
 	 *                        To skip the first 'n' entries.
 	 * @param limit
@@ -2080,15 +2103,15 @@ public class Ts3BasicAPI {
 	private void setConnected(boolean connected) {
 		this.connected = connected;
 	}
-	
+
 	public String get(String stringFrom, String splitter) {
 		return stringFrom.split(splitter)[1].split(" ")[0].replace(System.lineSeparator(), "");
 	}
-	
+
 	private String[] splitResult(String[] result) {
 		return result[0].split(TS_INFO_SEPARATOR);
 	}
-	
+
 	private boolean checkError(String[] result, String cmd) {
 		String info = result[1];
 		boolean error = false;
@@ -2114,13 +2137,13 @@ public class Ts3BasicAPI {
 			query.debug(DebugOutputType.ERROR, "Limit of virtual servers reached by command: '" + cmd + "'");
 			error = true;
 		}
-		
+
 		if (result[0].isEmpty() || result[0].isBlank())
 			error = true;
-		
+
 		return error;
 	}
-	
+
 	private boolean checkError(String[] result, StringBuilder cmd) {
 		return checkError(result, cmd.toString());
 	}
@@ -2138,8 +2161,8 @@ public class Ts3BasicAPI {
 	private String buildAddPermsArray(List<Permission> permissions) {
 		StringBuilder list = new StringBuilder();
 		permissions.forEach(perms -> {
-			if (perms.getPermName() != null) {
-				if (perms.getID() != permissions.get(0).getID() && !perms.getPermName().equals(permissions.get(0).getPermName()))
+			if (perms.getName() != null) {
+				if (perms.getID() != permissions.get(0).getID() && !perms.getName().equals(permissions.get(0).getName()))
 					list.append("|");
 			} else {
 				if (perms.getID() != permissions.get(0).getID())
@@ -2148,14 +2171,14 @@ public class Ts3BasicAPI {
 
 			if (perms.getPermID() != -1) {
 				list.append("permid=").append(perms.getPermID());
-				if (perms.getPermName() == null)
+				if (perms.getName() == null)
 					list.append(" ");
 			}
-				
-			if (perms.getPermName() != null)
-				list.append("permsid=").append(perms.getPermName());
-			if (perms.getPermValue() != -1)
-				list.append(" permvalue=").append(perms.getPermValue());
+
+			if (perms.getName() != null)
+				list.append("permsid=").append(perms.getName());
+			if (perms.getValue() != -1)
+				list.append(" permvalue=").append(perms.getValue());
 
 			list.append(" permnegated=").append(Formatter.toInt(perms.isNegated()));
 			list.append(" permskip=").append(Formatter.toInt(perms.isSkip()));

@@ -4,20 +4,20 @@ import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
 
 public class Permission {
 
-	private String permName = "";
-	private String permDesc = "";
-	private int permID = -1;
-	private int permValue = 0;
+	private String name = "";
+	private String desc = "";
+	private int id = -1;
+	private int value = 0;
 	private boolean negated = false;
 	private boolean skip = false;
 	
 	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip, String permDesc) {
-		this.permName = permName;
-		this.permID = permID;
-		this.permValue = permValue;
+		this.name = permName;
+		this.id = permID;
+		this.value = permValue;
 		this.negated = negated;
 		this.skip = skip;
-		this.permDesc = permDesc;
+		this.desc = permDesc;
 	}
 	
 	public Permission(String permName, int permID, int permValue, boolean negated, boolean skip) {
@@ -29,7 +29,7 @@ public class Permission {
 	}
 	
 	public Permission(TSPermission permission, int permValue, boolean negated, boolean skip) {
-		this(null, permission.getValue(), permValue, negated, skip, null);
+		this(permission.getName(), permission.getValue(), permValue, negated, skip, null);
 	}
 	
 	public Permission(String permName, int permValue, boolean negated, boolean skip) {
@@ -45,7 +45,7 @@ public class Permission {
 	}
 	
 	public Permission(TSPermission permission, int permValue) {
-		this(null, permission.getValue(), permValue, false, false, null);
+		this(permission.getName(), permission.getValue(), permValue, false, false, null);
 	}
 
 	public Permission(String permName, int permValue) {
@@ -68,24 +68,24 @@ public class Permission {
 		this(permName, -1, -1, false, false, permDesc);
 	}
 
-	public String getPermName() {
-		return this.permName;
+	public String getName() {
+		return this.name;
 	}
 
 	public int getPermID() {
-		return this.permID;
+		return this.id;
 	}
 	
 	public int getID() {
 		return getPermID();
 	}
 	
-	public int getPermValue() {
-		return this.permValue;
+	public int getValue() {
+		return this.value;
 	}
 
-	public String getPermDescription() {
-		return this.permDesc;
+	public String getDescription() {
+		return this.desc;
 	}
 
 	public boolean isNegated() {
@@ -99,10 +99,10 @@ public class Permission {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("Permission[");
-		resultBuilder.append("ID=" + getPermID());
-		resultBuilder.append(",Value=" + getPermValue());
-		resultBuilder.append(",Negated=" + isNegated());
-		resultBuilder.append(",Skip=" + isSkip());
+		resultBuilder.append("ID=").append(getPermID());
+		resultBuilder.append(",Value=").append(getValue());
+		resultBuilder.append(",Negated=").append(isNegated());
+		resultBuilder.append(",Skip=").append(isSkip());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

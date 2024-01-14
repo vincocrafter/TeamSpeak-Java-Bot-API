@@ -29,7 +29,7 @@ public enum InstanceProperty {
 	PENDING_CONNECTIONS_PER_IP("serverinstance_pending_connections_per_ip"),
 	SERVERQUERY_MAX_CONNECTIONS_PER_IP("serverinstance_serverquery_max_connections_per_ip");
 
-	String value = "";
+	private String value = "";
 
 	private InstanceProperty(String s) {
 		this.value = s;

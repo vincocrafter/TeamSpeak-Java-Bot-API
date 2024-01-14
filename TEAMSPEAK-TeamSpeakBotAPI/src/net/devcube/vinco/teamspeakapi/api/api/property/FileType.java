@@ -16,14 +16,14 @@ public enum FileType {
    FILE(0),
    DIRECTORY(1);
 
-   int i;
+   private int value;
 
    private FileType(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }
 

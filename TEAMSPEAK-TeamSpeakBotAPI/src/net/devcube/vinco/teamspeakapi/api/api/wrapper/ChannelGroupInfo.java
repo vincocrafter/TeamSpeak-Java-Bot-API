@@ -69,6 +69,11 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	public String toString() {
-		return "ChannelGroup[Name=" + getName() + ",ID=" + getID() + "]";
+		StringBuilder result = new StringBuilder("ChannelGroup[");
+		result.append("ID=").append(getID());
+		result.append(",Name=").append(getName());
+		result.append("]");
+		return  result.toString();
+		
 	}
 }

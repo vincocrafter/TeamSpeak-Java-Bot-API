@@ -58,10 +58,10 @@ public class TempPasswordInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("TempPassword[");
-		resultBuilder.append("InvokerName=" + getInvokerName());
-		resultBuilder.append(",InvokerUUID=" + getInvokerUUID());
-		resultBuilder.append(",Password=" + getPassword());
-		resultBuilder.append(",StartTime=" + getStartTime());
+		resultBuilder.append("InvokerName=").append(getInvokerName());
+		resultBuilder.append(",InvokerUUID=").append(getInvokerUUID());
+		resultBuilder.append(",Password=").append(getPassword());
+		resultBuilder.append(",StartTime=").append(getStartTime());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

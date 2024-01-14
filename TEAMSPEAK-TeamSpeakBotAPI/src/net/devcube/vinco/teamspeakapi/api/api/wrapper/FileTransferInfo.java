@@ -74,11 +74,11 @@ public class FileTransferInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("FileTransfer[");
-		resultBuilder.append("ClientID=" + getClientID());
-		resultBuilder.append(",ChannelID=" + getChannelID());
-		resultBuilder.append(",ClientFTID=" + getClientFileTransferID());
-		resultBuilder.append(",ServerFTID=" + getServerFileTransferID());
-		resultBuilder.append(",Size=" + getSize());
+		resultBuilder.append("ClientID=").append(getClientID());
+		resultBuilder.append(",ChannelID=").append(getChannelID());
+		resultBuilder.append(",ClientFTID=").append(getClientFileTransferID());
+		resultBuilder.append(",ServerFTID=").append(getServerFileTransferID());
+		resultBuilder.append(",Size=").append(getSize());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

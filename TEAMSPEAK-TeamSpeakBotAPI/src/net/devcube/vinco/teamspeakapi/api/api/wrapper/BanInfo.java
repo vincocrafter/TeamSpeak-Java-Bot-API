@@ -67,6 +67,10 @@ public class BanInfo extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		return "Ban[UUID=" + getClientUUID() + ",ID=" + getBanID() + "]";
+		StringBuilder result = new StringBuilder("Ban[");
+		result.append("UUID=").append(getClientUUID());
+		result.append(",ID=").append(getID());
+		result.append("]");
+		return  result.toString();
 	}
 }

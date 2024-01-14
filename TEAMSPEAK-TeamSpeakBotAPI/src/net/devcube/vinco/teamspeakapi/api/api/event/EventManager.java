@@ -52,10 +52,9 @@ public class EventManager {
 		if (event == null) {
 			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
 			throw new UnknownEventException("The selected Event was null!");
-		} else {
-			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
-			events.add(event);
 		}
+		query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
+		events.add(event);
 	}
 
 	public void addTs3Listener(TsEvent event) {
@@ -69,13 +68,12 @@ public class EventManager {
 		if (event == null) {
 			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
 			throw new UnknownEventException("The selected Event was null!");
+		}
+		if (events.contains(event)) {
+			query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
+			events.remove(event);
 		} else {
-			if (events.contains(event)) {
-				query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
-				events.remove(event);
-			} else {
-				query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
-			}
+			query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 		}
 	}
 	
@@ -212,7 +210,6 @@ public class EventManager {
 
 	public synchronized void callNewEvent(String[] infos) {
 		String eventName = infos[0];
-
 		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
 		events.forEach(registeredEvents -> callNewEventClass(infos, registeredEvents));
 	}
@@ -248,7 +245,7 @@ public class EventManager {
 	}
 
 	/**
-	 * Returners Different (BaseEvent)Classes depending by the given information.
+	 * Returns different (BaseEvent)Classes depending by the given information.
 	 * Only called by the callNewEvent Method
 	 * 
 	 * @param infos

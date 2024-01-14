@@ -28,10 +28,16 @@ public class KeepAliveThread extends Thread {
 	// keeps the Socket connected to the (Teamspeak)Server
 	public void run() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
+		
+		try {
+			Thread.sleep(SLEEP);
+		} catch (InterruptedException e) {
+		}
+		
 		while (!Thread.currentThread().isInterrupted()) {
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
 			query.debug(DebugOutputType.KEEPALIVETHREAD, "" + Thread.getAllStackTraces().size());
-			query.getWriter().executeAsyncReadCommand("version");
+			query.getWriter().executeAsyncCommand("version");
 			try {
 				Thread.sleep(SLEEP);
 			} catch (InterruptedException e) {

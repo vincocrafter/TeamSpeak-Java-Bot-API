@@ -21,7 +21,7 @@ public enum ChannelProperty {
    CHANNEL_CODEC_IS_UNENCRYPTED("channel_codec_is_unencrypted"),
    CHANNEL_PARENT_ID("cpid");
 
-   String value = "";
+   private String value = "";
 
    private ChannelProperty(String s) {
       this.value = s;

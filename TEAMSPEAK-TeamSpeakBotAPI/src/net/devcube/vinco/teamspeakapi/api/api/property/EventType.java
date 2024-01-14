@@ -9,7 +9,7 @@ public enum EventType {
    TEXT_PRIVATE("textprivate"),
    PRIVILEGE_KEY_USED("tokenused");
 
-   String value = "";
+   private String value = "";
 
    private EventType(String value) {
       this.value = value;

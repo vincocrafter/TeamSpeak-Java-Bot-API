@@ -8,7 +8,7 @@ public enum ClientProperty {
    CLIENT_IS_CHANNEL_COMMANDER("client_is_channel_commander"),
    CLIENT_ICON_ID("client_icon_id");
 
-   String value = "";
+   private String value = "";
 
    private ClientProperty(String s) {
       this.value = s;

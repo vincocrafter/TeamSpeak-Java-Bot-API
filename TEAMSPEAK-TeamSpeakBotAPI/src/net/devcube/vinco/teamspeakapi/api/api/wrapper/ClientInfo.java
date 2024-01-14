@@ -202,6 +202,12 @@ public class ClientInfo extends DefaultInfo {
 
 	@Override
 	public String toString() {
-		return "Client[Name=" + getName() + ",ID=" + getID() + ",UUID=" + getUUID() + "]";
+		StringBuilder result = new StringBuilder("Client[");
+		result.append("UUID=").append(getUUID());
+		result.append(",ID=").append(getID());
+		result.append(",Name=").append(getName());
+		result.append("]");
+		return  result.toString();
+		
 	}
 }

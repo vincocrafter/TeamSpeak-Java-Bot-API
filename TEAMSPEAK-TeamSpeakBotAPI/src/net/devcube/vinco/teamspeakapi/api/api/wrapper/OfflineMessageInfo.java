@@ -44,12 +44,12 @@ public class OfflineMessageInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("OfflineMessage[");
-		resultBuilder.append("MessageID=" + getMessageID());
-		resultBuilder.append(",ClientUUID=" + getClientUUID());
-		resultBuilder.append(",Subject=" + getSubject());
-		resultBuilder.append(",Message=" + getMessage());
-		resultBuilder.append(",Time=" + getTime());
-		resultBuilder.append(",Read=" + hasRead());
+		resultBuilder.append("MessageID=").append(getMessageID());
+		resultBuilder.append(",ClientUUID=").append(getClientUUID());
+		resultBuilder.append(",Subject=").append(getSubject());
+		resultBuilder.append(",Message=").append(getMessage());
+		resultBuilder.append(",Time=").append(getTime());
+		resultBuilder.append(",Read=").append(hasRead());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

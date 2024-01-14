@@ -6,13 +6,13 @@ public enum TextMessageType {
    CHANNEL(2),
    SERVER(3);
 
-   int i;
+   private int value;
 
    private TextMessageType(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }

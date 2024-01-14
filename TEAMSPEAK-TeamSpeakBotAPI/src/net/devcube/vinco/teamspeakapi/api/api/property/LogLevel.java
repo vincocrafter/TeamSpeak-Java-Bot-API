@@ -7,13 +7,13 @@ public enum LogLevel {
    DEBUG(3),
    INFO(4);
 
-   private int i = 0;
+   private int value = 0;
 
    private LogLevel(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }

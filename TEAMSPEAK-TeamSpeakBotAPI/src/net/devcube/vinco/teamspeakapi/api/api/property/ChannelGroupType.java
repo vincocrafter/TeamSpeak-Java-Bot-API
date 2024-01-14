@@ -5,13 +5,13 @@ public enum ChannelGroupType {
    DEFAULT(0),
    NORMAL(1);
 
-   private int i = 0;
+   private int value = 0;
 
    private ChannelGroupType(int i) {
-      this.i = i;
+      this.value = i;
    }
 
    public int getValue() {
-      return this.i;
+      return this.value;
    }
 }

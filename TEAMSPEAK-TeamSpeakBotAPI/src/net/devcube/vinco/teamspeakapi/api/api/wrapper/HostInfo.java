@@ -35,11 +35,11 @@ public class HostInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("HostInfo[");
-		resultBuilder.append("InstanceUptime=" + getInstanceUptime());
-		resultBuilder.append(",VirtualServersRunning=" + getVirtualServersRunning());
-		resultBuilder.append(",MaxClients=" + getMaxClients());
-		resultBuilder.append(",ClientsOnline=" + getClientsOnline());
-		resultBuilder.append(",Channels=" + getChannels());
+		resultBuilder.append("InstanceUptime=").append(getInstanceUptime());
+		resultBuilder.append(",VirtualServersRunning=").append(getVirtualServersRunning());
+		resultBuilder.append(",MaxClients=").append(getMaxClients());
+		resultBuilder.append(",ClientsOnline=").append(getClientsOnline());
+		resultBuilder.append(",Channels=").append(getChannels());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

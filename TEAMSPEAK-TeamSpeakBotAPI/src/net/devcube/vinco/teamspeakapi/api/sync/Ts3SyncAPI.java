@@ -708,7 +708,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addChannelPermission(int channelID, Permission permission) {
-		addChannelPermission(channelID, permission.getPermID(), permission.getPermValue());
+		addChannelPermission(channelID, permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelPermission(ChannelInfo channel, int permissionID, String permissionName, int permissionValue) {
@@ -720,7 +720,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addChannelPermission(ChannelInfo channel, Permission permission) {
-		addChannelPermission(channel.getChannelID(), permission.getPermID(), permission.getPermValue());
+		addChannelPermission(channel.getChannelID(), permission.getPermID(), permission.getValue());
 	}
 	
 	public void addChannelPermissions(ChannelInfo channel, List<Permission> permissions) {
@@ -732,11 +732,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void addChannelClientPermission(int channelID, int clientdataBaseID, Permission permission) {
-		addChannelClientPermission(channelID, clientdataBaseID, permission.getPermID(), permission.getPermValue());
+		addChannelClientPermission(channelID, clientdataBaseID, permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelClientPermission(int channelID, DataBaseClientInfo dbClientInfo, Permission permission) {
-		addChannelClientPermission(channelID, dbClientInfo.getClientDataBaseID(), permission.getPermID(), permission.getPermValue());
+		addChannelClientPermission(channelID, dbClientInfo.getClientDataBaseID(), permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelClientPermission(ChannelInfo channel, int clientdataBaseID, int permissionID, int permissionValue) {
@@ -748,11 +748,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addChannelClientPermission(ChannelInfo channel, int clientdataBaseID, Permission permission) {
-		addChannelClientPermission(channel.getChannelID(), clientdataBaseID, permission.getPermID(), permission.getPermValue());
+		addChannelClientPermission(channel.getChannelID(), clientdataBaseID, permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelClientPermission(ChannelInfo channel, DataBaseClientInfo dbClientInfo, Permission permission) {
-		addChannelClientPermission(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permission.getPermID(), permission.getPermValue());
+		addChannelClientPermission(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permission.getPermID(), permission.getValue());
 	}
 	
 	public void addChannelClientPermissions(int channelID, DataBaseClientInfo dbClientInfo, List<Permission> permissions) {
@@ -898,7 +898,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public void addChannelGroupPermission(int channelGroupID, Permission permission) {
-		addChannelGroupPermission(channelGroupID, permission.getPermID(), permission.getPermValue());
+		addChannelGroupPermission(channelGroupID, permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelGroupPermission(ChannelGroupInfo channelGroup, int permissionID, String permissionName, int permissionValue) {
@@ -910,7 +910,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addChannelGroupPermission(ChannelGroupInfo channelGroup, Permission permission) {
-		addChannelGroupPermission(channelGroup.getChannelGroupID(), permission.getPermID(), permission.getPermValue());
+		addChannelGroupPermission(channelGroup.getChannelGroupID(), permission.getPermID(), permission.getValue());
 	}
 
 	public void addChannelGroupPermissions(ChannelGroupInfo channelGroup, List<Permission> permissions) {
@@ -1006,7 +1006,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addClientPermission(int clientDataBaseID, Permission permission) {
-		addClientPermission(clientDataBaseID, permission.getPermID(), permission.getPermValue(), permission.isSkip());
+		addClientPermission(clientDataBaseID, permission.getPermID(), permission.getValue(), permission.isSkip());
 	}
 
 	public void addClientPermission(DataBaseClientInfo dataBaseClient, int permissionID, int permissionValue, boolean permSkip) {
@@ -1018,7 +1018,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addClientPermission(DataBaseClientInfo dataBaseClient, Permission permission) {
-		addClientPermission(dataBaseClient.getClientDataBaseID(), permission.getPermID(), permission.getPermValue(), permission.isSkip());
+		addClientPermission(dataBaseClient.getClientDataBaseID(), permission.getPermID(), permission.getValue(), permission.isSkip());
 	}
 	
 	public void addClientPermissions(DataBaseClientInfo dataBaseClient, List<Permission> permissions) {
@@ -1409,7 +1409,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addServerGroupPermission(int serverGroupID, Permission permission) {
-		addServerGroupPermission(serverGroupID, permission.getPermID(), permission.getPermValue());
+		addServerGroupPermission(serverGroupID, permission.getPermID(), permission.getValue());
 	}
 
 	public void addServerGroupPermission(ServerGroupInfo group, int permissionID, String permissionName, int permissionValue) {
@@ -1421,7 +1421,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addServerGroupPermission(ServerGroupInfo group, Permission permission) {
-		addServerGroupPermission(group.getID(), permission.getPermID(), permission.getPermValue());
+		addServerGroupPermission(group.getID(), permission.getPermID(), permission.getValue());
 	}
 	
 	public void addServerGroupPermissions(ServerGroupInfo serverGroup, List<Permission> permissions) {
@@ -1433,7 +1433,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addServerGroupAutoPermission(ServerGroupLevel groupLevel, Permission permission) {
-		addServerGroupAutoPermission(groupLevel, permission.getPermID(), permission.getPermValue());
+		addServerGroupAutoPermission(groupLevel, permission.getPermID(), permission.getValue());
 	}
 
 	public void removeServerGroupAutoPermission(ServerGroupLevel groupLevel, int permissionID) {

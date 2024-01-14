@@ -44,9 +44,9 @@ public class CreatedSnapshot extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("CreatedSnapshot[");
-		resultBuilder.append("Version=" + getVersion());
-		resultBuilder.append(",Salt=" + getSalt());
-		resultBuilder.append(",Data=" + getData());
+		resultBuilder.append("Version=").append(getVersion());
+		resultBuilder.append(",Salt=").append(getSalt());
+		resultBuilder.append(",Data=").append(getData());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

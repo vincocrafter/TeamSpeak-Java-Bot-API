@@ -58,10 +58,10 @@ public class QueryClientInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("QueryClient[");
-		resultBuilder.append("Name=" + getName());
-		resultBuilder.append(",ID=" + getClientID());
-		resultBuilder.append(",UUID=" + getUUID());
-		resultBuilder.append(",VirtualServerID=" + getVirtualServerID());
+		resultBuilder.append("Name=").append(getName());
+		resultBuilder.append(",ID=").append(getClientID());
+		resultBuilder.append(",UUID=").append(getUUID());
+		resultBuilder.append(",VirtualServerID=").append(getVirtualServerID());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}

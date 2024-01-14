@@ -33,17 +33,13 @@ public class Logger {
 
 	private String buildDebugMessage(int logLevel, Object message) {
 		StringBuilder logMessage = new StringBuilder();
-
-		String threadName = "[" + Thread.currentThread().getName() + "] ";
-		String time = "[" + serverQuery.getTime() + "] ";
-		String date = "";
+		
+		StringBuilder prefix = new StringBuilder();
+		prefix.append("[").append(Thread.currentThread().getName()).append("]").append(" ");
+		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
 		if (serverQuery.getConfig().isShowDate()) {
-			date = "[" + serverQuery.getDate() + "] ";
+			prefix.append("[").append(serverQuery.getDate()).append("]").append(" ");
 		}
-
-		logMessage.append(threadName);
-		logMessage.append(date);
-		logMessage.append(time);
 
 		String type = "";
 
@@ -79,6 +75,7 @@ public class Logger {
 			type = "[OTHER]";
 			break;
 		}
+		logMessage.append(prefix);
 		logMessage.append(type);
 		logMessage.append(" : ");
 		logMessage.append(message);
@@ -138,4 +135,6 @@ public class Logger {
 			}
 		}
 	}
+	
+	
 }

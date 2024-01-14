@@ -74,6 +74,10 @@ public class ServerGroupInfo extends DefaultInfo {
 	}
 
 	public String toString() {
-		return "ServerGroup[Name=" + getName() + ",ID=" + getID() + "]";
+		StringBuilder resultBuilder = new StringBuilder("ServerGroup[");
+		resultBuilder.append("ID=").append(getID());
+		resultBuilder.append(",Name=").append(getName());
+		resultBuilder.append("]");
+		return  resultBuilder.toString();
 	}
 }

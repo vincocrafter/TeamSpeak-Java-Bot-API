@@ -96,7 +96,7 @@ public class QueryReader {
 							if (floodRate.getValue() > 0) {
 								setCommandSenderSleeping(floodRate.getValue());
 								query.debug(DebugOutputType.QUERYREADERQUEUE, "Send Command to Server > (" + commands.peek().getCommand() + ")");
-							}	
+							}
 							hover.add(commands.poll());
 							writer.flush();
 						}

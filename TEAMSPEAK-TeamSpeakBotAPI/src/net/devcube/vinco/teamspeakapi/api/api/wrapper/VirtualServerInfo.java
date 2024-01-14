@@ -213,89 +213,11 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 	
 	public String getOnlineTime() {
-		String s = "";
-		long i = getUptime();
-		int j = 0;
-		int k = 0;
-		int l = 0;
-		int i1 = 0;
-
-		int j1;
-		for (j1 = 0; i >= 60L; ++j) {
-			i -= 60L;
-		}
-
-		while (j >= 60) {
-			j -= 60;
-			++k;
-		}
-
-		while (k >= 24) {
-			k -= 24;
-			++l;
-		}
-
-		while (l >= 7) {
-			l -= 7;
-			++i1;
-		}
-
-		while (i1 >= 4) {
-			++j1;
-			i1 -= 7;
-		}
-
-		s = j1 + " Monat(e) " + i1 + " Woche(n), " + l + " Tag(e), " + k + " Stunde(n), " + j + " Minute(n) " + i + " Sekunden";
-		return s;
+		return Formatter.toRemeaningTime(getUptime());
 	}
 
 	public String getCreatedTime() {
-		String s = "";
-		long i = getCreatingTime();
-		long j = 0L;
-		int k = 0;
-		int l = 0;
-		int i1 = 0;
-		int j1 = 0;
-		int k1 = 0;
-
-		int l1;
-		for (l1 = 0; i >= 1000L; i -= 1000L) {
-			++j;
-		}
-
-		while (j >= 60L) {
-			j -= 60L;
-			++k;
-		}
-
-		while (k >= 60) {
-			k -= 60;
-			++l;
-		}
-
-		while (l >= 24) {
-			l -= 24;
-			++i1;
-		}
-
-		while (i1 >= 7) {
-			i1 -= 7;
-			++j1;
-		}
-
-		while (j1 >= 4) {
-			++k1;
-			j1 -= 4;
-		}
-
-		while (k1 >= 12) {
-			++l1;
-			k1 -= 12;
-		}
-
-		s = l1 + " Jahr(e) " + k1 + " Monat(e) " + j1 + " Woche(n), " + i1 + " Tag(e), " + l + " Stunde(n), " + k + " Minute(n) " + j + " Sekunden";
-		return s;
+		return Formatter.toRemeaningTime(getCreatingTime());
 	}
 
 	public String getCreatingDate() {
@@ -309,14 +231,13 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public String toString() {
-		StringBuilder s = new StringBuilder("VirtualServer[");
-		
-		s.append("Name=" + getServerName() + ", ");
-		s.append("ID=" + getServerID() + ", ");
-		s.append("UUID=" + getServerUUID() + ", ");
-		s.append("MaxClientsOnline=" + getMaxclients() + ", ");
-		s.append("OnlineClients=" + getOnlineClientsSize());
-		s.append("]");
-		return s.toString();
+		StringBuilder result = new StringBuilder("VirtualServer[");
+		result.append("UUID=").append(getServerUUID());
+		result.append(",ID=").append(getServerID());
+		result.append(",Name=").append(getServerName());
+		result.append(",MaxClientsOnline=").append(getMaxclients());
+		result.append(",OnlineClients=").append(getOnlineClientsSize());
+		result.append("]");
+		return result.toString();
 	}
 }

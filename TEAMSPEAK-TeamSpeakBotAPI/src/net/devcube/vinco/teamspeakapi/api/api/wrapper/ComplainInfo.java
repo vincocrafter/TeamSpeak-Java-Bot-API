@@ -39,13 +39,13 @@ public class ComplainInfo extends DefaultInfo {
 	
 	@Override
 	public String toString() {
-		StringBuilder resultBuilder = new StringBuilder("Complain[");
-		resultBuilder.append("TargetName=" + getTargetName());
-		resultBuilder.append(",TargetDBID=" + getTargetClientDataBaseID());
-		resultBuilder.append(",SenderName=" + getSenderName());
-		resultBuilder.append(",SenderDBID=" + getSenderClientDataBaseID());
-		resultBuilder.append(",Message=" + getMessage());
-		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		StringBuilder result = new StringBuilder("Complain[");
+		result.append("TargetName=").append(getTargetName());
+		result.append(",TargetDBID=").append(getTargetClientDataBaseID());
+		result.append(",SenderName=").append(getSenderName());
+		result.append(",SenderDBID=").append(getSenderClientDataBaseID());
+		result.append(",Message=").append(getMessage());
+		result.append("]");
+		return  result.toString();
 	}
 }
