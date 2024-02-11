@@ -1,10 +1,12 @@
 package net.devcube.vinco.teamspeakapi.api.api.event;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManager;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
-import net.devcube.vinco.teamspeakapi.api.async.Ts3AsycAPI;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AsyncAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 
 public class BaseEvent extends DefaultInfo {
 
@@ -23,6 +25,14 @@ public class BaseEvent extends DefaultInfo {
 		return serverQuery;
 	}
 	
+	public QueryConfig getConfig() {
+		return serverQuery.getConfig();
+	}
+	
+	public CacheManager getCache() {
+		return serverQuery.getCache();
+	}
+	
 	public Ts3SyncAPI getSyncAPI() {
 		return serverQuery.getSyncAPI();
 	}
@@ -31,10 +41,10 @@ public class BaseEvent extends DefaultInfo {
 		return serverQuery.getBasicAPI();
 	}
  	
-	public Ts3AsycAPI getAsyncAPI() {
-		return serverQuery.getAsycAPI();
+	public Ts3AsyncAPI getAsyncAPI() {
+		return serverQuery.getAsyncAPI();
 	}
-
+		
 	public int getClientID() {
 		return -1;
 	}

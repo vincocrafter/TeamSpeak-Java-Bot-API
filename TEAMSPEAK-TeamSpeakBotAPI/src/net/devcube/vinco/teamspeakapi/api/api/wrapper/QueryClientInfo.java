@@ -26,8 +26,16 @@ public class QueryClientInfo extends DefaultInfo {
 	public String getUUID() {
 		return get("client_unique_identifier");
 	}
+	
+	public String getUniqueIdentifier() {
+		return getUUID();
+	}
 
 	public int getID() {
+		return getClientID();
+	}
+	
+	public int getId() {
 		return getClientID();
 	}
 	

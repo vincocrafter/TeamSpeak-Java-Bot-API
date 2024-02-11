@@ -50,7 +50,6 @@ public class ChannelCreateEvent extends BaseEvent {
 			}
 		}
 		return null;
-	
 	}
 	
 	public int getChannelQuality() {

@@ -22,7 +22,15 @@ public class ChannelInfo extends DefaultInfo {
 	public int getID() {
 		return getChannelID();
 	}
-
+	
+	public int getId() {
+		return getChannelID();
+	}
+	
+	public int getChannelId() {
+		return getChannelID();
+	}
+	
 	public String getOrginalName() {
 		return get("channel_name");
 	}

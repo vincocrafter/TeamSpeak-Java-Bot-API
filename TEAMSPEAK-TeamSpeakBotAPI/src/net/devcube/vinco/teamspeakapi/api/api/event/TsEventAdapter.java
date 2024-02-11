@@ -3,7 +3,7 @@ package net.devcube.vinco.teamspeakapi.api.api.event;
 import net.devcube.vinco.teamspeakapi.api.api.events.*;
 
 public abstract class TsEventAdapter implements TsEvent {
-
+	
 	public void onTextMessage(TextMessageEvent e) {
 	}
 

@@ -13,7 +13,7 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 
 public final class FloodRate {
 	
-	public static FloodRate DEFAULT = new FloodRate(350); 
+	public static FloodRate DEFAULT_TEAMSPEAK = new FloodRate(350); 
 	public static FloodRate DEFAULT_TSAPI = new FloodRate(0);
 	public static FloodRate UNLIMITED = new FloodRate(0);
 	

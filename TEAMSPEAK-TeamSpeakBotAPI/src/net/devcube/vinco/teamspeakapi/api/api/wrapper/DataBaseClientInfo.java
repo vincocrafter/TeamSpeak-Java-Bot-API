@@ -16,12 +16,24 @@ public class DataBaseClientInfo extends DefaultInfo {
 	public String getClientUUID() {
 		return get("client_unique_identifier");
 	}
-
+	
+	public String getUniqueIdentifier() {
+		return getClientUUID();
+	}
+	
+	public String getUUID() {
+		return getClientUUID();
+	}
+	
 	public int getClientDataBaseID() {
 		return toInt(get("client_database_id"));
 	}
-	
+
 	public int getID() {
+		return getClientDataBaseID();
+	}
+	
+	public int getDatabaseId() {
 		return getClientDataBaseID();
 	}
 	
@@ -43,6 +55,10 @@ public class DataBaseClientInfo extends DefaultInfo {
 
 	public String getLastIP() {
 		return get("client_lastip");
+	}
+	
+	public String getIP() {
+		return getLastIP();
 	}
 
 	public String getDescription() {

@@ -14,45 +14,60 @@ package net.devcube.vinco.teamspeakapi.api.api.keepalive;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
-public class KeepAliveThread extends Thread {
+public class KeepAliveThread {
 
 	private static final int SLEEP = 240_000; //Default Time for Timeout are 300 Seconds
 	private final Ts3ServerQuery query;
-
+	private Thread keepAliveThread;
+	
+	
 	public KeepAliveThread(Ts3ServerQuery query) {
-		super("KALT");
 		this.query = query;
 	}
 	
 	
 	// keeps the Socket connected to the (Teamspeak)Server
-	public void run() {
+	public void start() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		
-		try {
-			Thread.sleep(SLEEP);
-		} catch (InterruptedException e) {
-		}
-		
-		while (!Thread.currentThread().isInterrupted()) {
-			query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
-			query.debug(DebugOutputType.KEEPALIVETHREAD, "" + Thread.getAllStackTraces().size());
-			query.getWriter().executeAsyncCommand("version");
-			try {
-				Thread.sleep(SLEEP);
-			} catch (InterruptedException e) {
-				break;
+		keepAliveThread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				try {
+					Thread.sleep(SLEEP);
+				} catch (InterruptedException e) {
+				}
+				
+				while (!Thread.currentThread().isInterrupted()) {
+					query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
+					query.getAsyncAPI().getVersion();
+					try {
+						Thread.sleep(SLEEP);
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				
 			}
-		}
+		}, "KALT");
 	}
 	
 	
 	//stops the Thread
 	public void interrupt() {
+		keepAliveThread.interrupt();
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has beeen stopped");
-		super.interrupt();
 	}
-
+	
+	/**
+	 * @return the keepAliveThread
+	 */
+	public Thread getKeepAliveThread() {
+		return keepAliveThread;
+	}
+	
 	/**
 	 * @return the sleep durantion in ms
 	 */

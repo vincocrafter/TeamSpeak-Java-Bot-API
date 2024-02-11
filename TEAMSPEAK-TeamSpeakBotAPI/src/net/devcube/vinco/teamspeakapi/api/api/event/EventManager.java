@@ -45,7 +45,7 @@ public class EventManager {
 	}
 
 	public List<TsEvent> getEvents() {
-		return events;
+		return new ArrayList<>(events);
 	}
 
 	public void registerEvent(TsEvent event) throws UnknownEventException {
@@ -234,8 +234,16 @@ public class EventManager {
 						try {
 							meth.invoke(registeredEvent, getEventByName(infos));
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() 
-									+ "' caused by " + e.getCause().getClass().getName() + "!");
+							if (e.getClass() != null && e.getCause() != null) {
+								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + 
+										"' from Class '" + registeredEvent.getClass().getName() + "' caused by " + e.getCause().getClass().getName() + "!");
+							} else if (e.getCause() != null){
+								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' caused by " + e.getCause().getClass().getName() + "!");
+							} else {
+								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' !");
+							}
+							
+							
 							e.printStackTrace();
 						}
 					}
@@ -294,7 +302,7 @@ public class EventManager {
 	 * @see DebugOutputType
 	 */
 	private void debugNewEvent(String eventName, String infos) {
-		query.debug(DebugOutputType.EVENTMANAGER, eventName + " was called");
+		query.debug(DebugOutputType.EVENTMANAGER, "Event " + eventName + " was called");
 
 		if (eventName.equalsIgnoreCase("notifychannelcreated")) {
 			query.debug(DebugOutputType.E_CHANNEL_CREATED, infos);

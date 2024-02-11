@@ -12,7 +12,7 @@ public class ClientInfo extends DefaultInfo {
 	public ClientInfo(String[] infos) {
 		super(infos);
 	}
-	
+
 	public ClientInfo(String infos) {
 		super(infos);
 	}
@@ -30,7 +30,11 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getClientUUID() {
-		return get("client_unique_identifier").concat("=");
+		return get("client_unique_identifier");
+	}
+
+	public String getUniqueIdentifier() {
+		return getUUID();
 	}
 
 	public int getID() {
@@ -39,6 +43,14 @@ public class ClientInfo extends DefaultInfo {
 
 	public int getClientID() {
 		return toInt(get("clid"));
+	}
+
+	public int getId() {
+		return getClientID();
+	}
+
+	public int getClientId() {
+		return getClientID();
 	}
 
 	public int getClientDataBaseID() {
@@ -128,7 +140,7 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public String getCountry() {
-		return get("client_country=");
+		return get("client_country");
 	}
 
 	public int getTalkPower() {
@@ -166,7 +178,7 @@ public class ClientInfo extends DefaultInfo {
 	public boolean isTalker() {
 		return toBol(get("client_is_talker"));
 	}
-	
+
 	public boolean canTalk() {
 		return isTalker();
 	}
@@ -207,7 +219,7 @@ public class ClientInfo extends DefaultInfo {
 		result.append(",ID=").append(getID());
 		result.append(",Name=").append(getName());
 		result.append("]");
-		return  result.toString();
-		
+		return result.toString();
+
 	}
 }

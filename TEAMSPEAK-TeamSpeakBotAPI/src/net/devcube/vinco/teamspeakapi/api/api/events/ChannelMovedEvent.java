@@ -37,16 +37,19 @@ public class ChannelMovedEvent extends BaseEvent {
 		return toInt(get("reasonid"));
 	}
 	
-	public int getClientID() {
+	public int getInvokerID() {
 		return toInt(get("invokerid"));
 	}
 	
-	public String getClientName() {
+	public String getInvokerName() {
 		return Formatter.toNormalFormat(get("invokername"));
 	}
 	
-	public String getClientUUID() {
+	public String getInvokerUUID() {
 		return get("invokeruid");
 	}
 	
+	public int getClientID() {
+		return toInt(get("clid"));
+	}
 }

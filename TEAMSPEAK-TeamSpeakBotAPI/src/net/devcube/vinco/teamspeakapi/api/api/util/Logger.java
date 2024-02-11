@@ -36,10 +36,10 @@ public class Logger {
 		
 		StringBuilder prefix = new StringBuilder();
 		prefix.append("[").append(Thread.currentThread().getName()).append("]").append(" ");
-		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
 		if (serverQuery.getConfig().isShowDate()) {
 			prefix.append("[").append(serverQuery.getDate()).append("]").append(" ");
 		}
+		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
 
 		String type = "";
 

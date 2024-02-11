@@ -114,7 +114,7 @@ public class QueryReader {
 		String[] infos = msg.split(" ");
 		
 		
-		new Thread(new Runnable() {
+		Thread cacheManager = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
@@ -124,7 +124,8 @@ public class QueryReader {
 				}
 				
 			}
-		}, "CHMA").start();
+		}, "CHMA");
+		cacheManager.start();
 		
 		
 		/*
@@ -133,11 +134,14 @@ public class QueryReader {
 		 * @see QueryConfig#isEventCallType()
 		 */
 		
+		
 		eventThread = new Thread(new Runnable() {
 
 			@SuppressWarnings("deprecation")
 			@Override
 			public void run() {
+				while(cacheManager.isAlive());
+				
 				try {					
 					if (query.getConfig().isEventCallType(EventCallType.NEW)) { // New one
 						query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
@@ -179,6 +183,7 @@ public class QueryReader {
 	
 	
 	public synchronized void stopThreads() {
+		commands.forEach(cmd -> cmd.setError("Stopped"));
 		commands.clear();
 		
 		if (eventThread != null)
@@ -208,13 +213,6 @@ public class QueryReader {
 		return line.toString();
 	}
 	
-	/**
-	 * @return the readerThread
-	 */
-	public synchronized Thread getReaderThread() {
-		return readerThread;
-	}
-
 
 	/**
 	 * @return the commands
@@ -223,7 +221,7 @@ public class QueryReader {
 		return new LinkedList<>(commands);
 	}
 	
-	public synchronized void addCommand(Command command) {
+	protected synchronized void addCommand(Command command) {
 		commands.add(command);
 	}
 

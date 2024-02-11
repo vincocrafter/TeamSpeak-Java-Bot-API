@@ -556,6 +556,7 @@ public enum TSPermission {
 
 	private TSPermission(int value, String name) {
 		this.value = value;
+		this.name = name;
 	}
 
 	public int getValue() {

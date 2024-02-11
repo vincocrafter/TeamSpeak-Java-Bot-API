@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class Permission {
 
@@ -53,7 +54,11 @@ public class Permission {
 	}
 
 	public Permission(int permID, String permName) {
-		this(permName, permID, 0, false, false, null);
+		this(permName, permID, -1, false, false, null);
+	}
+	
+	public Permission(TSPermission permission) {
+		this(permission.getName(), permission.getValue(), -1, false, false, null);
 	}
 
 	public Permission(String permName, int permID, String permDesc) {
@@ -67,7 +72,27 @@ public class Permission {
 	public Permission(String permName, String permDesc) {
 		this(permName, -1, -1, false, false, permDesc);
 	}
-
+	
+	public Permission(String information) {
+		if (information.contains("permsid=")) {
+			this.name = Formatter.get(information, "permsid=");
+		} else if (information.contains("permname=")) {
+			this.name = Formatter.get(information, "permname=");
+		}
+		
+		if (information.contains("permid="))
+			this.id = Integer.parseInt(Formatter.get(information, "permid="));
+		if (information.contains("permvalue="))
+			this.value = Integer.parseInt(Formatter.get(information, "permvalue="));
+		if (information.contains("permnegated="))
+			this.negated = Integer.parseInt(Formatter.get(information, "permnegated=")) == 1;
+		if (information.contains("permskip="))
+			this.skip = Integer.parseInt(Formatter.get(information, "permskip=")) == 1;
+		if (information.contains("permdesc=")) {
+			this.desc = Formatter.toNormalFormat(Formatter.get(information, "permdesc="));
+		}
+	}
+	
 	public String getName() {
 		return this.name;
 	}

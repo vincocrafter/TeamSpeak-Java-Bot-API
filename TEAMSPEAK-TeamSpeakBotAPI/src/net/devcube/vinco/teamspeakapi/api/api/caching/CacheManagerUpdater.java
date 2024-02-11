@@ -25,82 +25,122 @@ import net.devcube.vinco.teamspeakapi.api.api.events.ClientMoveEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.PrivilegeKeyUsedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.ServerEditedEvent;
 import net.devcube.vinco.teamspeakapi.api.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class CacheManagerUpdater extends TsEventAdapter {
-	
+
 	@EventHandler
 	public void onChannelCreate(ChannelCreateEvent e) {
-		e.getServerQuery().getCache().updateChannelsListCache(); //only update channellist info
-		e.getServerQuery().getCache().updateChannelCache(e.getChannelID()); //only update channelinfo of channel
+		if (e.getConfig().isChannelsCached()) {
+			e.getCache().updateChannelsListCache(); // only update channellist info
+			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+		}
+
 	}
-	
+
 	@EventHandler
 	public void onChannelDeleted(ChannelDeletedEvent e) {
-		e.getServerQuery().getCache().updateChannelsListCache(); //only update channellist info
-		e.getServerQuery().getCache().cacheRemoveChannel(e.getChannelID());
+		if (e.getConfig().isChannelsCached()) {
+			e.getCache().updateChannelsListCache(); // only update channellist info
+			e.getCache().cacheRemoveChannel(e.getChannelID());
+		}
 	}
-	
+
 	@EventHandler
 	public void onChannelDescriptionChanged(ChannelDescriptionEditedEvent e) {
 		// Not needed, because ChannelEditedEvent
 	}
-	
+
 	@EventHandler
 	public void onChannelEdit(ChannelEditedEvent e) {
-		e.getServerQuery().getCache().updateChannelsListCache(); //only update channellist info
-		e.getServerQuery().getCache().updateChannelCache(e.getChannelID()); //only update channelinfo of channel
+		if (e.getConfig().isChannelsCached()) {
+			e.getCache().updateChannelsListCache(); // only update channellist info
+			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+		}
 	}
-	
+
 	@EventHandler
 	public void onChannelMoved(ChannelMovedEvent e) {
-		e.getServerQuery().getCache().updateChannelsListCache(); //only update channellist info
-		e.getServerQuery().getCache().updateChannelCache(e.getChannelID()); //only update channelinfo of channel		
+		if (e.getConfig().isChannelsCached()) {
+			e.getCache().updateChannelsListCache(); // only update channellist info
+			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+		}
 	}
-	
+
 	@EventHandler
 	public void onChannelPasswordChanged(ChannelPasswordChangedEvent e) {
 		// Not needed, because ChannelEditedEvent
 	}
-	
+
 	@EventHandler
 	public void onClientJoin(ClientJoinEvent e) {
-		e.getServerQuery().getCache().updateClientListCache(); //only update clientlist info
-		e.getServerQuery().getCache().updateClientCache(e.getClientID()); //only update clientinfo of client
-		e.getServerQuery().getCache().updateDBClientCache(e.getSyncAPI().getDataBaseClientIDByUUID(e.getClientUUID())); //only update databaseinfo of client
+		CacheManager cache = e.getCache();
+
+		if (e.getConfig().isClientsCached()) {
+			cache.updateClientListCache(); // only update clientlist info
+			cache.updateClientCache(e.getClientID()); // only update clientinfo of client
+		}
+
+		if (e.getConfig().isDataBaseCached()) {
+			int dbID = 0;
+			if (e.getConfig().isClientsCached()) {
+				dbID = Integer.parseInt(Formatter.get(cache.getClientInfo(e.getClientID()), "client_database_id="));
+			} else {
+				dbID = e.getSyncAPI().getClientDataBaseIDByUUID(e.getClientUUID());
+			}
+			cache.updateDBClientCache(dbID); // only update databaseinfo of client
+		}
 	}
-	
+
 	@EventHandler
 	public void onClientLeave(ClientLeaveEvent e) {
-		e.getServerQuery().getCache().updateClientListCache(); //only update clientlist info
-		e.getServerQuery().getCache().updateDBClientCache(e.getSyncAPI().getClientDataBaseIDByUUID(e.getSyncAPI().getClientUUIDByID(e.getClientID()))); //only update databaseinfo of client
-		e.getServerQuery().getCache().cacheRemoveClient(e.getClientID());
+		CacheManager cache = e.getServerQuery().getCache();
+
+		if (!e.getConfig().isClientsCached())
+			return;
+		
+		if (e.getConfig().isDataBaseCached()) //update Database cache is only possible if client caching is enabled
+			cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(e.getClientID()), "client_database_id="))); // only update databaseinfo of client
+		
+		cache.updateClientListCache(); // only update clientlist info
+		cache.cacheRemoveClient(e.getClientID());
 	}
-	
+
 	@EventHandler
 	public void onClientMove(ClientMoveEvent e) {
-		if (e.getServerQuery().getConfig().isQueryCached()) {
-			if (e.getClientID() == e.getBasicAPI().getQueryInfo().getClientID()) {
-				e.getServerQuery().getCache().updateQueryPropsCache(); //only update whoami info
-			}
+		CacheManager cache = e.getCache();
+		
+		if (e.getConfig().isClientsCached()) {
+			cache.updateClientListCache(); // only update clientlist info
+			cache.updateClientCache(e.getClientID()); // only update clientinfo of client
 		}
- 		
-		e.getServerQuery().getCache().updateClientListCache(); //only update clientlist info
-		e.getServerQuery().getCache().updateClientCache(e.getClientID()); //only update clientinfo of client
+		
+		if (e.getConfig().isQueryCached()) {
+			String information = cache.getQueryProperties();
+			int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
+			if (e.getClientID() != queryID) // checks if the query has moved
+				return;
+			information = cache.updateAttribute(information, "client_channel_id=", String.valueOf(e.getTargetChannelID()));
+			cache.updateQueryPropsCache(information);
+		}
 	}
-	
+
 	@EventHandler
 	public void onPrivilegeKeyUsed(PrivilegeKeyUsedEvent e) {
-		
+
 	}
-	
+
 	@EventHandler
 	public void onServerEdit(ServerEditedEvent e) {
-		e.getServerQuery().getCache().updateVirtualServerCache(); // only update virtual server properties
+		if (e.getConfig().isVirtualServerCached())
+			e.getServerQuery().getCache().updateVirtualServerCache(); // only update virtual server properties
 	}
-	
+
 	@EventHandler
 	public void onTextMessage(TextMessageEvent e) {
-		
+
 	}
+
 	
+
 }

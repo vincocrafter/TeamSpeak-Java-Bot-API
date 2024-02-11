@@ -12,72 +12,29 @@
 
 package net.devcube.vinco.teamspeakapi.query.manager;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.Command;
+import net.devcube.vinco.teamspeakapi.api.api.util.CommandFuture;
+import net.devcube.vinco.teamspeakapi.api.api.util.CommandFuture.Transformator;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryWriter {
 
 	private Ts3ServerQuery query;
-	private Socket socket;
-	private OutputStream outputStream;
-	private PrintWriter writer;
-
+	
 	long timeout = -1;
 
-	public QueryWriter(Ts3ServerQuery query, Socket socket) {
+	public QueryWriter(Ts3ServerQuery query) {
 		this.query = query;
-		this.socket = socket;
-		timeout = query.getConfig().getConnectionTimeout();
-
-		try {
-			this.outputStream = socket.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		writer = new PrintWriter(new OutputStreamWriter(this.outputStream));
+		this.timeout = query.getConfig().getConnectionTimeout();
 	}
-
-	/**
-	 * @return the query
-	 */
-	public Ts3ServerQuery getQuery() {
-		return query;
-	}
-
-	/**
-	 * @return the socket
-	 */
-	public Socket getSocket() {
-		return socket;
-	}
-
-	/**
-	 * @return the outputStream
-	 */
-	public OutputStream getOutputStream() {
-		return outputStream;
-	}
-
-	/**
-	 * @return the writer
-	 */
-	public PrintWriter getWriter() {
-		return writer;
-	}
-
+	
 	/**
 	 * All commands executed here and send to the server
 	 * 
@@ -109,10 +66,11 @@ public class QueryWriter {
 	 * @param command
 	 * @return {Normal Packet, Error}
 	 */
-	public synchronized String[] executeReadCommand(String command) {
+	public String[] executeReadCommand(String command) {
 		Command cmd = new Command(command);
 		executeCommand(cmd);
-		while (!cmd.isFinished());
+		while (!cmd.isFinished())
+			;
 		List<String> packets = cmd.getPackets();
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
@@ -125,13 +83,13 @@ public class QueryWriter {
 		return new String[] { resPackets.toString(), cmd.getError() };
 	}
 
-	public synchronized String[] executeReadCommand(StringBuilder command) {
+	public String[] executeReadCommand(StringBuilder command) {
 		return executeReadCommand(command.toString());
 	}
 
 	/**
-	 * Async commands executed here and send to the server. 
-	 * Then wait for an response.
+	 * Async commands executed here and send to the server. Then wait for an
+	 * response.
 	 * 
 	 * 
 	 * @param command
@@ -139,47 +97,37 @@ public class QueryWriter {
 	 * @return {Normal Packet, Error}
 	 */
 
-	public String[] executeAsyncReadCommand(String command) {
-		try {
-			return executeAsyncCommand(command).get(timeout, TimeUnit.MILLISECONDS);
-		} catch (ExecutionException | TimeoutException | InterruptedException e) {
-			query.debug(DebugOutputType.ERROR, "Executing AsyncCommand > (" + command + ") caused an Exception :" + e.getCause());
-			e.printStackTrace();
-		}
-		return null;
+	public <T> T executeAsyncReadCommand(String cmd, Transformator<T> transformator) {
+		return executeAsyncCommand(cmd, transformator).get(timeout, TimeUnit.MILLISECONDS);
 	}
-	
+
 	/**
-	 * Async command executed and send to the server.
-	 * Does not wait for an response.
+	 * Async command executed and send to the server. Does not wait for an response.
 	 * 
-	 * @param command Command that is send to the server.
-	 * @return FutureTask Class containing an String array like {Normal Packet, Error}.
+	 * @param command
+	 *                    Command that is send to the server.
+	 * @return CommandFuture Class containing an information about the result.
 	 */
+
 	
-	public FutureTask<String[]> executeAsyncCommand(String command) {
-		FutureTask<String[]> task = new FutureTask<>(new Callable<String[]>() {
+	public <T> CommandFuture<T> executeAsyncCommand(String command, Transformator<T> transformator) {
+		Command cmd = new Command(command);
+
+		FutureTask<Command> task = new FutureTask<>(new Callable<Command>() {
 
 			@Override
-			public String[] call() throws Exception {
-				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + command + ")");
-				Command cmd = new Command(command);
+			public Command call() throws Exception {
+				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
 				query.getReader().addCommand(cmd);
 				while (!cmd.isFinished());
-				List<String> packets = cmd.getPackets();
-				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
+				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
 				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
-				StringBuilder resPackets = new StringBuilder();
-				packets.forEach(result -> {
-					resPackets.append(result);
-					resPackets.append(System.lineSeparator());
-				});
-
-				return new String[] { resPackets.toString(), cmd.getError() };
+				return cmd;
 			}
 
 		});
 		new Thread(task, "ASYN").start();
-		return task;
+		return new CommandFuture<T>(task, transformator);
 	}
+
 }

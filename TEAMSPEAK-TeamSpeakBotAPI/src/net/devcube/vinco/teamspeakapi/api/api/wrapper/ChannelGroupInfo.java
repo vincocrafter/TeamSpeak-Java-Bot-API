@@ -18,6 +18,10 @@ public class ChannelGroupInfo extends DefaultInfo {
 		return getChannelGroupID();
 	}
 	
+	public int getId() {
+		return getChannelGroupID();
+	}
+	
 	public int getChannelGroupID() {
 		return toInt(get("cgid"));
 	}

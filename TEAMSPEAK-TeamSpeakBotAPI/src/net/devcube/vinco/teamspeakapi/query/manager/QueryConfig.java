@@ -39,7 +39,7 @@ public class QueryConfig {
 	private EventCallType eventCallType = EventCallType.NEW;
 
 	/**
-	 * idea of specify much more the types of output, array to select more as one
+	 * Idea of specify more accurate the types of output, array to select more as one
 	 * type for more detailed debugging
 	 * 
 	 * @see Ts3ServerQuery#debug()

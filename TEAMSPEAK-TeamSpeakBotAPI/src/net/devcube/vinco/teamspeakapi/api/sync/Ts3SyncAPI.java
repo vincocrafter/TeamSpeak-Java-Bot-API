@@ -12,6 +12,7 @@
 package net.devcube.vinco.teamspeakapi.api.sync;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,12 +27,12 @@ import net.devcube.vinco.teamspeakapi.api.api.property.ChannelProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientProperty;
 import net.devcube.vinco.teamspeakapi.api.api.property.EventType;
 import net.devcube.vinco.teamspeakapi.api.api.property.InstanceProperty;
-import net.devcube.vinco.teamspeakapi.api.api.property.LogLevel;
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupLevel;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.TextMessageType;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerProperty;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.BanInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelInfo;
@@ -408,11 +409,11 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public ChannelInfo getChannelInfo(int channelID) throws UnknownChannelInfoException {
-		ChannelInfo clientinfo = getChannel(channelID);
-		if (clientinfo != null) {
-			return clientinfo;
+		ChannelInfo channelInfo = getChannel(channelID);
+		if (channelInfo != null) {
+			return channelInfo;
 		} else {
-			throw new UnknownChannelInfoException("The Channel is null! Please use channellist for more Information about the Channels of the Server.");
+			throw new UnknownChannelInfoException("The Channel is null! Please use channellist for more information about the channels of the server.");
 		}
 	}
 
@@ -811,6 +812,22 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		removeChannelClientPermissions(channel.getChannelID(), dbClientInfo.getClientDataBaseID(), permissions);
 	}
 	
+	public void removeChannelClientAllPermissions(int channelID, int clientdataBaseID) {
+		removeChannelClientPermissions(channelID, clientdataBaseID, getChannelClientPermissions(channelID, clientdataBaseID));
+	}
+	
+	public void removeChannelClientAllPermissions(int channelID, DataBaseClientInfo dbClientInfo) {
+		removeChannelClientAllPermissions(channelID, dbClientInfo.getClientDataBaseID());
+	}
+	
+	public void removeChannelClientAllPermissions(ChannelInfo channel, int clientdataBaseID) {
+		removeChannelClientAllPermissions(channel.getChannelID(), clientdataBaseID);
+	}
+	
+	public void removeChannelClientAllPermissions(ChannelInfo channel, DataBaseClientInfo dbClientInfo) {
+		removeChannelClientAllPermissions(channel.getChannelID(), dbClientInfo.getClientDataBaseID());
+	}
+	
 	public List<PermissionAssignmentInfo> getPermOverview(int clientDBID, int channelID) {
 		return getPermOverview(clientDBID, channelID, 0);
 	}
@@ -828,7 +845,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void deleteChannel(ChannelInfo channel) {
-		deleteChannel(channel.getChannelID(), true);
+		deleteChannel(channel, true);
 	}
 
 	public void removeChannelPermission(int channelID, int permissionID) {
@@ -876,9 +893,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void editChannel(int channelID, ChannelProperty channelProperty, String setValue) {
-		Map<ChannelProperty, String> prop = new HashMap<>();
-		prop.put(channelProperty, setValue);
-		editChannel(channelID, prop);
+		editChannel(channelID, Collections.singletonMap(channelProperty, setValue));
 	}
 
 	public void editChannel(ChannelInfo channel, Map<ChannelProperty, String> channelProperties) {
@@ -1096,15 +1111,25 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void removeClientPermissionIDs(DataBaseClientInfo dataBaseClient, List<Integer> permissions) {
 		removeClientPermissionIDs(dataBaseClient.getClientDataBaseID(), permissions);
 	}
+	
+	public void removeClientAllPermissions(int clientDataBaseID) {
+		removeClientPermissions(clientDataBaseID, getClientPermissions(clientDataBaseID));
+	}
+
+	public void removeClientAllPermissions(DataBaseClientInfo dataBaseClient) {
+		removeClientAllPermissions(dataBaseClient.getClientDataBaseID());
+	}
+	
+	public void removeClientAllPermissions(ClientInfo client) {
+		removeClientAllPermissions(client.getClientDataBaseID());
+	}
 
 	public void editClient(ClientInfo client, Map<ClientProperty, String> clientProperties) {
 		editClient(client.getID(), clientProperties);
 	}
 
 	public void editClient(int clientID, ClientProperty clientProperty, String setValue) {
-		Map<ClientProperty, String> prop = new HashMap<>();
-		prop.put(clientProperty, setValue);
-		editClient(clientID, prop);
+		editClient(clientID, Collections.singletonMap(clientProperty, setValue));
 	}
 
 	public void editClient(ClientInfo client, ClientProperty clientProperty, String setValue) {
@@ -1261,13 +1286,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void editInstance(InstanceProperty instanceProperty, String setValue) {
-		Map<InstanceProperty, String> prop = new HashMap<>();
-		prop.put(instanceProperty, setValue);
-		editInstance(prop);
-	}
-
-	public void addToLog(LogLevel logLevel, String logMessage) {
-		addToLog(logLevel.getValue(), logMessage);
+		editInstance(Collections.singletonMap(instanceProperty, setValue));
 	}
 
 	public List<String> getInstanceLog() {
@@ -1334,12 +1353,20 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		sendTextMessage(messageType, client.getClientID(), message);
 	}
 	
-	public void sendClientMessage(TextMessageType messageType, int clientID, String message) {
-		sendTextMessage(messageType, clientID, message);
+	public void sendClientMessage(int clientID, String message) {
+		sendTextMessage(TextMessageType.CLIENT, clientID, message);
 	}
 	
-	public void sendClientMessage(TextMessageType messageType, ClientInfo client, String message) {
-		sendTextMessage(messageType, client.getClientID(), message);
+	public void sendClientMessage(ClientInfo client, String message) {
+		sendClientMessage(client.getClientID(), message);
+	}
+	
+	public void sendPrivateMessage(int clientID, String message) {
+		sendClientMessage(clientID, message);
+	}
+	
+	public void sendPrivateMessage(ClientInfo client, String message) {
+		sendClientMessage(client.getClientID(), message);
 	}
 	
 	public void sendChannelMessage(String message) {
@@ -1355,9 +1382,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void editVirtualServer(VirtualServerProperty virtualServerProperty, String setValue) {
-		Map<VirtualServerProperty, String> prop = new HashMap<>();
-		prop.put(virtualServerProperty, setValue);
-		editVirtualServer(prop);
+		editVirtualServer(Collections.singletonMap(virtualServerProperty, setValue));
 	}
 
 	public int createServerGroup(String serverGroupName) {
@@ -1548,7 +1573,15 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public void removeServerGroupPermissionIDs(ServerGroupInfo serverGroup, List<Integer> permissionIDs) {
 		removeServerGroupPermissionIDs(serverGroup.getID(), permissionIDs);
 	}
-
+	
+	public void removeServerGroupAllPermissions(int serverGroupID) {
+		removeServerGroupPermissions(serverGroupID, getServerGroupPermissions(serverGroupID));
+	}
+	
+	public void removeServerGroupAllPermissions(ServerGroupInfo serverGroup) {
+		removeServerGroupAllPermissions(serverGroup.getID());
+	}
+	
 	public void addVirtualServerTempPassword(String password, String description, long duration, int targetChannelID) {
 		addVirtualServerTempPassword(password, description, duration, targetChannelID, "");
 	}
@@ -1617,6 +1650,16 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		registerEvent(eventType, -1);
 	}
 	
+	public void registerAllEvents() {
+		registerEvent(EventType.SERVER);
+		registerEvent(EventType.CHANNEL, 0);
+		registerEvent(EventType.TEXT_SERVER);
+		registerEvent(EventType.TEXT_CHANNEL);
+		registerEvent(EventType.TEXT_PRIVATE);
+		registerEvent(EventType.PRIVILEGE_KEY_USED);
+		query.debug(DebugOutputType.QUERY, "Registered all Events");
+	}
+	
 	public void stopServerProcess() {
 		stopServerProcess(null);
 	}
@@ -1627,5 +1670,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	
 	public CreatedSnapshot createSnapshot() {
 		return createSnapshot(null);
+	}
+	
+	public void setNickname(String nickname) {
+		updateQueryName(nickname);
 	}
 }

@@ -12,8 +12,9 @@ public class DefaultInfo {
 		for (String info : infos) {
 			String key = info.split("=")[0];
 			String value = "";
+				
 			if (info.split("=").length > 1) {
-				value = info.split("=")[1].replace(System.lineSeparator(), "");
+				value = info.replace(key.concat("="), "").replace(System.lineSeparator(), "");
 			}
 			
 			splitInfos.put(key, value);

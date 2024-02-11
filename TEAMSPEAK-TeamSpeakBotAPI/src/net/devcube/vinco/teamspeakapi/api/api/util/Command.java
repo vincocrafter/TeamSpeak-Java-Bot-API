@@ -20,15 +20,16 @@ public class Command {
 	private List<String> packets;
 	private String error;
 	
+	
 	public Command(String command) {
 		this.command = command;
-		this.packets = new ArrayList<>();
+		this.packets = new ArrayList<>();		
 	}
 	
 	public synchronized boolean isFinished() {
 		return error != null;
 	}
-	
+		
 	/**
 	 * @return the command
 	 */
@@ -50,6 +51,16 @@ public class Command {
 		return packets;
 	}
 	
+	public String getResult() {
+		StringBuilder resPackets = new StringBuilder();
+		packets.forEach(result -> {
+			resPackets.append(result);
+			resPackets.append(" ");
+		});
+		return resPackets.toString();
+	}
+	
+
 	/**
 	 * @return the error
 	 */

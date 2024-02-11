@@ -19,7 +19,7 @@ public class TextMessageEvent extends BaseEvent {
 		return get("invokername");
 	}
 
-	public int getTargetMode() {
+	public int getTargetModeID() {
 		return toInt(get("targetmode"));
 	}
 
@@ -29,11 +29,15 @@ public class TextMessageEvent extends BaseEvent {
 
 	public TextMessageType getTextMessageType() {
 		for (TextMessageType type : TextMessageType.values()) {
-			if (getTargetMode() == type.getValue()) {
+			if (getTargetModeID() == type.getValue()) {
 				return type;
 			}
 		}
 		return null;
+	}
+	
+	public TextMessageType getTargetMode() {
+		return getTextMessageType();
 	}
 
 	public int getTargetID() {

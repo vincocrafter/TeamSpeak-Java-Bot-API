@@ -12,8 +12,6 @@
 package net.devcube.vinco.teamspeakapi.query;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,11 +22,11 @@ import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
 import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
+import net.devcube.vinco.teamspeakapi.api.api.util.CommandBuilder;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
-import net.devcube.vinco.teamspeakapi.api.api.util.TSError;
-import net.devcube.vinco.teamspeakapi.api.async.Ts3AsycAPI;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AsyncAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
@@ -49,8 +47,8 @@ public class Ts3ServerQuery {
 	private QueryConfig config = new QueryConfig(this);
 	private CacheManager cache;
 
-	private Ts3SyncAPI syncAPI = new Ts3SyncAPI(this);
-	private Ts3AsycAPI asycAPI = new Ts3AsycAPI(this);
+	private Ts3SyncAPI syncAPI;
+	private Ts3AsyncAPI asyncAPI;
 	private Ts3BasicAPI basicAPI;
 
 	private EventManager eventManager = new EventManager(this);
@@ -74,42 +72,27 @@ public class Ts3ServerQuery {
 
 	public void connect(String hostname, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
 		connect(hostname, port);
-		login(username, password);
+		syncAPI.login(username, password);
 		syncAPI.connectTeamSpeakQuery(virtualServerID, queryNickName);
+		syncAPI.registerAllEvents();
 		if (defaultchannelID != -1)
 			syncAPI.goToChannel(defaultchannelID);
-		registerAllEvents();
 	}
 
 	public void connect(String hostname, int port) throws IOException {
 		this.socket = new Socket(hostname, port);
 		this.reader = new QueryReader(this, socket);
-		this.writer = new QueryWriter(this, socket);
+		this.writer = new QueryWriter(this);
+		this.asyncAPI = new Ts3AsyncAPI(this);
 		this.cache = new CacheManager(this);
 		this.basicAPI = new Ts3BasicAPI(this);
+		this.syncAPI  = new Ts3SyncAPI(this);
 		reader.start(); // starts the reader Thread
 		socket.setKeepAlive(true);
 		keepAliveThread.start(); // starts KeepAlivThread
 	}
 
-	/**
-	 * Log in the Client to the Server using the login information
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	public void login(String username, String password) throws QueryLoginException {
-		String res = writer.executeReadErrorCommand("login " + username + " " + password);
-		if (TSError.isError(res, TSError.QUERY_INVALID_LOGIN)) {
-			debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
-			throw new QueryLoginException("Invalid loginname or password!");
-		} else if (TSError.isError(res, TSError.CONNECTION_FAILED_BANNED)) {
-			debug(DebugOutputType.ERROR, "Login failed! Queryclient is banned!");
-			throw new QueryLoginException("Queryclient is banned!");
-		} else {
-			debug(DebugOutputType.QUERY, "Logged in sucessfully");
-		}
-	}
+	
 
 	/**
 	 * Stops the Query, Socket and all Threads
@@ -130,19 +113,7 @@ public class Ts3ServerQuery {
 		reader.stopThreads();
 	}
 
-	/**
-	 * Register all Events
-	 */
-
-	public void registerAllEvents() {
-		writer.executeReadErrorCommand("servernotifyregister event=server");
-		writer.executeReadErrorCommand("servernotifyregister event=channel id=0");
-		writer.executeReadErrorCommand("servernotifyregister event=textserver");
-		writer.executeReadErrorCommand("servernotifyregister event=textchannel");
-		writer.executeReadErrorCommand("servernotifyregister event=textprivate");
-		writer.executeReadErrorCommand("servernotifyregister event=tokenused");
-		debug(DebugOutputType.QUERY, "Registered all Events");
-	}
+	
 
 	public void checkQueryPermissions() {
 		Set<Integer> queryPermissions = syncAPI.getQueryPermissions();
@@ -183,8 +154,8 @@ public class Ts3ServerQuery {
 	/**
 	 * @return the ansycAPI
 	 */
-	public Ts3AsycAPI getAsycAPI() {
-		return asycAPI;
+	public Ts3AsyncAPI getAsyncAPI() {
+		return asyncAPI;
 	}
 
 	/**

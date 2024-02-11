@@ -51,17 +51,18 @@ public class ClientJoinEvent extends BaseEvent {
 	}
 	
 	public ArrayList<Integer> getClientServerGroups() {
-		ArrayList<Integer> arraylist = new ArrayList<Integer>();
-		if (get("client_servergroups").contains(",")) {
-			String[] astring = get("client_servergroups").split(",");
-			for (String s : astring) {
-				arraylist.add(toInt(s));
+		String servergroups = get("client_servergroups");
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		if (servergroups.contains(",")) {
+			String[] splitGroups = servergroups.split(",");
+			for (String groupID : splitGroups) {
+				result.add(toInt(groupID));
 			}
 		} else {
-			arraylist.add(toInt(get("client_servergroups")));
+			result.add(toInt(servergroups));
 		}
 
-		return arraylist;
+		return result;
 	}
 	
 	public boolean isClientAway() {
@@ -69,7 +70,7 @@ public class ClientJoinEvent extends BaseEvent {
 	}
 	
 	public String getAwayMessage() {
-		return get("client_away_message");
+		return Formatter.toNormalFormat(get("client_away_message"));
 	}
 	
 	private int getClientTypeInt() {
@@ -101,7 +102,7 @@ public class ClientJoinEvent extends BaseEvent {
 	}
 	
 	public String getClientDescription() {
-		return get("client_description");
+		return Formatter.toNormalFormat(get("client_description"));
 	}
 	
 	public boolean isClientTalker() {
@@ -113,7 +114,7 @@ public class ClientJoinEvent extends BaseEvent {
 	}
 	
 	public String getClientPoneticName() {
-		return get("client_nickname_phonetic ");
+		return Formatter.toNormalFormat(get("client_nickname_phonetic"));
 	}
 	
 	public int getClientNeededServerQueryViewPower() {
