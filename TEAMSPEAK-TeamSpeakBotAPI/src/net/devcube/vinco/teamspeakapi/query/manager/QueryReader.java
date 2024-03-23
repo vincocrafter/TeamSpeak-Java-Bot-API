@@ -72,6 +72,7 @@ public class QueryReader {
 								continue;
 							}
 							if (isEvent(msg)) { // Event here
+								query.debug(DebugOutputType.QUERYREADER, "Read Event: " + msg);
 								callEvents(msg);
 								continue;
 							}
@@ -144,16 +145,12 @@ public class QueryReader {
 				
 				try {					
 					if (query.getConfig().isEventCallType(EventCallType.NEW)) { // New one
-						query.debug(DebugOutputType.QUERYREADER, "Called New Event: " + msg);
 						query.getEventManager().callNewEvent(infos);
 					} else if (query.getConfig().isEventCallType(EventCallType.OLD)) { // Old one
-						query.debug(DebugOutputType.QUERYREADER, "Called Old Event: " + msg);
-						query.getEventManager().callEvent(infos, infos[0]);
-
+						query.getEventManager().callEvent(infos);
 					} else { // And here both types of Event call
-						query.debug(DebugOutputType.QUERYREADER, "Called both Events: " + msg);
 						query.getEventManager().callNewEvent(infos);
-						query.getEventManager().callEvent(infos, infos[0]);
+						query.getEventManager().callEvent(infos);
 					}
 				} catch (Exception e) {
 					query.debug(DebugOutputType.ERROR, "Got an Exception from calling an event caused by " + e.getClass().getName() + "!");

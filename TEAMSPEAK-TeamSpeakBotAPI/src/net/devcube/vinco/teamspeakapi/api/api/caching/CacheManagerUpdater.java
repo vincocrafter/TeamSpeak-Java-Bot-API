@@ -11,6 +11,9 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.caching;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.devcube.vinco.teamspeakapi.api.api.event.EventHandler;
 import net.devcube.vinco.teamspeakapi.api.api.event.TsEventAdapter;
 import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
@@ -98,10 +101,10 @@ public class CacheManagerUpdater extends TsEventAdapter {
 
 		if (!e.getConfig().isClientsCached())
 			return;
-		
-		if (e.getConfig().isDataBaseCached()) //update Database cache is only possible if client caching is enabled
+
+		if (e.getConfig().isDataBaseCached()) // update Database cache is only possible if client caching is enabled
 			cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(e.getClientID()), "client_database_id="))); // only update databaseinfo of client
-		
+
 		cache.updateClientListCache(); // only update clientlist info
 		cache.cacheRemoveClient(e.getClientID());
 	}
@@ -109,17 +112,24 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	@EventHandler
 	public void onClientMove(ClientMoveEvent e) {
 		CacheManager cache = e.getCache();
-		
+
 		if (e.getConfig().isClientsCached()) {
 			cache.updateClientListCache(); // only update clientlist info
-			cache.updateClientCache(e.getClientID()); // only update clientinfo of client
+			Set<Integer> ids = new HashSet<>();
+			ids.addAll(e.getClientIDs()); // update clientinfo of moved clients
+			int invoker = e.getInvokerID();
+			if (invoker != -1)
+				ids.add(invoker); // update clientinfo of invoker
+
+			cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
 		}
-		
+
 		if (e.getConfig().isQueryCached()) {
 			String information = cache.getQueryProperties();
 			int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
-			if (e.getClientID() != queryID) // checks if the query has moved
+			if (!e.getClientIDs().contains(queryID)) // checks if the query has moved
 				return;
+
 			information = cache.updateAttribute(information, "client_channel_id=", String.valueOf(e.getTargetChannelID()));
 			cache.updateQueryPropsCache(information);
 		}
@@ -132,15 +142,15 @@ public class CacheManagerUpdater extends TsEventAdapter {
 
 	@EventHandler
 	public void onServerEdit(ServerEditedEvent e) {
-		if (e.getConfig().isVirtualServerCached())
+		if (e.getConfig().isVirtualServerCached()) {
 			e.getServerQuery().getCache().updateVirtualServerCache(); // only update virtual server properties
+			e.getServerQuery().getCache().updateVirtualServerListCache(); // only update list of virtualservers
+		}
 	}
 
 	@EventHandler
 	public void onTextMessage(TextMessageEvent e) {
 
 	}
-
-	
 
 }

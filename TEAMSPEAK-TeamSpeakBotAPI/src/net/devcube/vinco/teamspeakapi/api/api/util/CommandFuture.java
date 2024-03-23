@@ -107,7 +107,7 @@ public class CommandFuture<I> {
 	}
 	
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		return 	task.cancel(mayInterruptIfRunning);
+		return task.cancel(mayInterruptIfRunning);
 	}
 	
 	@FunctionalInterface

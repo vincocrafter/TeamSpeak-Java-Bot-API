@@ -34,24 +34,20 @@ public class KeepAliveThread {
 			
 			@Override
 			public void run() {
-				
-				try {
-					Thread.sleep(SLEEP);
-				} catch (InterruptedException e) {
-				}
-				
-				while (!Thread.currentThread().isInterrupted()) {
-					query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
-					query.getAsyncAPI().getVersion();
+				while (Thread.currentThread().isAlive()) {
 					try {
 						Thread.sleep(SLEEP);
 					} catch (InterruptedException e) {
 						break;
 					}
+					
+					query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
+					query.getAsyncAPI().getVersion();
 				}
 				
 			}
 		}, "KALT");
+		keepAliveThread.start();
 	}
 	
 	

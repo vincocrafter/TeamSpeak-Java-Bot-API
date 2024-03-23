@@ -27,7 +27,6 @@ public class ChannelEditedEvent extends BaseEvent {
 		return toInt(get("cid"));
 	}
 	
-	
 	/**
 	 * 
 	 * @return everytime 10, because it is the id for channelediting

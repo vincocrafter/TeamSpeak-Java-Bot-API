@@ -76,7 +76,7 @@ public class EventManager {
 			query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 		}
 	}
-	
+
 	public void removeTs3Listener(TsEvent event) {
 		if (event != null) {
 			if (events.contains(event)) {
@@ -96,8 +96,8 @@ public class EventManager {
 	 * @throws UnknownEventException
 	 * @deprecated
 	 */
-	public synchronized void callEvent(String[] infos, String eventName) throws UnknownEventException {
-
+	public synchronized void callEvent(String[] infos) throws UnknownEventException {
+		String eventName = infos[0];		
 		switch (eventName) {
 		case "notifytokenused": // TOKEN USED EVENT
 			for (TsEvent event : getEvents()) {
@@ -147,7 +147,7 @@ public class EventManager {
 				event.onServerEdit(new ServerEditedEvent(infos, query));
 			}
 			break;
-		case "notifychannelmoved": //CHANNEL MOVED
+		case "notifychannelmoved": // CHANNEL MOVED
 			for (TsEvent event : getEvents()) {
 				if (event == null) {
 					throw new UnknownEventException("One Event is null");
@@ -204,26 +204,27 @@ public class EventManager {
 	/**
 	 * New Method of calling Events, using Annotations
 	 * 
-	 * @param infos String[]
-	 *                     eventInformation
+	 * @param infos
+	 *                  String[] eventInformation
 	 */
 
 	public synchronized void callNewEvent(String[] infos) {
-		String eventName = infos[0];
-		debugNewEvent(eventName, Formatter.connectString(infos)); // new debug Method for Event calling
+		debugNewEvent(infos); // new debug Method for Event calling
 		events.forEach(registeredEvents -> callNewEventClass(infos, registeredEvents));
 	}
-	
+
 	/**
 	 * Split Methods to call specified Event at any point for specific class.
 	 * 
-	 * @param infos Eventinformation given by the query
-	 * @param registeredEvent Eventclass which should be invoked
+	 * @param infos
+	 *                            Eventinformation given by the query
+	 * @param registeredEvent
+	 *                            Eventclass which should be invoked
 	 */
-	
+
 	public void callNewEventClass(String[] infos, TsEvent registeredEvent) {
 		BaseEvent event = getEventByName(infos);
-		
+
 		for (Method meth : registeredEvent.getClass().getDeclaredMethods()) {
 			if (meth.isAnnotationPresent(EventHandler.class)) { // Check
 				for (AnnotatedType ann1 : meth.getAnnotatedParameterTypes()) {
@@ -232,18 +233,17 @@ public class EventManager {
 						// Example -> public void test(PrivilegeKeyUsedEvent ev) {
 						// PrivilegeKeyUsedEvent is the name of the parameter and the name of the Class
 						try {
-							meth.invoke(registeredEvent, getEventByName(infos));
+							meth.invoke(registeredEvent, event);
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 							if (e.getClass() != null && e.getCause() != null) {
-								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + 
-										"' from Class '" + registeredEvent.getClass().getName() + "' caused by " + e.getCause().getClass().getName() + "!");
-							} else if (e.getCause() != null){
+								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' from Class '" + registeredEvent.getClass().getName()
+										+ "' caused by " + e.getCause().getClass().getName() + "!");
+							} else if (e.getCause() != null) {
 								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' caused by " + e.getCause().getClass().getName() + "!");
 							} else {
 								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' !");
 							}
-							
-							
+
 							e.printStackTrace();
 						}
 					}
@@ -253,11 +253,11 @@ public class EventManager {
 	}
 
 	/**
-	 * Returns different (BaseEvent)Classes depending by the given information.
-	 * Only called by the callNewEvent Method
+	 * Returns different (BaseEvent)Classes depending by the given information. Only
+	 * called by the callNewEvent Method
 	 * 
 	 * @param infos
-	 *                     eventInformation
+	 *                  eventInformation
 	 */
 
 	private BaseEvent getEventByName(String[] infos) {
@@ -273,7 +273,7 @@ public class EventManager {
 			return new ChannelDescriptionEditedEvent(infos, query);
 		case "notifychanneledited": // CHANNEL EDITED
 			return new ChannelEditedEvent(infos, query);
-		case "notifychannelmoved": //CHANNEL MOVED
+		case "notifychannelmoved": // CHANNEL MOVED
 			return new ChannelMovedEvent(infos, query);
 		case "notifyserveredited": // SERVER EDITED
 			return new ServerEditedEvent(infos, query);
@@ -301,35 +301,50 @@ public class EventManager {
 	 * @see QueryConfig
 	 * @see DebugOutputType
 	 */
-	private void debugNewEvent(String eventName, String infos) {
+	private void debugNewEvent(String[] infos) {
+		String eventName = infos[0];
+		String information = Formatter.connectString(infos);
 		query.debug(DebugOutputType.EVENTMANAGER, "Event " + eventName + " was called");
 
-		if (eventName.equalsIgnoreCase("notifychannelcreated")) {
-			query.debug(DebugOutputType.E_CHANNEL_CREATED, infos);
-		} else if (eventName.equalsIgnoreCase("notifychanneldeleted")) {
-			query.debug(DebugOutputType.E_CHANNEL_DELETED, infos);
-		} else if (eventName.equalsIgnoreCase("notifychanneldescriptionchanged")) {
-			query.debug(DebugOutputType.E_CHANNEL_DESCRIPTION_EDITED, infos);
-		} else if (eventName.equalsIgnoreCase("notifychanneledited")) {
-			query.debug(DebugOutputType.E_CHANNEL_EDITED, infos.toString());
-		} else if (eventName.equalsIgnoreCase("notifychannelpasswordchanged")) {
-			query.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, infos);
-		} else if(eventName.equalsIgnoreCase("notifychannelmoved")) {
-			query.debug(DebugOutputType.E_CHANNEL_MOVED, infos);
-		} else if (eventName.equalsIgnoreCase("notifycliententerview")) {
-			query.debug(DebugOutputType.E_CLIENT_JOIN, infos);
-		} else if (eventName.equalsIgnoreCase("notifyclientleftview")) {
-			query.debug(DebugOutputType.E_CLIENT_LEAVE, infos);
-		} else if (eventName.equalsIgnoreCase("notifyclientmoved")) {
-			query.debug(DebugOutputType.E_CLIENT_MOVE, infos);
-		} else if (eventName.equalsIgnoreCase("notifytokenused")) {
-			query.debug(DebugOutputType.E_PRIVILEGEKEY_USED, infos);
-		} else if (eventName.equalsIgnoreCase("notifyserveredited")) {
-			query.debug(DebugOutputType.E_SERVER_EDITED, infos);
-		} else if (eventName.equalsIgnoreCase("notifytextmessage")) {
-			query.debug(DebugOutputType.E_TEXT_MESSAGE, infos);
+		switch (eventName) {
+		case "notifychannelcreated": // CHANNEL CREATED
+			query.debug(DebugOutputType.E_CHANNEL_CREATED, "Channel Created Event: " + information);
+			break;
+		case "notifychanneldeleted": // CHANNEL DELETED
+			query.debug(DebugOutputType.E_CHANNEL_DELETED, "Channel Deleted Event: " + information);
+			break;
+		case "notifychanneldescriptionchanged": // CHANNEL DESCRIPTION CHANGED
+			query.debug(DebugOutputType.E_CHANNEL_DESCRIPTION_EDITED, "Channel Description Edited Event: " + information);
+			break;
+		case "notifychanneledited": // CHANNEL EDITED
+			query.debug(DebugOutputType.E_CHANNEL_EDITED, "Channel Edited Event: " + information);
+			break;
+		case "notifychannelpasswordchanged": // CHANNEL PASSWORD CHANGED
+			query.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, "Channel Password Changed Event: " + information);
+			break;
+		case "notifychannelmoved": // CHANNEL MOVED
+			query.debug(DebugOutputType.E_CHANNEL_MOVED, "Channel Moved Event: " + information);
+			break;
+		case "notifycliententerview": // CLIENT JOIN EVENT
+			query.debug(DebugOutputType.E_CLIENT_JOIN, "Client Join Event: " + information);
+			break;
+		case "notifyclientleftview": // CLIENT LEAVE EVENT
+			query.debug(DebugOutputType.E_CLIENT_LEAVE, "Client Leave Event: " + information);
+			break;
+		case "notifyclientmoved": // CLIENT MOVED
+			query.debug(DebugOutputType.E_CLIENT_MOVE, "Client Move Event: " + information);
+			break;
+		case "notifytokenused": // TOKEN USED EVENT
+			query.debug(DebugOutputType.E_PRIVILEGEKEY_USED, "Token Used Event: " + information);
+			break;
+		case "notifyserveredited": // SERVER EDITED
+			query.debug(DebugOutputType.E_SERVER_EDITED, "Server Edited Event: " + information);
+			break;
+		case "notifytextmessage": // TEXT MESSAGE SEND
+			query.debug(DebugOutputType.E_TEXT_MESSAGE, "Text Message Event: " + information);
+			break;
+		default:
 		}
-
 	}
 
 }

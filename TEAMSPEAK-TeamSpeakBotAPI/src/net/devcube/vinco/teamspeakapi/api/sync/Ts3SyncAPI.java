@@ -157,8 +157,8 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	/**
 	 * Method to get an overview for the permissions of
 	 * the Query Client.
-	 * Does not include channel/client specific permissions, because
-	 * this may not be the most important ones for a query client.
+	 * Does not include channel client permissions, because
+	 * they can change if the query switches the channel.
 	 * @return List of PermissionIDs containing every ID only once.
 	 */
 	
@@ -169,7 +169,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		getServerGroupIDsByClient(dbID).forEach(servergroups -> {
 			perms.addAll(getPermissionIDs(getServerGroupPermissions(servergroups)));
 		});
-
+		
+		perms.addAll(getPermissionIDs(getClientPermissions(dbID)));
+		
 		return perms;
 	}
 
@@ -297,7 +299,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		Optional<ChannelGroupInfo> result = groupList.stream().filter(groups -> groups.getID() == groupID).findFirst();
 		if (result.isEmpty())
 			return null;
-		
+
 		return result.get();
 	}
 
@@ -359,7 +361,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		if (clientinfo != null) {
 			return clientinfo;
 		} else {
-			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the information of this player");
+			throw new UnknownClientInfoException("The Client is null! Please use the DataBaseClientInfo to get the information of this Player.");
 		}
 	}
 	
@@ -370,7 +372,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public ClientInfo getClientInfoByUUID(String clientUUID) throws UnknownClientInfoException {
 		ClientInfo info = getClient(getClientIDByUUID(clientUUID));
 		if (info == null) {
-			throw new UnknownClientInfoException("Client with UUID: " + clientUUID + " was not found");
+			throw new UnknownClientInfoException("Client with UUID: " + clientUUID + " was not found!");
 		}
 		return info;
 	}
@@ -413,7 +415,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		if (channelInfo != null) {
 			return channelInfo;
 		} else {
-			throw new UnknownChannelInfoException("The Channel is null! Please use channellist for more information about the channels of the server.");
+			throw new UnknownChannelInfoException("The Channel is null! Please use channellist for more information about the channels of the Server.");
 		}
 	}
 
@@ -460,7 +462,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Map<DataBaseClientInfo, List<Integer>> getDatabaseClientInfosByChannelGroup(int channelgroupID) {
 		Map<DataBaseClientInfo, List<Integer>> resultMap = new HashMap<>();
 		Map<Integer, List<Integer>> getMap = getDatabaseIDsByChannelGroup(channelgroupID);
-		getDataBaseClientsByDBIDs(new ArrayList<>(getMap.keySet())).forEach(dbClient -> {
+		getDataBaseClientsByDBIDs(getMap.keySet().stream().toList()).forEach(dbClient -> {
 			resultMap.put(dbClient, getMap.get(dbClient.getClientDataBaseID()));
 		});
 	
@@ -1223,7 +1225,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Map<DataBaseClientInfo, List<String>> searchDBClientCustomInfo(String ident, String pattern) {
 		Map<DataBaseClientInfo, List<String>> resultMap = new HashMap<>();
 		Map<Integer, List<String>> searchList = searchDBIDsCustomInfo(ident, pattern);
-		getDataBaseClientsByDBIDs(new ArrayList<>(searchList.keySet())).forEach(client -> {
+		getDataBaseClientsByDBIDs(searchList.keySet().stream().toList()).forEach(client -> {
 			resultMap.put(client, searchList.get(client.getClientDataBaseID()));
 		});
 

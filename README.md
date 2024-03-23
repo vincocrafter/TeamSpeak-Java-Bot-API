@@ -25,8 +25,8 @@ public class Test {
 }
 ```
 ## Getting Started:
-See [How to start with the API](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Advanced-API).
 
+See [How to start with the API](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Getting-Started).
 ## How to use debugging:
 See [How to debug with the API](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Debugging) 
 or [Advanced Debugging](https://github.com/vincocrafter/TeamSpeak-Java-Bot-API/wiki/Advanced-Debugging).\

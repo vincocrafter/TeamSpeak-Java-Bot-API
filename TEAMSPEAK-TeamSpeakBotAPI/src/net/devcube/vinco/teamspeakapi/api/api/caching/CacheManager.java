@@ -12,13 +12,14 @@
 package net.devcube.vinco.teamspeakapi.api.api.caching;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.CommandBuilder;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
-import net.devcube.vinco.teamspeakapi.api.api.wrapper.ClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.DataBaseClientInfo;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
@@ -39,6 +40,7 @@ public class CacheManager {
 	private final String SGROUPLIST = "SERVERGROUPLIST";
 	private final String CGROUPLIST = "CHANNELGROUPLIST";
 	private final String PERMSLIST = "PERMISSIONLIST";
+	private final String VSERVERLIST = "VSERVERLIST";
 
 	private final String PROPERTIES = "PROPERTIES";
 	
@@ -53,14 +55,15 @@ public class CacheManager {
 
 
 	/**
-	 * @return a copy the cache
+	 * @return a copy of the cache
 	 */
 	public Map<String, String> getCache() {
 		return new HashMap<>(cache);
 	}
 
 	public void prepareCache() {
-		query.debug(DebugOutputType.CACHEMANAGER, "Starting caching process for the first time....");
+		long startTime = System.currentTimeMillis();
+		query.debug(DebugOutputType.CACHEMANAGER, "Preparing caching process for the first time....");
 		
 		if (config.isClientsCached()) {
 			query.debug(DebugOutputType.CACHEMANAGER, "Updating clients cache");
@@ -70,10 +73,7 @@ public class CacheManager {
 				clientIDs.add(Integer.parseInt(Formatter.get(clients, "clid=")));
 			}
 			
-			List<ClientInfo> clients = query.getBasicAPI().getClientsByIDs(clientIDs);
-			for (ClientInfo client : clients) {
-				updateClientCache(client.getID(), client.getRawInfos());
-			}
+			updateClientsCache(clientIDs);
 		}
 		
 		if (config.isDataBaseCached()) {
@@ -85,9 +85,7 @@ public class CacheManager {
 				clientdbIDs.add(Integer.parseInt(Formatter.get(dbClients, "cldbid=")));
 			}
 			List<DataBaseClientInfo> clients = query.getBasicAPI().getDataBaseClientsByDBIDs(clientdbIDs);
-			for (DataBaseClientInfo client : clients) {
-				updateDBClientCache(client.getClientDataBaseID(), client.getRawInfos());
-			}
+			clients.forEach(client -> updateDBClientCache(client.getClientDataBaseID(), client.getRawInfos()));
 		}
 		
 		if (config.isChannelsCached()) {
@@ -117,19 +115,31 @@ public class CacheManager {
 		if (config.isVirtualServerCached()) {
 			query.debug(DebugOutputType.CACHEMANAGER, "Updating virtualserver cache");
 			updateVirtualServerCache();
+			updateVirtualServerListCache();
 		}
-
-		query.debug(DebugOutputType.CACHEMANAGER, "Starting caching process finished!");
+		
+		query.debug(DebugOutputType.CACHEMANAGER, "Preparing caching process took " + (System.currentTimeMillis() - startTime) + " Miliseconds to finish!");
 
 	}
 
 
 	public void updateClientListCache() {
-		cache.put(CLIENTLIST, getInformation("clientlist -uid -away -voice -times -groups -info -country -ip -badges")); // update clientlist
+		cache.put(CLIENTLIST, getInformation(CommandBuilder.buildGetClientsCommand())); // update clientlist
 	}
 
 	public void updateClientCache(int clientID) {
-		cache.put(CLIENT + SEPERATOR + clientID, getInformation("clientinfo clid=" + clientID).concat(" clid=" + clientID));
+		cache.put(CLIENT + SEPERATOR + clientID, 
+				getInformation(CommandBuilder.buildGetClientsByIDsCommand(Collections.singletonList(clientID))).concat(" clid=" + clientID));
+	}
+	
+	public void updateClientsCache(List<Integer> clientIDs) {
+		String info = getInformation(CommandBuilder.buildGetClientsByIDsCommand(clientIDs));
+
+		int counter = 0;
+		for (String clientInfo : info.split(TS_INFO_SEPERATOR)) {
+			updateClientCache(clientIDs.get(counter), clientInfo);
+			counter++;
+		}
 	}
 	
 	public void updateClientCache(int clientID, String information) {
@@ -137,28 +147,29 @@ public class CacheManager {
 	}
 	
 	public void updateChannelsListCache() {
-		cache.put(CHANNELLIST, getInformation("channellist -topic -flags -voice -limits -icon -secondsempty -banners")); // update Channellist
+		cache.put(CHANNELLIST, getInformation(CommandBuilder.buildGetChannelsCommand())); // update Channellist
 	}
 	
 	public void updateChannelCache(int channelID) {
-		cache.put(CHANNEL + SEPERATOR + channelID, getInformation("channelinfo cid=" + channelID).concat(" cid=" + channelID)); // Update individual channel
+		cache.put(CHANNEL + SEPERATOR + channelID, 
+				getInformation(CommandBuilder.buildGetChannelCommand(channelID)).concat(" cid=" + channelID)); // Update individual channel
 	}
 
-	
 	public void updateServerGroupsCache() {
-		cache.put(SGROUPLIST, getInformation("servergrouplist")); // update channel groups
+		cache.put(SGROUPLIST, getInformation(CommandBuilder.buildGetServerGroupsCommand())); // update channel groups
 	}
 	
 	public void updateChannelGroupsCache() {
-		cache.put(CGROUPLIST, getInformation("channelgrouplist")); // update channel groups
+		cache.put(CGROUPLIST, getInformation(CommandBuilder.buildGetChannelGroupsCommand())); // update channel groups
 	}
 	
 	public void updateDBClientsListCache() {
-		cache.put(DBCLIENTLIST, getInformation("clientdblist")); // update DataBaseclientslist
+		cache.put(DBCLIENTLIST, getInformation(CommandBuilder.buildGetDataBaseClientsCommand(-1, -1))); // update DataBaseclientslist
 	}
 	
 	public void updateDBClientCache(int clientDBID) {
-		cache.put(DBCLIENT + SEPERATOR + clientDBID, getInformation("clientdbinfo cldbid=" + clientDBID).replace("cldbid", "client_database_id")); // Update database client
+		cache.put(DBCLIENT + SEPERATOR + clientDBID, 
+				getInformation(CommandBuilder.buildGetDataBaseClientsByDBIDsCommand(Collections.singletonList(clientDBID))).replace("cldbid", "client_database_id")); // Update database client
 	}
 	
 	public void updateDBClientCache(int clientDBID, String information) {
@@ -166,11 +177,15 @@ public class CacheManager {
 	}
 	
 	public void updateVirtualServerCache() {
-		cache.put(VSERVER + SEPERATOR + PROPERTIES, getInformation("serverinfo"));
+		cache.put(VSERVER + SEPERATOR + PROPERTIES, getInformation(CommandBuilder.buildGetServerInfoCommand()));
+	}
+	
+	public void updateVirtualServerListCache() {
+		cache.put(VSERVERLIST, getInformation(CommandBuilder.buildGetVirtualServersCommand()));
 	}
 	
 	public void updateQueryPropsCache() {
-		cache.put(QUERY + SEPERATOR + PROPERTIES, getInformation("whoami"));
+		cache.put(QUERY + SEPERATOR + PROPERTIES, getInformation(CommandBuilder.buildgetQueryInfoCommand()));
 	}
 	
 	public void updateQueryPropsCache(String information) {
@@ -178,7 +193,17 @@ public class CacheManager {
 	}
 	
 	public void updatePermissionsList() {
-		cache.put(PERMSLIST, getInformation("permissionlist"));
+		String pList = getInformation(CommandBuilder.buildGetPermissionListCommand());
+		cache.put(PERMSLIST, pList);
+		
+		//Would store the List of permission ids as seperated list like 1 2 3...
+		 StringBuilder ids = new StringBuilder();
+		for (String perm : pList.split("permid=")) {
+			String permID = perm.split(" ")[0];
+			if (!permID.isEmpty())
+				ids.append(permID).append(" ");
+		}
+		cache.put(PERMSLIST + SEPERATOR + "IDS", ids.toString());
 	}
 	
 	private String getInformation(String cmd) {
@@ -235,11 +260,19 @@ public class CacheManager {
 		return cache.get(VSERVER + SEPERATOR + PROPERTIES);
 	}
 	
+	public String getVirtualServerList() {
+		return cache.get(VSERVERLIST);
+	}
+	
 	public String getQueryProperties() {
 		return cache.get(QUERY + SEPERATOR + PROPERTIES);
 	}
 	
 	public String getPermissionsList() {
 		return cache.get(PERMSLIST);
+	}
+	
+	public String getPermissionsIDsList() {
+		return cache.get(PERMSLIST + SEPERATOR + "IDS");
 	}
 }

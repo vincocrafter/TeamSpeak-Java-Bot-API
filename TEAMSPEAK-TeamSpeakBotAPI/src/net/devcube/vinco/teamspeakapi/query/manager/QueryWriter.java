@@ -12,7 +12,6 @@
 
 package net.devcube.vinco.teamspeakapi.query.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -69,18 +68,11 @@ public class QueryWriter {
 	public String[] executeReadCommand(String command) {
 		Command cmd = new Command(command);
 		executeCommand(cmd);
-		while (!cmd.isFinished())
-			;
+		while (!cmd.isFinished());
 		List<String> packets = cmd.getPackets();
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
 		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
-		StringBuilder resPackets = new StringBuilder();
-		packets.forEach(result -> {
-			resPackets.append(result);
-			resPackets.append(System.lineSeparator());
-		});
-
-		return new String[] { resPackets.toString(), cmd.getError() };
+		return new String[] { cmd.getResult(), cmd.getError() };
 	}
 
 	public String[] executeReadCommand(StringBuilder command) {

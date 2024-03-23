@@ -108,7 +108,7 @@ public class ClientInfo extends DefaultInfo {
 	}
 
 	public boolean hasClientDescription() {
-		return !getClientDescription().equalsIgnoreCase("");
+		return !getClientDescription().isEmpty();
 	}
 
 	public String getClientDescription() {

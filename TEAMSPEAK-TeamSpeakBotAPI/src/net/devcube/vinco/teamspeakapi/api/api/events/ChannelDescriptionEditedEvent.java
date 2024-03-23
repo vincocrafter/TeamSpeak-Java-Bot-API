@@ -13,4 +13,8 @@ public class ChannelDescriptionEditedEvent extends BaseEvent {
 	public int getChannelID() {
 		return toInt(get("cid"));
 	}
+	
+	public String toString() {
+		return "ChannelDeleteEvent[ChannelID=" + getChannelID() + "]";
+	}
 }

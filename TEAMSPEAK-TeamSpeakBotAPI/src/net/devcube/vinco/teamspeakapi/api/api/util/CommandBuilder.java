@@ -92,7 +92,7 @@ public class CommandBuilder {
 		return new StringBuilder("quit").toString();
 	}
 
-	public static String buildWhoamiCommand() {
+	public static String buildgetQueryInfoCommand() {
 		StringBuilder cmd = new StringBuilder("whoami");
 		return cmd.toString();
 	}
@@ -109,7 +109,7 @@ public class CommandBuilder {
 		return cmd.toString();
 	}
 
-	public static String builGetPermissionListCommand() {
+	public static String buildGetPermissionListCommand() {
 		return new StringBuilder("permissionlist").toString();
 	}
 
@@ -189,6 +189,7 @@ public class CommandBuilder {
 
 	public static String buildGetDataBaseClientsCountCommand() {
 		StringBuilder cmd = new StringBuilder("clientdblist");
+		cmd.append(" duration=").append(1);
 		cmd.append(" -count");
 		return cmd.toString();
 	}
@@ -333,6 +334,7 @@ public class CommandBuilder {
 	public static String buildGetVirtualServersCommand() {
 		StringBuilder cmd = new StringBuilder("serverlist");
 		cmd.append(" -uid");
+		cmd.append(" -all");
 		return cmd.toString();
 	}
 	

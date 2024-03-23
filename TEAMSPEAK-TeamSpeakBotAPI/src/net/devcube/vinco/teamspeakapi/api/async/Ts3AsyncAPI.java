@@ -118,7 +118,7 @@ public class Ts3AsyncAPI {
 	}
 
 	public CommandFuture<QueryClientInfo> getQueryInfo() {
-		return writer.executeAsyncCommand(CommandBuilder.buildWhoamiCommand(), QueryClientInfo::new);
+		return writer.executeAsyncCommand(CommandBuilder.buildgetQueryInfoCommand(), QueryClientInfo::new);
 	}
 
 	public CommandFuture<Integer> getVirtualServerIDByPort(int port) {
@@ -138,7 +138,7 @@ public class Ts3AsyncAPI {
 	}
 
 	public CommandFuture<List<Permission>> getPermissionList() {
-		return getPermissionListByCommand(CommandBuilder.builGetPermissionListCommand());
+		return getPermissionListByCommand(CommandBuilder.buildGetPermissionListCommand());
 	}
 
 	public CommandFuture<List<Permission>> getPermissionListByCommand(String command) {
@@ -435,8 +435,8 @@ public class Ts3AsyncAPI {
 		return executeCommandGetNoResult(CommandBuilder.buildStopServerProcessCommand(reasonmsg));
 	}
 
-	public CommandFuture<Void> resetPermissions() {
-		return executeCommandGetNoResult(CommandBuilder.buildResetPermissionsCommand());
+	public CommandFuture<String> resetPermissions() {
+		return executeCommandGetStringPropResult(CommandBuilder.buildResetPermissionsCommand(), "token=");
 	}
 
 	public CommandFuture<Void> addChannelPermission(int channelID, int permissionID, String permissionName, int permissionValue) {
@@ -890,9 +890,8 @@ public class Ts3AsyncAPI {
 					int valID = Integer.parseInt(Formatter.get(user, valueProp));
 
 					List<Integer> list = new ArrayList<>();
-					if (resultMap.containsKey(keyID)) {
-						list = resultMap.get(keyID);
-					}
+					resultMap.putIfAbsent(keyID, list);
+					list = resultMap.get(keyID);
 					list.add(valID);
 					resultMap.put(keyID, list);
 				}
@@ -929,9 +928,8 @@ public class Ts3AsyncAPI {
 					int keyID = Integer.parseInt(Formatter.get(info, keyProp));
 					String valueID = Formatter.toNormalFormat(Formatter.get(info, valueProp));
 					List<String> list = new ArrayList<>();
-					if (resultMap.containsKey(keyID)) {
-						list = resultMap.get(keyID);
-					}
+					resultMap.putIfAbsent(keyID, list);
+					list = resultMap.get(keyID);
 					list.add(valueID);
 					resultMap.put(keyID, list);
 				}
@@ -996,7 +994,7 @@ public class Ts3AsyncAPI {
 		});
 	}
 
-	private <T> CommandFuture<List<String>> executeCommandGetListStringPropResult(String command, String property) {
+	private CommandFuture<List<String>> executeCommandGetListStringPropResult(String command, String property) {
 		return executeCommandGetListResult(command, new Transformator<String>() {
 
 			@Override
@@ -1006,7 +1004,7 @@ public class Ts3AsyncAPI {
 		});
 	}
 
-	private <T> CommandFuture<Integer> executeCommandGetListIntFirstPropResult(String command, String property) {
+	private CommandFuture<Integer> executeCommandGetListIntFirstPropResult(String command, String property) {
 		return executeCommandGetListFirstResult(command, new Transformator<Integer>() {
 
 			@Override
@@ -1016,7 +1014,7 @@ public class Ts3AsyncAPI {
 		});
 	}
 
-	private <T> CommandFuture<String> executeCommandGetListStringFirstPropResult(String command, String property) {
+	private CommandFuture<String> executeCommandGetListStringFirstPropResult(String command, String property) {
 		return executeCommandGetListFirstResult(command, new Transformator<String>() {
 
 			@Override

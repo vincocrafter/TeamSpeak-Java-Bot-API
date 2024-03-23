@@ -11,8 +11,8 @@
  */
 package net.devcube.vinco.teamspeakapi.query.manager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.CacheType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
@@ -44,9 +44,9 @@ public class QueryConfig {
 	 * 
 	 * @see Ts3ServerQuery#debug()
 	 */
-	private List<DebugOutputType> debuglist = new ArrayList<DebugOutputType>();
+	private Set<DebugOutputType> debuglist = new HashSet<>();
 	
-	private List<CacheType> cacheList = new ArrayList<CacheType>();
+	private Set<CacheType> cacheList = new HashSet<>();
 	
 	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
 	private long connectionTimeout = 2000;
@@ -104,7 +104,7 @@ public class QueryConfig {
 	 * 
 	 * @return the debuglist
 	 */
-	public List<DebugOutputType> getDebuglist() {
+	public Set<DebugOutputType> getDebuglist() {
 		return debuglist;
 	}
 
@@ -183,7 +183,7 @@ public class QueryConfig {
 	 * 
 	 * @return the debuglist
 	 */
-	public List<CacheType> getCachingList() {
+	public Set<CacheType> getCachingList() {
 		return cacheList;
 	}
 

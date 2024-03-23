@@ -22,7 +22,6 @@ import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.keepalive.KeepAliveThread;
 import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
-import net.devcube.vinco.teamspeakapi.api.api.util.CommandBuilder;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
@@ -104,13 +103,13 @@ public class Ts3ServerQuery {
 		keepAliveThread.interrupt();
 		getSyncAPI().unRegisterAllEvents();
 		getSyncAPI().quit();
+		reader.stopThreads();
 		try {
 			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		reader.stopThreads();
 	}
 
 	

@@ -108,7 +108,7 @@ public class Ts3BasicAPI {
 		if (TSError.isError(res[1], TSError.OK)) {
 			query.debug(DebugOutputType.QUERY, "Logged in sucessfully");
 			query.debug(DebugOutputType.QUERY, "Using Debugs: " + query.getConfig().getDebuglist().toString());
-			query.debug(DebugOutputType.QUERY, "Using Chaches: " + query.getConfig().getCachingList().toString());
+			query.debug(DebugOutputType.QUERY, "Using Caches: " + query.getConfig().getCachingList().toString());
 		} else if (TSError.isError(res[1], TSError.QUERY_INVALID_LOGIN)) {
 			query.debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
 			throw new QueryLoginException("Invalid loginname or password!");
@@ -131,7 +131,6 @@ public class Ts3BasicAPI {
 			query.debug(DebugOutputType.QUERY, "Query is already connected");
 			return;
 		}
-
 		if (selectVirtualServer(serverID, -1, nickName)) { // select the virtualServer, the query client should connect to
 			query.debug(DebugOutputType.QUERY, "Query connected successfully");
 			setConnected(true);
@@ -215,9 +214,9 @@ public class Ts3BasicAPI {
 		if (config.isQueryCached()) {
 			info = cache.getQueryProperties();
 		} else {
-			String[] res = writer.executeReadCommand(CommandBuilder.buildWhoamiCommand());
+			String[] res = writer.executeReadCommand(CommandBuilder.buildgetQueryInfoCommand());
 
-			if (checkError(res, CommandBuilder.buildWhoamiCommand()))
+			if (checkError(res, CommandBuilder.buildgetQueryInfoCommand()))
 				return null;
 
 			info = res[0];
@@ -260,7 +259,7 @@ public class Ts3BasicAPI {
 		if (config.isPermissionCached()) {
 			permissions  = cache.getPermissionsList();
 		} else {	
-			String cmd = CommandBuilder.builGetPermissionListCommand();
+			String cmd = CommandBuilder.buildGetPermissionListCommand();
 			String[] result = writer.executeReadCommand(cmd);
 			if (checkError(result, cmd))
 				return resultList;
@@ -431,7 +430,7 @@ public class Ts3BasicAPI {
 	 * databaseclientinfo for each client, because some Information are not provided
 	 * by clientdblist.
 	 * 
-	 * @see Ts3SyncAPI#getClientDBListDetailed() gets more information about each
+	 * @see Ts3SyncAPI#getClientDBListDetailed() This Method gets more information about each
 	 *      client.
 	 * @param startOffset
 	 *                        To skip the first 'n' entries. Ignored if caching is
@@ -678,7 +677,16 @@ public class Ts3BasicAPI {
 		}
 		return resultList;
 	}
-
+	
+	/**
+	 * Used getClientIDs on all Clients which are online by
+	 * getting them with getClients().
+	 * 
+	 * @see Ts3BasicAPI#getClients()
+	 * @see Ts3BasicAPI#getClientIDs(List)
+	 * @return
+	 */
+	
 	public List<Integer> getClientIDs() {
 		return getClientIDs(getClients());
 	}
@@ -779,7 +787,7 @@ public class Ts3BasicAPI {
 	}
 
 	/**
-	 * Provides a Map which contains every Clientdatabaseid as a ley and the value
+	 * Provides a Map which contains every Clientdatabaseid as a key and the value
 	 * is a list of channelids in which the Clientdatabaseid has the channelgroup.
 	 * 
 	 * @param channelgroupID
@@ -798,9 +806,8 @@ public class Ts3BasicAPI {
 			int clientDBID = Integer.parseInt(Formatter.get(user, "cldbid="));
 			int channelID = Integer.parseInt(Formatter.get(user, "cid="));
 			List<Integer> list = new ArrayList<>();
-			if (resultMap.containsKey(clientDBID)) {
-				list = resultMap.get(clientDBID);
-			}
+			resultMap.putIfAbsent(clientDBID, list);
+			list = resultMap.get(clientDBID);
 			list.add(channelID);
 			resultMap.put(clientDBID, list);
 		}
@@ -854,9 +861,8 @@ public class Ts3BasicAPI {
 			int channelGroupID = Integer.parseInt(Formatter.get(user, "cgid="));
 			int channelID = Integer.parseInt(Formatter.get(user, "cid="));
 			List<Integer> list = new ArrayList<>();
-			if (resultMap.containsKey(channelGroupID)) {
-				list = resultMap.get(channelGroupID);
-			}
+			resultMap.putIfAbsent(channelGroupID, list);
+			list = resultMap.get(channelGroupID);
 			list.add(channelID);
 			resultMap.put(channelGroupID, list);
 		}
@@ -885,9 +891,8 @@ public class Ts3BasicAPI {
 			int clDBID = Integer.parseInt(Formatter.get(user, "cldbid="));
 			int cgID = Integer.parseInt(Formatter.get(user, "cgid="));
 			List<Integer> list = new ArrayList<>();
-			if (resultMap.containsKey(cgID)) {
-				list = resultMap.get(cgID);
-			}
+			resultMap.putIfAbsent(cgID, list);
+			list = resultMap.get(cgID);
 			list.add(clDBID);
 			resultMap.put(cgID, list);
 		}
@@ -958,6 +963,16 @@ public class Ts3BasicAPI {
 	}
 
 	public List<VirtualServerInfo> getVirtualServers() {
+		if (config.isVirtualServerCached()) {
+			List<VirtualServerInfo> resultList = new ArrayList<>();
+			String result = cache.getVirtualServerList();
+			for (String server : result.split(TS_INFO_SEPARATOR)) {
+				resultList.add(new VirtualServerInfo(server));
+			}
+			return resultList;
+		}
+		
+		
 		return getVirtualServersByCommand(CommandBuilder.buildGetVirtualServersCommand());
 	}
 
@@ -1047,8 +1062,13 @@ public class Ts3BasicAPI {
 		writer.executeReadCommand(CommandBuilder.buildStopServerProcessCommand(reasonmsg));
 	}
 
-	public void resetPermissions() {
-		writer.executeReadCommand(CommandBuilder.buildResetPermissionsCommand());
+	public String resetPermissions() {
+		String cmd = CommandBuilder.buildResetPermissionsCommand();
+		String[] result = writer.executeReadCommand(cmd);
+		if (checkError(result, cmd))
+			return null;
+		
+		return Formatter.get(result[0], "token=");
 	}
 
 	/**
@@ -1367,9 +1387,8 @@ public class Ts3BasicAPI {
 			int clDBID = Integer.parseInt(Formatter.get(info, "cldbid="));
 			String value = Formatter.toNormalFormat(Formatter.get(info, "value="));
 			List<String> list = new ArrayList<>();
-			if (resultMap.containsKey(clDBID)) {
-				list = resultMap.get(clDBID);
-			}
+			resultMap.putIfAbsent(clDBID, list);
+			list = resultMap.get(clDBID);
 			list.add(value);
 			resultMap.put(clDBID, list);
 		}
@@ -1467,7 +1486,17 @@ public class Ts3BasicAPI {
 	public void addToLog(LogLevel logLevel, String logMessage) {
 		writer.executeReadErrorCommand(CommandBuilder.buildAddToLogCommand(logLevel, logMessage));
 	}
-
+	
+	/**
+	 * Gets a specified number of entries from the servers log
+	 * 
+	 * @param lines Amount of entries should be returned between [1,100] (100 Default)
+	 * @param reverse if enabled the order is reversed
+	 * @param instance if enabled log is returned from the instance, otherwise from the virtualserver.
+	 * @param beginPos amout of lines that should be skipped from the start.
+	 * @return List of Log entries from the servers log.
+	 */
+	
 	public List<String> getLog(int lines, boolean reverse, boolean instance, int beginPos) {
 		List<String> resultLines = new ArrayList<>();
 		String cmd = CommandBuilder.buildGetLogCommand(lines, reverse, instance, beginPos);
