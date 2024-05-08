@@ -51,7 +51,7 @@ public class FileInfo extends DefaultInfo {
 	}
 	
 	public FileType getFileType() {
-		return getFileTypeInt() == 0 ? FileType.FILE : FileType.DIRECTORY ;
+		return getFileTypeInt() == 0 ? FileType.FILE : FileType.DIRECTORY;
 	}
 	
 	@Override

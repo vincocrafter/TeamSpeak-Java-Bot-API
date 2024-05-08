@@ -327,7 +327,7 @@ public class Ts3AsyncAPI {
 		return getChannelsByCommand(CommandBuilder.buildGetChannelsByNameCommand(channelName));
 	}
 
-	public CommandFuture<List<ChannelInfo>> getChannelsByCommand(String command) {
+	private CommandFuture<List<ChannelInfo>> getChannelsByCommand(String command) {
 		return executeCommandGetListResult(command, ChannelInfo::new);
 	}
 
@@ -343,8 +343,8 @@ public class Ts3AsyncAPI {
 		return executeCommandGetHashMapIntListResult(CommandBuilder.buildGetDatabaseIDsByChannelGroupCommand(channelgroupID), "cldbid=", "cid=");
 	}
 
-	public CommandFuture<List<Integer>> getDatabaseIDsByChannelAndGroup(int channelgroupID, int channelID) {
-		return executeCommandGetListIntPropResult(CommandBuilder.buildGetDatabaseIDsByChannelAndGroupCommand(channelgroupID, channelID), "cldbid=");
+	public CommandFuture<List<Integer>> getDatabaseIDsByChannelAndGroup(int channelID, int channelgroupID) {
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetDatabaseIDsByChannelAndGroupCommand(channelID, channelgroupID), "cldbid=");
 	}
 
 	public CommandFuture<Map<Integer, List<Integer>>> getChannelGroupsByDatabaseID(int clientDataBaseID) {
@@ -889,11 +889,7 @@ public class Ts3AsyncAPI {
 					int keyID = Integer.parseInt(Formatter.get(user, keyProp));
 					int valID = Integer.parseInt(Formatter.get(user, valueProp));
 
-					List<Integer> list = new ArrayList<>();
-					resultMap.putIfAbsent(keyID, list);
-					list = resultMap.get(keyID);
-					list.add(valID);
-					resultMap.put(keyID, list);
+					resultMap.computeIfAbsent(keyID, k -> new ArrayList<>()).add(valID);
 				}
 				return resultMap;
 			}
@@ -927,11 +923,7 @@ public class Ts3AsyncAPI {
 				for (String info : splitResult(result)) {
 					int keyID = Integer.parseInt(Formatter.get(info, keyProp));
 					String valueID = Formatter.toNormalFormat(Formatter.get(info, valueProp));
-					List<String> list = new ArrayList<>();
-					resultMap.putIfAbsent(keyID, list);
-					list = resultMap.get(keyID);
-					list.add(valueID);
-					resultMap.put(keyID, list);
+					resultMap.computeIfAbsent(keyID, k -> new ArrayList<>()).add(valueID);
 				}
 
 				return resultMap;

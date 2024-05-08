@@ -294,7 +294,7 @@ public class CommandBuilder {
 		return cmd.toString();
 	}
 
-	public static String buildGetDatabaseIDsByChannelAndGroupCommand(int channelgroupID, int channelID) {
+	public static String buildGetDatabaseIDsByChannelAndGroupCommand(int channelID, int channelgroupID) {
 		StringBuilder cmd = new StringBuilder("channelgroupclientlist");
 		cmd.append(" cid=").append(channelID);
 		cmd.append(" cgid=").append(channelgroupID);

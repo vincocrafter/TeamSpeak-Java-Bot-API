@@ -26,7 +26,15 @@ public class KeepAliveThread {
 	}
 	
 	
-	// keeps the Socket connected to the (Teamspeak)Server
+	/**
+	 * Starts the KeepAliveThread.
+	 * 
+	 * This method initializes and starts a new thread responsible for sending KeepAlive messages 
+	 * to maintain the connection with the TeamSpeak server.
+	 * 
+	 * The KeepAliveThread runs in a loop until its owning thread is alive. It periodically sends 
+	 * a KeepAlive message to the server and retrieves the version of the TeamSpeak server asynchronously.
+	 */
 	public void start() {
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		
@@ -51,7 +59,12 @@ public class KeepAliveThread {
 	}
 	
 	
-	//stops the Thread
+	/**
+	 * Stops the KeepAliveThread.
+	 * 
+	 * This method interrupts the KeepAliveThread, causing it to stop sending KeepAlive messages 
+	 * and terminate its execution.
+	 */
 	public void interrupt() {
 		keepAliveThread.interrupt();
 		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has beeen stopped");
