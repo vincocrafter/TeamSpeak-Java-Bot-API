@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
+import net.devcube.vinco.teamspeakapi.api.api.property.NameMode;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
@@ -56,8 +57,18 @@ public class ChannelGroupInfo extends DefaultInfo {
 		return toInt(get("sortid"));
 	}
 	
-	public int getNameMode() {
+	public int getNameModeInt() {
 		return toInt(get("namemode"));
+	}
+	
+	public NameMode getNameMode() {
+		int nameMode = getNameModeInt();
+		for (NameMode modes : NameMode.values()) {
+			if (modes.getValue() == nameMode) {
+				return modes;
+			}
+		}
+		return null;
 	}
 	
 	public int getNeededModifyPower() {
@@ -76,6 +87,7 @@ public class ChannelGroupInfo extends DefaultInfo {
 		StringBuilder result = new StringBuilder("ChannelGroup[");
 		result.append("ID=").append(getID());
 		result.append(",Name=").append(getName());
+		result.append(",Type=").append(getType());
 		result.append("]");
 		return  result.toString();
 		

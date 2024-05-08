@@ -6,6 +6,8 @@ public enum ChannelProperty {
    CHANNEL_TOPIC("channel_topic"),
    CHANNEL_DESCRIPTION("channel_description"),
    CHANNEL_PASSWORD("channel_password"),
+   CHANNEL_CODEC("channel_codec"),
+   CHANNEL_CODEC_QUALITY("channel_codec_quality"),
    CHANNEL_MAXCLIENTS("channel_maxclients"),
    CHANNEL_MAXFAMILYCLIENTS("channel_maxfamilfyclients"),
    CHANNEL_ORDER("channel_order"),

@@ -1,5 +1,6 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.property.NameMode;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
@@ -36,8 +37,10 @@ public class ServerGroupInfo extends DefaultInfo {
 	}
 
 	public ServerGroupType getType() {
+		int type = getTypeID();
+		
 		for (ServerGroupType servergrouptype : ServerGroupType.values()) {
-			if (getTypeID() == servergrouptype.getValue()) {
+			if (servergrouptype.getValue() == type) {
 				return servergrouptype;
 			}
 		}
@@ -57,8 +60,18 @@ public class ServerGroupInfo extends DefaultInfo {
 		return toInt(get("sortid"));
 	}
 	
-	public int getNameMode() {
+	public int getNameModeInt() {
 		return toInt(get("namemode"));
+	}
+	
+	public NameMode getNameMode() {
+		int nameMode = getNameModeInt();
+		for (NameMode modes : NameMode.values()) {
+			if (modes.getValue() == nameMode) {
+				return modes;
+			}
+		}
+		return null;
 	}
 	
 	public int getNeededModifyPower() {
@@ -77,6 +90,7 @@ public class ServerGroupInfo extends DefaultInfo {
 		StringBuilder resultBuilder = new StringBuilder("ServerGroup[");
 		resultBuilder.append("ID=").append(getID());
 		resultBuilder.append(",Name=").append(getName());
+		resultBuilder.append(",Type=").append(getType());
 		resultBuilder.append("]");
 		return  resultBuilder.toString();
 	}
