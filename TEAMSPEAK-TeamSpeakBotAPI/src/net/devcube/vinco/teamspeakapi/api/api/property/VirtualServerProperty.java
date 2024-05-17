@@ -7,6 +7,7 @@ public enum VirtualServerProperty {
    VIRTUALSERVER_MAXCLIENTS("virtualserver_maxclients"),
    VIRTUALSERVER_PASSWORD("virtualserver_password"),
    VIRTUALSERVER_HOSTMESSAGE("virtualserver_hostmessage"),
+   VIRTUALSERVER_HOSTMESSAGE_MODE("virtualserver_hostmessage_mode"),
    VIRTUALSERVER_DEFAULT_SERVER_GROUP("virtualserver_default_server_group"),
    VIRTUALSERVER_DEFAULT_CHANNEL_GROUP("virtualserver_default_channel_group"),
    VIRTUALSERVER_DEFAULT_CHANNEL_ADMIN_GROUP("virtualserver_default_channel_admin_group"),
