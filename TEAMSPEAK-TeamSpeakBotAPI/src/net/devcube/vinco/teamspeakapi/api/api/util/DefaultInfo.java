@@ -1,11 +1,12 @@
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class DefaultInfo {
 
 	private String[] infos;
-	private HashMap<String, String> splitInfos = new HashMap<>();
+	private Map<String, String> splitInfos = new TreeMap<>();
 	
 	public DefaultInfo(String[] infos) {
 		this.infos = infos;
@@ -46,11 +47,11 @@ public class DefaultInfo {
 	}
 	
 	public void addInfo(String key, String value) {
-		splitInfos.put(key, value);
+		splitInfos.put(key, value);		
 	}
 	
-	public HashMap<String, String> getSplitMap() {
-		return new HashMap<>(splitInfos);
+	public Map<String, String> getSplitMap() {
+		return new TreeMap<>(splitInfos);
 	}
 	
 	public String[] getInfos() {

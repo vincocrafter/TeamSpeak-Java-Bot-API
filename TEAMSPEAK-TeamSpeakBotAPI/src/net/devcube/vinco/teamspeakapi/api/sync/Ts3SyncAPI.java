@@ -266,7 +266,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return getServerGroupsByClient(client.getClientDataBaseID());
 	}
 
-	public List<String> getServerGroupNamessByClient(DataBaseClientInfo dataBaseClient) {
+	public List<String> getServerGroupNamesByClient(DataBaseClientInfo dataBaseClient) {
 		return getServerGroupNamesByClient(dataBaseClient.getClientDataBaseID());
 	}
 
@@ -275,12 +275,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public ChannelGroupInfo getChannelGroupByID(int groupID) {
-		for (ChannelGroupInfo groups : getChannelGroups()) {
-			if (groups.getID() == groupID) {
-				return groups;
-			}
-		}
-		return null;
+		return getChannelGroups().stream().filter(groups -> groups.getID() == groupID).findFirst().orElse(null);
 	}
 	
 	/**
@@ -296,17 +291,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 */
 
 	public ChannelGroupInfo getChannelGroupByID(List<ChannelGroupInfo> groupList, int groupID) {
-		Optional<ChannelGroupInfo> result = groupList.stream().filter(groups -> groups.getID() == groupID).findFirst();
-		if (result.isEmpty())
-			return null;
-
-		return result.get();
+		return groupList.stream().filter(groups -> groups.getID() == groupID).findFirst().orElse(null);
 	}
 
-	public VirtualServerInfo getVirtualServerInfo() {
-		return getServerInfo();
-	}
-
+	
 	public List<DataBaseClientInfo> getClientDBList() {
 		return getDataBaseClients(-1, -1);
 	}
@@ -421,12 +409,12 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	public List<ChannelInfo> getChannelsDetailed() {
 		List<ChannelInfo> resultList = new ArrayList<ChannelInfo>();
-		for (ChannelInfo channel : getChannelsByCommand("channellist")) {
-			ChannelInfo chInfo = getChannel(channel.getID());
-			chInfo.addInfo("total_clients", channel.get("total_clients"));
-			chInfo.addInfo("channel_needed_subscribe_power", channel.get("channel_needed_subscribe_power"));
+		getChannelsByCommand("channellist").forEach(channels -> {
+			ChannelInfo chInfo = getChannel(channels.getID());
+			chInfo.addInfo("total_clients", channels.get("total_clients"));
+			chInfo.addInfo("channel_needed_subscribe_power", channels.get("channel_needed_subscribe_power"));
 			resultList.add(chInfo);
-		}
+		});
 		return resultList;
 	}
 
@@ -473,16 +461,16 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return getDatabaseClientInfosByChannelGroup(channelGroup.getID());
 	}
 
-	public List<Integer> getDatabaseIDsByChannelGroup(int channelgroupID, ChannelInfo channel) {
-		return getDatabaseIDsByChannelAndGroup(channelgroupID, channel.getChannelID());
+	public List<Integer> getDatabaseIDsByChannelAndGroup(ChannelInfo channel, int channelgroupID) {
+		return getDatabaseIDsByChannelAndGroup(channel.getChannelID(), channelgroupID);
 	}
 
-	public List<Integer> getDatabaseIDsByChannelAndGroup(ChannelGroupInfo channelGroup, int channelID) {
-		return getDatabaseIDsByChannelAndGroup(channelGroup.getID(), channelID);
+	public List<Integer> getDatabaseIDsByChannelAndGroup(int channelID, ChannelGroupInfo channelGroup) {
+		return getDatabaseIDsByChannelAndGroup(channelID, channelGroup.getID());
 	}
 
-	public List<Integer> getDatabaseIDsByChannelAndGroup(ChannelGroupInfo channelGroup, ChannelInfo channel) {
-		return getDatabaseIDsByChannelAndGroup(channelGroup.getID(), channel.getChannelID());
+	public List<Integer> getDatabaseIDsByChannelAndGroup(ChannelInfo channel, ChannelGroupInfo channelGroup) {
+		return getDatabaseIDsByChannelAndGroup(channel.getChannelID(), channelGroup.getID());
 	}
 	
 	/**
@@ -492,20 +480,20 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 * @return
 	 */
 
-	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, int channelID) {
-		return getDataBaseClientsByDBIDs(getDatabaseIDsByChannelAndGroup(channelGroupID, channelID));
+	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelID, int channelGroupID) {
+		return getDataBaseClientsByDBIDs(getDatabaseIDsByChannelAndGroup(channelID, channelGroupID));
 	}
 
-	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelGroupID, ChannelInfo channel) {
-		return getDatabaseClientInfosByChannelAndGroup(channelGroupID, channel.getChannelID());
+	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(ChannelInfo channel, int channelGroupID) {
+		return getDatabaseClientInfosByChannelAndGroup(channel.getChannelID(), channelGroupID);
 	}
 
-	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelGroup(ChannelGroupInfo channelGroup, int channelID) {
-		return getDatabaseClientInfosByChannelAndGroup(channelGroup.getID(), channelID);
+	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(int channelID, ChannelGroupInfo channelGroup) {
+		return getDatabaseClientInfosByChannelAndGroup(channelID, channelGroup.getID());
 	}
 
-	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(ChannelGroupInfo channelGroup, ChannelInfo channel) {
-		return getDatabaseClientInfosByChannelAndGroup(channelGroup.getID(), channel.getChannelID());
+	public List<DataBaseClientInfo> getDatabaseClientInfosByChannelAndGroup(ChannelInfo channel, ChannelGroupInfo channelGroup) {
+		return getDatabaseClientInfosByChannelAndGroup(channel.getChannelID(), channelGroup.getID());
 	}
 
 	public Map<Integer, List<Integer>> getChannelGroupsByDatabaseClient(DataBaseClientInfo dataBaseClient) {
@@ -653,24 +641,14 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 	
 	public BanInfo getBanInfo(int banID) {
-		for (BanInfo bans : getBans()) {
-			if (bans.getID() == banID) {
-				return bans;
-			}
-		}
-		return null;
+		return getBans().stream().filter(bans -> bans.getID() == banID).findFirst().orElse(null);
 	}
 	
 	public BanInfo getBanInfo(List<BanInfo> bannedClients, int banID) {
-		for (BanInfo bans : bannedClients) {
-			if (bans.getID() == banID) {
-				return bans;
-			}
-		}
-		return null;
+		return bannedClients.stream().filter(bans -> bans.getID() == banID).findFirst().orElse(null);
 	}
 	
-	public void unbanClient(String clientUUID) {
+	public void unbanClient(String clientUUID) {		
 		for (BanInfo bans : getBans()) {
 			if (bans.getClientUUID().equals(clientUUID)) {
 				removeBan(bans.getBanID());
@@ -1213,13 +1191,21 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public Map<String, String> getCustomInfo(DataBaseClientInfo dataBaseClient) {
 		return getCustomInfo(dataBaseClient.getClientDataBaseID());
 	}
+	
+	public Map<String, String> getCustomInfo(ClientInfo client) {
+		return getCustomInfo(client.getClientDataBaseID());
+	}
 
 	public String getCustomInfo(int clientDBID, String ident) {
 		return getCustomInfo(clientDBID).get(ident);
 	}
 
 	public String getCustomInfo(DataBaseClientInfo dataBaseClient, String ident) {
-		return getCustomInfo(dataBaseClient).get(ident);
+		return getCustomInfo(dataBaseClient.getClientDataBaseID(), ident);
+	}
+	
+	public String getCustomInfo(ClientInfo client, String ident) {
+		return getCustomInfo(client.getClientDataBaseID(), ident);
 	}
 
 	public Map<DataBaseClientInfo, List<String>> searchDBClientCustomInfo(String ident, String pattern) {
@@ -1242,6 +1228,10 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 
 	public void deleteCustomInfo(DataBaseClientInfo dataBaseClient, String ident) {
 		deleteCustomInfo(dataBaseClient.getClientDataBaseID(), ident);
+	}
+	
+	public void deleteCustomInfo(ClientInfo client, String ident) {
+		deleteCustomInfo(client.getClientDataBaseID(), ident);
 	}
 
 	public void createFileDirectory(ChannelInfo channel, String dirName) {

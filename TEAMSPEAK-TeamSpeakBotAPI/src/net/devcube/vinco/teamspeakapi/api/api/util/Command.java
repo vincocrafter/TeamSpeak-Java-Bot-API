@@ -13,6 +13,7 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class Command {
 	
@@ -52,12 +53,9 @@ public class Command {
 	}
 	
 	public String getResult() {
-		StringBuilder resPackets = new StringBuilder();
-		packets.forEach(result -> {
-			resPackets.append(result);
-			resPackets.append(" ");
-		});
-		return resPackets.toString();
+		StringJoiner resPackets = new StringJoiner(System.lineSeparator());
+	    packets.forEach(resPackets::add);
+	    return resPackets.toString();
 	}
 	
 

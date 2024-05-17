@@ -11,9 +11,10 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.property;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum TSPermission {
 
@@ -568,14 +569,9 @@ public enum TSPermission {
 	}
 
 	private static List<Integer> getPermissions(int min, int max) {
-		List<Integer> resultList = new ArrayList<>();
-		for (TSPermission perm : values()) {
-			int value = perm.getValue();
-			if (value >= min && value <= max) {
-				resultList.add(perm.getValue());
-			}
-		}
-		return resultList;
+		return Arrays.stream(values()).map(TSPermission::getValue)
+        .filter(value -> value >= min && value <= max)
+        .collect(Collectors.toList());
 	}
 
 	public static void checkQueryFullPermissions(Set<Integer> queryPerms) {

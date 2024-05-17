@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
@@ -32,6 +33,7 @@ import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.TextMessageType;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerProperty;
 import net.devcube.vinco.teamspeakapi.api.api.util.CommandBuilder;
+import net.devcube.vinco.teamspeakapi.api.api.util.CommandFuture.Transformator;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.api.api.util.TSError;
@@ -74,7 +76,7 @@ public class Ts3BasicAPI {
 	protected QueryWriter writer;
 	protected CacheManager cache;
 	private boolean connected = false;
-	protected static String TS_INFO_SEPARATOR = "\\|";
+	protected static final String TS_INFO_SEPARATOR = "\\|";
 
 	/**
 	 * Initiation of the Sync API
@@ -98,15 +100,16 @@ public class Ts3BasicAPI {
 	}
 
 	/**
-	 * Log in the Client to the Server using the login information
+	 * Logs the client into the server using the provided login credentials.
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username The username for the login.
+	 * @param password The password for the login.
+	 * @throws QueryLoginException If the login fails due to invalid credentials or a banned query client.
 	 */
 	public void login(String username, String password) throws QueryLoginException {
 		String[] res = writer.executeReadCommand(CommandBuilder.buildLoginCommand(username, password));
 		if (TSError.isError(res[1], TSError.OK)) {
-			query.debug(DebugOutputType.QUERY, "Logged in sucessfully");
+			query.debug(DebugOutputType.QUERY, "Logged in successfully");
 			query.debug(DebugOutputType.QUERY, "Using Debugs: " + query.getConfig().getDebuglist().toString());
 			query.debug(DebugOutputType.QUERY, "Using Caches: " + query.getConfig().getCachingList().toString());
 		} else if (TSError.isError(res[1], TSError.QUERY_INVALID_LOGIN)) {
@@ -165,14 +168,35 @@ public class Ts3BasicAPI {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Sends a poke message to a client with the specified ID.
+	 * 
+	 * @param clientID The ID of the client to poke.
+	 * @param message  The message to send in the poke.
+	 */
+	
 	public void pokeClient(int clientID, String message) {
 		writer.executeReadErrorCommand(CommandBuilder.buildPokeClientCommand(clientID, message));
 	}
-
+	
+	/**
+	 * Moves a single client to the specified channel.
+	 * 
+	 * @param clientID  The ID of the client to move.
+	 * @param channelID The ID of the channel to move the client to.
+	 */
+	
 	public void moveClient(int clientID, int channelID) {
 		moveClientIDs(Collections.singletonList(clientID), channelID);
 	}
+	
+	/**
+	 * Moves multiple clients to the specified channel.
+	 * 
+	 * @param clientIDs The IDs of the clients to move.
+	 * @param channelID The ID of the channel to move the clients to.
+	 */
 
 	public void moveClientIDs(List<Integer> clientIDs, int channelID) {
 		writer.executeReadErrorCommand(CommandBuilder.buildMoveClientsCommand(clientIDs, channelID));
@@ -189,12 +213,20 @@ public class Ts3BasicAPI {
 	public void sendGlobalMessage(String message) {
 		writer.executeReadErrorCommand(CommandBuilder.buildSendGlobalMessageCommand(message));
 	}
-
+	
+	/**
+	 * Logs out the current query session.
+	 * 
+	 * This method sends a logout command to the server using the writer. If the logout command
+	 * is executed successfully and the query is currently connected, it sets the connected status
+	 * to false and logs a successful logout message.
+	 */
+	
 	public void logout() {
 		writer.executeReadErrorCommand(CommandBuilder.buildLogoutCommand());
 
 		if (isConnected()) {
-			query.debug(DebugOutputType.QUERY, "Query logged out successfully ");
+			query.debug(DebugOutputType.QUERY, "Query logged out successful");
 			setConnected(false);
 		}
 	}
@@ -215,49 +247,37 @@ public class Ts3BasicAPI {
 			info = cache.getQueryProperties();
 		} else {
 			String[] res = writer.executeReadCommand(CommandBuilder.buildgetQueryInfoCommand());
-
 			if (checkError(res, CommandBuilder.buildgetQueryInfoCommand()))
 				return null;
-
 			info = res[0];
 		}
+		if (info == null)
+			return null;
 		return new QueryClientInfo(info);
 	}
 
 	public int getVirtualServerIDByPort(int port) {
-		return Integer.parseInt(Formatter.get(writer.executeReadCommand(CommandBuilder.buildGetVirtualServerIDByPort(port))[0], "server_id="));
+		return executeCommandGetIntResult(CommandBuilder.buildGetVirtualServerIDByPort(port), "server_id=");
 	}
 
 	public int getPermissionID(String permissionName) {
-		List<String> names = new ArrayList<>();
-		names.add(permissionName);
-		List<Integer> result = getPermissionIDsByNames(names);
-		return result.isEmpty() ? -1 : result.get(0);
+		return getPermissionIDsByNames(Collections.singletonList(permissionName))
+				.stream().findFirst().orElse(-1);
 	}
 
 	public List<Integer> getPermissionIDsByNames(List<String> permissionNames) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetPermissionIDsByNamesCommand(permissionNames);
-		
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String info : splitResult(result)) {
-			resultList.add(Integer.parseInt(Formatter.get(info, "permid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetPermissionIDsByNamesCommand(permissionNames), "permid=");
 	}
 
 	public String getPermissionName(int permissionID) {
-		return Formatter.get(writer.executeReadCommand(CommandBuilder.buildGetPermissionNameByIDCommand(permissionID))[0], "permsid=");
+		return executeCommandGetStringPropResult(CommandBuilder.buildGetPermissionNameByIDCommand(permissionID), "permsid=");
 	}
 
 	public List<Permission> getPermissionList() {
 		List<Permission> resultList = new ArrayList<>();
-
 		String permissions;
 		if (config.isPermissionCached()) {
-			permissions  = cache.getPermissionsList();
+			permissions = cache.getPermissionsList();
 		} else {	
 			String cmd = CommandBuilder.buildGetPermissionListCommand();
 			String[] result = writer.executeReadCommand(cmd);
@@ -265,7 +285,8 @@ public class Ts3BasicAPI {
 				return resultList;
 			permissions = result[0];
 		}
-
+		if (permissions == null)
+			return resultList;
 		for (String permission : permissions.split(TS_INFO_SEPARATOR)) {
 			resultList.add(new Permission(permission));
 		}
@@ -273,9 +294,9 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getPermissionIDs(List<Permission> permissions) {
-		List<Integer> resultList = new ArrayList<>();
-		permissions.forEach(perms -> resultList.add(perms.getID()));
-		return resultList;
+	    return permissions.stream()
+	                     .map(Permission::getID)
+	                     .collect(Collectors.toList());
 	}
 
 	private List<Permission> getPermissionListByCommand(String command) {
@@ -312,7 +333,6 @@ public class Ts3BasicAPI {
 
 	public List<ServerGroupInfo> getServerGroups() {
 		List<ServerGroupInfo> resultList = new ArrayList<>();
-
 		String serverGroups;
 		if (config.isGroupsCached()) {
 			serverGroups = cache.getServerGroupsList();
@@ -323,7 +343,9 @@ public class Ts3BasicAPI {
 				return resultList;
 			serverGroups = result[0];
 		}
-
+		
+		if (serverGroups == null)
+			return resultList;
 		for (String groups : serverGroups.split(TS_INFO_SEPARATOR)) {
 			resultList.add(new ServerGroupInfo(groups));
 		}
@@ -331,30 +353,11 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getServerGroupIDsByClient(int clientDBID) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetServerGroupIDsByClientCommand(clientDBID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String groups : splitResult(result)) {
-			int groupID = Integer.parseInt(Formatter.get(groups, "sgid="));
-			resultList.add(groupID);
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetServerGroupIDsByClientCommand(clientDBID), "sgid=");
 	}
 
 	public List<String> getServerGroupNamesByClient(int clientDBID) {
-		List<String> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetServerGroupIDsByClientCommand(clientDBID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String groups : splitResult(result)) {
-			resultList.add(Formatter.toNormalFormat(Formatter.get(groups, "name=")));
-		}
-		return resultList;
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetServerGroupIDsByClientCommand(clientDBID), "name=");
 	}
 
 	public List<ChannelGroupInfo> getChannelGroups() {
@@ -370,16 +373,18 @@ public class Ts3BasicAPI {
 			channelGroups = result[0];
 		}
 		
+		if (channelGroups == null)
+			return resultList;
 		for (String client : channelGroups.split(TS_INFO_SEPARATOR)) {
 			resultList.add(new ChannelGroupInfo(client));
 		}
 		return resultList;
 	}
 
-	public VirtualServerInfo getServerInfo() {
+	public VirtualServerInfo getVirtualServerInfo() {
 		String information;
 		if (config.isVirtualServerCached()) {
-			return new VirtualServerInfo(cache.getVirtualServerProperties());
+			information = cache.getVirtualServerProperties();
 		} else {
 			String cmd = CommandBuilder.buildGetServerInfoCommand();
 			String[] result = writer.executeReadCommand(cmd);
@@ -387,42 +392,21 @@ public class Ts3BasicAPI {
 				return null;
 			information = result[0];
 		}
+		if (information == null)
+			return null;
 		return new VirtualServerInfo(information);
 	}
 
 	public ConnectionInfo getConnectionInfo() {
-		return new ConnectionInfo(writer.executeReadCommand(CommandBuilder.buildGetConnectionInfoCommand())[0]);
+		return executeCommandGetObject(CommandBuilder.buildGetConnectionInfoCommand(), ConnectionInfo::new);
 	}
 	public String getVersion() {
 		return writer.executeReadCommand(CommandBuilder.buildGetVersionCommand())[0];
 	}
 
-	/**
-	 * Adds a bandrule to the server, every argument is optional, but you should use
-	 * at least one. Be aware that you could ban more clients than indeeded.
-	 * 
-	 * @param ip
-	 *                       is optional (if null not used)
-	 * @param name
-	 *                       is optional (if null not used)
-	 * @param clientUUID
-	 *                       is optional (if null not used)
-	 * @param myTSID
-	 *                       is optional (if null not used)
-	 * @param banTime
-	 *                       is optional (if -2 not used)
-	 * @param banReason
-	 *                       is optional (if null not used)
-	 * 
-	 * @return ID of the ban.
-	 */
 
 	public OfflineMessageInfo getOfflineMessage(int messageID) {
-		String cmd = CommandBuilder.buildGetOfflineMessageCommand(messageID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return new OfflineMessageInfo(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildGetOfflineMessageCommand(messageID), OfflineMessageInfo::new);
 	}
 
 	/**
@@ -454,6 +438,8 @@ public class Ts3BasicAPI {
 				return resultList;
 			clients = result[0];
 		}
+		if (clients == null)
+			return resultList;
 		for (String client : clients.split(TS_INFO_SEPARATOR)) {
 			resultList.add(new DataBaseClientInfo(client.replace("cldbid", "client_database_id")));
 		}
@@ -461,11 +447,7 @@ public class Ts3BasicAPI {
 	}
 
 	public int getDataBaseClientsCount() {
-		String cmd = CommandBuilder.buildGetDataBaseClientsCountCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "count="));
+		return executeCommandGetIntResult(CommandBuilder.buildGetDataBaseClientsCountCommand(), "count=");
 	}
 
 	public List<Integer> getDataBaseClientIDs() {
@@ -473,166 +455,111 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getDataBaseClientIDs(List<DataBaseClientInfo> clients) {
-		List<Integer> resultList = new ArrayList<>();
-		clients.forEach(client -> resultList.add(client.getClientDataBaseID()));
-		return resultList;
+	    return clients.stream()
+	                 .map(DataBaseClientInfo::getClientDataBaseID)
+	                 .collect(Collectors.toList());
 	}
 
 	public List<Integer> getDataBaseClientIDsByClients(List<ClientInfo> clients) {
-		List<Integer> resultList = new ArrayList<>();
-		clients.forEach(client -> resultList.add(client.getClientDataBaseID()));
-		return resultList;
+	    return clients.stream()
+	                 .map(ClientInfo::getClientDataBaseID)
+	                 .collect(Collectors.toList());
 	}
 
 	public List<OfflineMessageInfo> getOfflineMessages() {
-		List<OfflineMessageInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetOfflineMessagesCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String client : splitResult(result)) {
-			resultList.add(new OfflineMessageInfo(client));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetOfflineMessagesCommand(), OfflineMessageInfo::new);
 	}
 
 	public HostInfo getHostInfo() {
-		String cmd = CommandBuilder.buildGetHostInfoCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-
-		return new HostInfo(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildGetHostInfoCommand(), HostInfo::new);
 	}
 
 	public int getClientIDByUUID(String clientUUID) {
-		List<Integer> result = getClientIDsByUUIDs(Collections.singletonList(clientUUID));
-		return result.isEmpty() ? -1 : result.get(0);
+		return getClientIDsByUUIDs(Collections.singletonList(clientUUID)).stream().findFirst().orElse(-1);
 	}
 
 	public List<Integer> getClientIDsByUUIDs(List<String> clientUUIDs) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientIDsByUUIDsCommand(clientUUIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String info : splitResult(result)) {
-			resultList.add(Integer.parseInt(Formatter.get(info, "clid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetClientIDsByUUIDsCommand(clientUUIDs), "clid=");
 	}
 
 	public String getClientUUIDByID(int clientID) {
-		List<String> result = getClientNamesUUIDsByIDs(Collections.singletonList(clientID), false);
-		return result.isEmpty() ? null : result.get(0);
+		return getClientUUIDsByIDs(Collections.singletonList(clientID)).stream().findFirst().orElse(null);
 	}
 
 	public List<String> getClientUUIDsByIDs(List<Integer> clientIDs) {
-		return getClientNamesUUIDsByIDs(clientIDs, false);
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetClientNamesUUIDsByIDsCommand(clientIDs), "cluid=");
 	}
 
 	public String getClientNameByID(int clientID) {
-		List<String> result = getClientNamesUUIDsByIDs(Collections.singletonList(clientID), true);
-		return result.isEmpty() ? null : result.get(0);
+	    return getClientNamesByIDs(Collections.singletonList(clientID)).stream().findFirst().orElse(null);
 	}
+
 
 	public List<String> getClientNamesByIDs(List<Integer> clientIDs) {
-		return getClientNamesUUIDsByIDs(clientIDs, true);
-	}
-
-	protected List<String> getClientNamesUUIDsByIDs(List<Integer> clientIDs, boolean names) {
-		List<String> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientNamesUUIDsByIDsCommand(clientIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String info : splitResult(result)) {
-			if (names) {
-				resultList.add(Formatter.toNormalFormat(Formatter.get(info, "nickname=")));
-			} else {
-				resultList.add(Formatter.get(info, "cluid="));
-			}
-		}
-		return resultList;
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetClientNamesUUIDsByIDsCommand(clientIDs), "nickname=");
 	}
 
 	public String getClientNameByUUID(String clientUUID) {
-		List<String> result = getClientNamesByUUIDs(Collections.singletonList(clientUUID));
-		return result.isEmpty() ? null : result.get(0);
+	    return getClientNamesByUUIDs(Collections.singletonList(clientUUID)).stream().findFirst().orElse(null);
 	}
 
 	public List<String> getClientNamesByUUIDs(List<String> clientUUIDs) {
-		List<String> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientNamesByUUIDsCommand(clientUUIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		
-		for (String info : splitResult(result)) {
-			resultList.add(Formatter.toNormalFormat(Formatter.get(info, "name=")));
-		}
-		return resultList;
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetClientNamesByUUIDsCommand(clientUUIDs), "name=");
 	}
 
 	public String getClientNameByDBID(int clientDataBaseID) {
-		List<String> result = getClientNamesUUIDs(Collections.singletonList(clientDataBaseID), true);
-		return result.isEmpty() ? null : result.get(0);
+	    return getClientNamesByDBIDs(Collections.singletonList(clientDataBaseID)).stream().findFirst().orElse(null);
 	}
 
 	public List<String> getClientNamesByDBIDs(List<Integer> clientDataBaseIDs) {
-		return getClientNamesUUIDs(clientDataBaseIDs, true);
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetClientNamesUUIDsCommand(clientDataBaseIDs), "name=");
 	}
 
 	public String getClientUUIDByDBID(int clientDataBaseID) {
-		List<String> result = getClientNamesUUIDs(Collections.singletonList(clientDataBaseID), false);
-		return result.isEmpty() ? null : result.get(0);
+		return getClientUUIDsByDBIDs(Collections.singletonList(clientDataBaseID)).stream().findFirst().orElse(null);
 	}
 
 	public List<String> getClientUUIDsByDBIDs(List<Integer> clientDataBaseIDs) {
-		return getClientNamesUUIDs(clientDataBaseIDs, false);
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetClientNamesUUIDsCommand(clientDataBaseIDs), "cluid=");
 	}
 
-	protected List<String> getClientNamesUUIDs(List<Integer> clientDataBaseIDs, boolean names) {
-		List<String> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientNamesUUIDsCommand(clientDataBaseIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String info : splitResult(result)) {
-			if (names) {
-				resultList.add(Formatter.toNormalFormat(Formatter.get(info, "name=")));
-			} else {
-				resultList.add(Formatter.get(info, "cluid="));
-			}
-		}
-		return resultList;
-	}
 
 	public int getClientDataBaseIDByUUID(String clientUUID) {
-		List<Integer> result = getClientDataBaseIDsByUUIDs(Collections.singletonList(clientUUID));
-		return result.isEmpty() ? -1 : result.get(0);
-	}
+		return getClientDataBaseIDsByUUIDs(Collections.singletonList(clientUUID)).stream().findFirst().orElse(-1);
+}
 
 	public List<Integer> getClientDataBaseIDsByUUIDs(List<String> clientUUIDs) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientDataBaseIDsByUUIDsCommand(clientUUIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String info : splitResult(result)) {
-			resultList.add(Integer.parseInt(Formatter.get(info, "cldbid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetClientDataBaseIDsByUUIDsCommand(clientUUIDs), "cldbid=");
 	}
-
+	
+	/**
+	 * Retrieves information about a client with the specified ID.
+	 * 
+	 * If client caching is enabled in the configuration, this method attempts to retrieve
+	 * the client information from the cache. If the information is found, it is returned as
+	 * a {@code ClientInfo} object. If the client information is not found in the cache, 
+	 * {@code null} is returned.
+	 * 
+	 * If client caching is not enabled, this method retrieves the client information from
+	 * the server by calling {@code getClientsByIDs} method with a list containing the 
+	 * specified client ID. If client information is retrieved successfully, it is returned
+	 * as a {@code ClientInfo} object. If no client is found with the specified ID, 
+	 * {@code null} is returned.
+	 * 
+	 * @param clientID The ID of the client to retrieve information for.
+	 * @return A {@code ClientInfo} object containing information about the client, or 
+	 *         {@code null} if the client is not found or if an error occurs.
+	 */
+	
 	public ClientInfo getClient(int clientID) {
 		if (config.isClientsCached()) {
-			return new ClientInfo(cache.getClientInfo(clientID).concat(" clid=" + clientID));
+			String info = cache.getClientInfo(clientID);
+			if (info == null)
+				return null;
+			return new ClientInfo(info.concat(" clid=" + clientID));
 		} else {
-			List<ClientInfo> result = getClientsByIDs(Collections.singletonList(clientID));
-			return result.isEmpty() ? null : result.get(0);
+			return getClientsByIDs(Collections.singletonList(clientID)).stream()
+		            .findFirst().orElse(null);
 		}
 	}
 
@@ -662,17 +589,19 @@ public class Ts3BasicAPI {
 
 	public List<ClientInfo> getClients() {
 		List<ClientInfo> resultList = new ArrayList<>();
-		String[] clients;
+		String clients;
 		if (config.isClientsCached()) {
-			clients = cache.getClientsList().split(TS_INFO_SEPARATOR);
+			clients = cache.getClientsList();
 		} else {
 			String cmd = CommandBuilder.buildGetClientsCommand();
 			String[] result = writer.executeReadCommand(cmd);
 			if (checkError(result, cmd))
 				return resultList;
-			clients = splitResult(result);
+			clients = result[0];
 		}
-		for (String client : clients) {
+		if (clients == null)
+			return resultList;
+		for (String client : clients.split(TS_INFO_SEPARATOR)) {
 			resultList.add(new ClientInfo(client));
 		}
 		return resultList;
@@ -692,34 +621,44 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getClientIDs(List<ClientInfo> clients) {
-		List<Integer> resultList = new ArrayList<>();
-		clients.forEach(client -> resultList.add(client.getID()));
-		return resultList;
+		return clients.stream()
+        .map(ClientInfo::getID)
+        .collect(Collectors.toList());
 	}
 
 	public DataBaseClientInfo getDataBaseClient(int clientDataBaseID) {
 		if (config.isDataBaseCached()) {
-			return new DataBaseClientInfo(cache.getDBClientInfo(clientDataBaseID));
+			String info = cache.getDBClientInfo(clientDataBaseID);
+			if (info == null)
+				return null;
+			return new DataBaseClientInfo(info);
 		} else {
 			List<Integer> clientDBIDs = new ArrayList<>();
 			clientDBIDs.add(clientDataBaseID);
-			List<DataBaseClientInfo> result = getDataBaseClientsByDBIDs(clientDBIDs);
-			return result.isEmpty() ? null : result.get(0);
+			return getDataBaseClientsByDBIDs(clientDBIDs).stream().findFirst().orElse(null);
 		}
 	}
 
 	public List<DataBaseClientInfo> getDataBaseClientsByDBIDs(List<Integer> clientDBIDs) {
-		List<DataBaseClientInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetDataBaseClientsByDBIDsCommand(clientDBIDs);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String clientInfo : splitResult(result)) {
-			resultList.add(new DataBaseClientInfo(clientInfo));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetDataBaseClientsByDBIDsCommand(clientDBIDs), DataBaseClientInfo::new);
 	}
-
+	
+	/**
+	 * Retrieves information about a channel with the specified ID.
+	 * 
+	 * If channel caching is enabled in the configuration, this method attempts to retrieve
+	 * the channel information from the cache. If the information is found, it is returned as
+	 * a {@code ChannelInfo} object. If the channel information is not found in the cache, 
+	 * it queries the server to get the channel information using the channel ID. If the 
+	 * information is retrieved successfully, it is returned as a {@code ChannelInfo} object.
+	 * If no channel is found with the specified ID or an error occurs during retrieval,
+	 * {@code null} is returned.
+	 * 
+	 * @param channelID The ID of the channel to retrieve information for.
+	 * @return A {@code ChannelInfo} object containing information about the channel, or 
+	 *         {@code null} if the channel is not found or if an error occurs.
+	 */
+	
 	public ChannelInfo getChannel(int channelID) {
 		String info;
 		if (config.isChannelsCached()) {
@@ -731,7 +670,7 @@ public class Ts3BasicAPI {
 				return null;
 			info = result[0];
 		}
-		if (info.isEmpty())
+		if (info == null || info.isEmpty())
 			return null;
 		return new ChannelInfo(info.concat(" cid=" + channelID));
 	}
@@ -753,7 +692,7 @@ public class Ts3BasicAPI {
 
 	/**
 	 * Gets information about all Channels. Less detailed, because some Information
-	 * are not provided by channellist. For more detailed Information use
+	 * are not provided by channellist. For more detailed information use
 	 * {@link Ts3SyncAPI#getChannelsDetailed()}
 	 * 
 	 * @see Ts3SyncAPI#getChannelsDetailed()
@@ -764,7 +703,11 @@ public class Ts3BasicAPI {
 	public List<ChannelInfo> getChannels() {
 		if (config.isChannelsCached()) {
 			List<ChannelInfo> resultList = new ArrayList<>();
-			for (String channel : cache.getChannelsList().split(TS_INFO_SEPARATOR)) {
+			String channels = cache.getChannelsList();
+			if (channels == null)
+				return resultList;
+			
+			for (String channel : channels.split(TS_INFO_SEPARATOR)) {
 				resultList.add(new ChannelInfo(channel));
 			}
 			return resultList;
@@ -773,17 +716,7 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getDatabaseIDsByServerGroup(int servergroupID) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetDatabaseIDsByServerGroupCommand(servergroupID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String user : splitResult(result)) {
-			if (user.isEmpty())
-				continue;
-			resultList.add(Integer.parseInt(Formatter.get(user, "cldbid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetDatabaseIDsByServerGroupCommand(servergroupID), "cldbid=");
 	}
 
 	/**
@@ -805,11 +738,7 @@ public class Ts3BasicAPI {
 				continue;
 			int clientDBID = Integer.parseInt(Formatter.get(user, "cldbid="));
 			int channelID = Integer.parseInt(Formatter.get(user, "cid="));
-			List<Integer> list = new ArrayList<>();
-			resultMap.putIfAbsent(clientDBID, list);
-			list = resultMap.get(clientDBID);
-			list.add(channelID);
-			resultMap.put(clientDBID, list);
+			resultMap.computeIfAbsent(clientDBID, k -> new ArrayList<>()).add(channelID);
 		}
 		return resultMap;
 	}
@@ -818,24 +747,13 @@ public class Ts3BasicAPI {
 	 * Provides a List of DatabaseClient(ID)s which have a specific ChannelGroup in
 	 * a specific Channel.
 	 * 
-	 * @param channelgroupID
 	 * @param channelID
+	 * @param channelgroupID
 	 * @return List[ClientDataBaseID]
 	 */
 
-	public List<Integer> getDatabaseIDsByChannelAndGroup(int channelgroupID, int channelID) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetDatabaseIDsByChannelAndGroupCommand(channelgroupID, channelID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String user : splitResult(result)) {
-			if (user.isEmpty())
-				continue;
-			resultList.add(Integer.parseInt(Formatter.get(user, "cldbid=")));
-		}
-		return resultList;
+	public List<Integer> getDatabaseIDsByChannelAndGroup(int channelID, int channelgroupID) {
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetDatabaseIDsByChannelAndGroupCommand(channelID, channelgroupID), "cldbid=");
 	}
 
 	/**
@@ -860,11 +778,7 @@ public class Ts3BasicAPI {
 				continue;
 			int channelGroupID = Integer.parseInt(Formatter.get(user, "cgid="));
 			int channelID = Integer.parseInt(Formatter.get(user, "cid="));
-			List<Integer> list = new ArrayList<>();
-			resultMap.putIfAbsent(channelGroupID, list);
-			list = resultMap.get(channelGroupID);
-			list.add(channelID);
-			resultMap.put(channelGroupID, list);
+			resultMap.computeIfAbsent(channelGroupID, k -> new ArrayList<>()).add(channelID);
 		}
 		return resultMap;
 	}
@@ -890,88 +804,42 @@ public class Ts3BasicAPI {
 				continue;
 			int clDBID = Integer.parseInt(Formatter.get(user, "cldbid="));
 			int cgID = Integer.parseInt(Formatter.get(user, "cgid="));
-			List<Integer> list = new ArrayList<>();
-			resultMap.putIfAbsent(cgID, list);
-			list = resultMap.get(cgID);
-			list.add(clDBID);
-			resultMap.put(cgID, list);
+			resultMap.computeIfAbsent(cgID, k -> new ArrayList<>()).add(clDBID);
 		}
 		return resultMap;
 	}
 
 	public List<ComplainInfo> getComplainsByClient(int clientDataBaseID) {
-		List<ComplainInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetComplainsByClientCommand(clientDataBaseID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String complain : splitResult(result)) {
-			resultList.add(new ComplainInfo(complain));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetComplainsByClientCommand(clientDataBaseID), ComplainInfo::new);
 	}
 
 	public List<PrivilegeKeyInfo> getPrivilegeKeys() {
-		List<PrivilegeKeyInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetPrivilegeKeysCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String token : splitResult(result)) {
-			resultList.add(new PrivilegeKeyInfo(token));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetPrivilegeKeysCommand(), PrivilegeKeyInfo::new);
 	}
 
 	public List<ComplainInfo> getComplains() {
-		List<ComplainInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetComplainsCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String complain : splitResult(result)) {
-			resultList.add(new ComplainInfo(complain));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetComplainsCommand(), ComplainInfo::new);
 	}
 
 	public List<BanInfo> getBans() {
-		List<BanInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetBansCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-
-		for (String ban : splitResult(result)) {
-			resultList.add(new BanInfo(ban));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetBansCommand(), BanInfo::new);
 	}
 
 	protected List<VirtualServerInfo> getVirtualServersByCommand(String command) {
-		List<VirtualServerInfo> resultList = new ArrayList<>();
-		String[] result = writer.executeReadCommand(command);
-		if (checkError(result, command))
-			return resultList;
-		for (String server : splitResult(result)) {
-			resultList.add(new VirtualServerInfo(server));
-		}
-		return resultList;
+		return executeCommandGetListResult(command, VirtualServerInfo::new);
 	}
 
 	public List<VirtualServerInfo> getVirtualServers() {
 		if (config.isVirtualServerCached()) {
 			List<VirtualServerInfo> resultList = new ArrayList<>();
-			String result = cache.getVirtualServerList();
-			for (String server : result.split(TS_INFO_SEPARATOR)) {
+			String vservers = cache.getVirtualServerList();
+			if (vservers == null)
+				return resultList;
+			for (String server : vservers.split(TS_INFO_SEPARATOR)) {
 				resultList.add(new VirtualServerInfo(server));
 			}
 			return resultList;
 		}
-		
 		
 		return getVirtualServersByCommand(CommandBuilder.buildGetVirtualServersCommand());
 	}
@@ -979,7 +847,7 @@ public class Ts3BasicAPI {
 	/**
 	 * Adds a bandrule to the server, every argument is optional, but you should use
 	 * at least one. Be aware that you could ban more clients than indeeded.
-	 * 
+	 *
 	 * @param ip
 	 *                       is optional (if null not used)
 	 * @param name
@@ -992,16 +860,12 @@ public class Ts3BasicAPI {
 	 *                       is optional (if -2 not used)
 	 * @param banReason
 	 *                       is optional (if null not used)
-	 * 
+	 *
 	 * @return ID of the ban.
 	 */
 
 	public int addBan(String ip, String name, String clientUUID, String myTSID, long banTime, String banReason) {
-		String cmd = CommandBuilder.buildAddBanCommand(ip, name, clientUUID, myTSID, banTime, banReason);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "banid="));
+		return executeCommandGetIntResult(CommandBuilder.buildAddBanCommand(ip, name, clientUUID, myTSID, banTime, banReason), "banid=");
 	}
 
 	/**
@@ -1063,12 +927,7 @@ public class Ts3BasicAPI {
 	}
 
 	public String resetPermissions() {
-		String cmd = CommandBuilder.buildResetPermissionsCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		
-		return Formatter.get(result[0], "token=");
+		return executeCommandGetStringPropResult(CommandBuilder.buildResetPermissionsCommand(), "token=");
 	}
 
 	/**
@@ -1148,11 +1007,7 @@ public class Ts3BasicAPI {
 	}
 
 	public int createChannel(String channelName, Map<ChannelProperty, String> channelProperties) {
-		String cmd = CommandBuilder.buildCreateChannelCommand(channelName, channelProperties);
-		String[] result = writer.executeReadCommand(cmd.toString());
-		if (checkError(result, cmd.toString()))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "cid="));
+		return executeCommandGetIntResult(CommandBuilder.buildCreateChannelCommand(channelName, channelProperties), "cid=");
 	}
 
 	public void deleteChannel(int channelID, boolean force) {
@@ -1186,11 +1041,7 @@ public class Ts3BasicAPI {
 	}
 
 	public int createChannelGroup(String channelGroupName, ChannelGroupType channelGroupType) {
-		String cmd = CommandBuilder.buildCreateChannelGroupCommand(channelGroupName, channelGroupType);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "cgid="));
+		return executeCommandGetIntResult(CommandBuilder.buildCreateChannelGroupCommand(channelGroupName, channelGroupType), "cgid=");
 	}
 
 	/**
@@ -1218,11 +1069,7 @@ public class Ts3BasicAPI {
 	}
 
 	public int copyChannelGroup(int sourceChannelGroupID, int targetChannelGroupID, String channelGroupName, ChannelGroupType channelGroupType) {
-		String cmd = CommandBuilder.buildCopyChannelGroupCommand(sourceChannelGroupID, targetChannelGroupID, channelGroupName, channelGroupType);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "cgid="));
+		return executeCommandGetIntResult(CommandBuilder.buildCopyChannelGroupCommand(sourceChannelGroupID, targetChannelGroupID, channelGroupName, channelGroupType), "cgid=");
 	}
 
 	public void deleteChannelGroup(int channelGroupID, boolean force) {
@@ -1277,23 +1124,11 @@ public class Ts3BasicAPI {
 	}
 
 	public int getDataBaseClientIDByUUID(String clientUUID) {
-		String cmd = CommandBuilder.buildGetDataBaseClientIDByUUIDCommand(clientUUID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "cldbid="));
+		return executeCommandGetIntResult(CommandBuilder.buildGetDataBaseClientIDByUUIDCommand(clientUUID), "cldbid=");
 	}
 
 	public List<Integer> getDataBaseClientIDsByName(String clientLastName) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetDataBaseClientIDsByNameCommand(clientLastName);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String infos : splitResult(result)) {
-			resultList.add(Integer.parseInt(Formatter.get(infos, "cldbid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetDataBaseClientIDsByNameCommand(clientLastName), "cldbid=");
 	}
 
 	public void removeClientPermission(int clientDataBaseID, int permissionID, String permissionName) {
@@ -1309,15 +1144,7 @@ public class Ts3BasicAPI {
 	}
 
 	public List<Integer> getClientIDsByName(String clientName) {
-		List<Integer> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetClientIDsByNameCommand(clientName);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String infos : splitResult(result)) {
-			resultList.add(Integer.parseInt(Formatter.get(infos, "clid=")));
-		}
-		return resultList;
+		return executeCommandGetListIntPropResult(CommandBuilder.buildGetClientIDsByNameCommand(clientName), "clid=");
 	}
 
 	public void kickClientFromServer(int clientID, String reason) {
@@ -1333,11 +1160,7 @@ public class Ts3BasicAPI {
 	}
 
 	public String updateServerQueryLogin(String username) {
-		String cmd = CommandBuilder.buildUpdateServerQueryLoginCommand(username);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return Formatter.get(result[0], "client_login_password=");
+		return executeCommandGetStringPropResult(CommandBuilder.buildUpdateServerQueryLoginCommand(username), "client_login_password=");
 	}
 
 	public void updateQueryName(String queryName) {
@@ -1386,11 +1209,7 @@ public class Ts3BasicAPI {
 		for (String info : splitResult(result)) {
 			int clDBID = Integer.parseInt(Formatter.get(info, "cldbid="));
 			String value = Formatter.toNormalFormat(Formatter.get(info, "value="));
-			List<String> list = new ArrayList<>();
-			resultMap.putIfAbsent(clDBID, list);
-			list = resultMap.get(clDBID);
-			list.add(value);
-			resultMap.put(clDBID, list);
+			resultMap.computeIfAbsent(clDBID, k -> new ArrayList<>()).add(value);
 		}
 		return resultMap;
 	}
@@ -1416,8 +1235,8 @@ public class Ts3BasicAPI {
 	}
 
 	public FileInfo getFileInfo(int channelID, String channelPassword, String fileName) {
-		List<FileInfo> result = getFileInfos(channelID, channelPassword, Collections.singletonList(fileName));
-		return result.isEmpty() ? null : result.get(0);
+		return getFileInfos(channelID, channelPassword, Collections.singletonList(fileName)).stream()
+	            .findFirst().orElse(null);
 	}
 
 	public List<FileInfo> getFileInfos(int channelID, String channelPassword, List<String> fileNames) {
@@ -1447,15 +1266,7 @@ public class Ts3BasicAPI {
 	}
 
 	public List<FileTransferInfo> getFileTransfers() {
-		List<FileTransferInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetFileTransfersCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String info : splitResult(result)) {
-			resultList.add(new FileTransferInfo(info));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetFileTransfersCommand(), FileTransferInfo::new);
 	}
 
 	public void renameFile(int channelID, String channelPassword, String oldFilePath, String newFilePath) {
@@ -1475,12 +1286,7 @@ public class Ts3BasicAPI {
 	}
 
 	public InstanceInfo getInstanceInfo() {
-		String cmd = CommandBuilder.buildGetInstanceInfoCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-
-		return new InstanceInfo(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildGetInstanceInfoCommand(), InstanceInfo::new);
 	}
 
 	public void addToLog(LogLevel logLevel, String logMessage) {
@@ -1490,7 +1296,7 @@ public class Ts3BasicAPI {
 	/**
 	 * Gets a specified number of entries from the servers log
 	 * 
-	 * @param lines Amount of entries should be returned between [1,100] (100 Default)
+	 * @param lines Amount of entries should be returned. Between [1,100] (100 Default)
 	 * @param reverse if enabled the order is reversed
 	 * @param instance if enabled log is returned from the instance, otherwise from the virtualserver.
 	 * @param beginPos amout of lines that should be skipped from the start.
@@ -1498,16 +1304,7 @@ public class Ts3BasicAPI {
 	 */
 	
 	public List<String> getLog(int lines, boolean reverse, boolean instance, int beginPos) {
-		List<String> resultLines = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetLogCommand(lines, reverse, instance, beginPos);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultLines;
-
-		for (String logLines : splitResult(result)) {
-			resultLines.add(Formatter.toNormalFormat(Formatter.get(logLines, "l=")));
-		}
-		return resultLines;
+		return executeCommandGetListStringPropResult(CommandBuilder.buildGetLogCommand(lines, reverse, instance, beginPos), "l=");
 	}
 
 	public void sendOfflineMessage(String clientUUID, String subject, String message) {
@@ -1531,25 +1328,17 @@ public class Ts3BasicAPI {
 	}
 
 	public List<PermissionAssignmentInfo> getAssignmentsOfPermissions(List<Integer> permissions, List<String> permissionNames) {
-		List<PermissionAssignmentInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetAssignmentsOfPermissionsCommand(permissions, permissionNames);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String perms : splitResult(result)) {
-			resultList.add(new PermissionAssignmentInfo(perms));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetAssignmentsOfPermissionsCommand(permissions, permissionNames), PermissionAssignmentInfo::new);
 	}
 
 	public Permission getQueryAssignmentOfPermission(int permissionID) {
-		List<Permission> result = getQueryAssignmentsOfPermissions(Collections.singletonList(permissionID), new ArrayList<>());
-		return result.isEmpty() ? null : result.get(0);
+		return getQueryAssignmentsOfPermissions(Collections.singletonList(permissionID), new ArrayList<>())
+				.stream().findFirst().orElse(null);
 	}
 
 	public Permission getQueryAssignmentOfPermission(String permissionName) {
-		List<Permission> result = getQueryAssignmentsOfPermissions(new ArrayList<>(), Collections.singletonList(permissionName));
-		return result.isEmpty() ? null : result.get(0);
+		return getQueryAssignmentsOfPermissions(new ArrayList<>(), Collections.singletonList(permissionName))
+				.stream().findFirst().orElse(null);
 	}
 
 	public List<Permission> getQueryAssignmentsOfPermissions(List<Integer> permissions, List<String> permissionNames) {
@@ -1557,16 +1346,7 @@ public class Ts3BasicAPI {
 	}
 
 	public List<PermissionAssignmentInfo> getPermOverview(int clientDBID, int channelID, int permID) {
-		List<PermissionAssignmentInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetPermOverviewCommand(clientDBID, channelID, permID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		
-		for (String perms : splitResult(result)) {
-			resultList.add(new PermissionAssignmentInfo(perms));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetPermOverviewCommand(clientDBID, channelID, permID), PermissionAssignmentInfo::new);
 	}
 
 	public PermissionAssignmentInfo getPermOverviewByPermID(int clientDBID, int channelID, int permID) {
@@ -1574,11 +1354,7 @@ public class Ts3BasicAPI {
 	}
 
 	public String createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID, String description) {
-		String cmd = CommandBuilder.buildCreatePrivilegeKeyCommand(keyType, groupID, channelID, description);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return Formatter.get(result[0], "token=");
+		return executeCommandGetStringPropResult(CommandBuilder.buildCreatePrivilegeKeyCommand(keyType, groupID, channelID, description), "token=");
 	}
 
 	public void deletePrivilegeKey(String privilegeKey) {
@@ -1590,11 +1366,7 @@ public class Ts3BasicAPI {
 	}
 
 	public CreatedQueryLogin createQueryLogin(String loginName, int clientDBID) {
-		String cmd = CommandBuilder.buildCreateQueryLoginCommand(loginName, clientDBID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return new CreatedQueryLogin(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildCreateQueryLoginCommand(loginName, clientDBID), CreatedQueryLogin::new);
 	}
 
 	public void deleteQueryLogin(int clientDBID) {
@@ -1616,14 +1388,7 @@ public class Ts3BasicAPI {
 	 */
 
 	public List<CreatedQueryLogin> getQueryLogins(String pattern, int startOffset, int duration) {
-		List<CreatedQueryLogin> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetQueryLoginsCommand(pattern, startOffset, duration);
-		String[] info = writer.executeReadCommand(cmd.toString())[0].split(TS_INFO_SEPARATOR);
-		for (String queryLogin : info) {
-			resultList.add(new CreatedQueryLogin(queryLogin));
-		}
-
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetQueryLoginsCommand(pattern, startOffset, duration), CreatedQueryLogin::new);
 	}
 
 	public void sendTextMessage(TextMessageType messageType, int clientID, String message) {
@@ -1631,11 +1396,7 @@ public class Ts3BasicAPI {
 	}
 
 	public CreatedVirtualServer createVirtualServer(Map<VirtualServerProperty, String> virtualServerProperties) {
-		String cmd = CommandBuilder.buildCreateVirtualServerCommand(virtualServerProperties);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return new CreatedVirtualServer(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildCreateVirtualServerCommand(virtualServerProperties), CreatedVirtualServer::new);
 	}
 
 	public void deleteVirtualServer(int virtualServerID) {
@@ -1647,11 +1408,7 @@ public class Ts3BasicAPI {
 	}
 
 	public int createServerGroup(String serverGroupName, ServerGroupType groupType) {
-		String cmd = CommandBuilder.buildCreateServerGroupCommand(serverGroupName, groupType);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "sgid="));
+		return executeCommandGetIntResult(CommandBuilder.buildCreateServerGroupCommand(serverGroupName, groupType), "sgid=");
 	}
 
 	public void addClientToServerGroup(int groupID, int clientDBID) {
@@ -1723,11 +1480,7 @@ public class Ts3BasicAPI {
 	 */
 
 	public int copyServerGroup(int sourceServerGroupID, int targetServerGroupID, String serverGroupName, ServerGroupType serverGroupType) {
-		String cmd = CommandBuilder.buildCopyServerGroupCommand(sourceServerGroupID, targetServerGroupID, serverGroupName, serverGroupType);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return -1;
-		return Integer.parseInt(Formatter.get(result[0], "sgid="));
+		return executeCommandGetIntResult(CommandBuilder.buildCopyServerGroupCommand(sourceServerGroupID, targetServerGroupID, serverGroupName, serverGroupType), "sgid=");
 	}
 
 	public void deleteServerGroup(int serverGroupID, boolean force) {
@@ -1763,25 +1516,11 @@ public class Ts3BasicAPI {
 	}
 
 	public List<TempPasswordInfo> getVirtualServerTempPasswords() {
-		List<TempPasswordInfo> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetVirtualServerTempPasswordsCommand();
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		String[] information = splitResult(result);
-		for (String tempPassword : information) {
-			resultList.add(new TempPasswordInfo(tempPassword));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetVirtualServerTempPasswordsCommand(), TempPasswordInfo::new);
 	}
 
 	public CreatedSnapshot createSnapshot(String password) {
-		String cmd = CommandBuilder.buildCreateSnapshotCommand(password);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-
-		return new CreatedSnapshot(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildCreateSnapshotCommand(password), CreatedSnapshot::new);
 	}
 
 	/**
@@ -1799,11 +1538,7 @@ public class Ts3BasicAPI {
 	 */
 
 	public CreatedAPIKey addAPIKey(APIScope scope, int lifetime, int clientDBID) {
-		String cmd = CommandBuilder.buildAddAPIKeyCommand(scope, lifetime, clientDBID);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return null;
-		return new CreatedAPIKey(result[0]);
+		return executeCommandGetObject(CommandBuilder.buildAddAPIKeyCommand(scope, lifetime, clientDBID), CreatedAPIKey::new);
 	}
 
 	public void deleteAPIKey(int keyID) {
@@ -1824,15 +1559,7 @@ public class Ts3BasicAPI {
 	 */
 
 	public List<CreatedAPIKey> getAPIKeys(int clientDBID, int startOffset, int limit) {
-		List<CreatedAPIKey> resultList = new ArrayList<>();
-		String cmd = CommandBuilder.buildGetAPIKeysCommand(clientDBID, startOffset, limit);
-		String[] result = writer.executeReadCommand(cmd);
-		if (checkError(result, cmd))
-			return resultList;
-		for (String info : splitResult(result)) {
-			resultList.add(new CreatedAPIKey(info));
-		}
-		return resultList;
+		return executeCommandGetListResult(CommandBuilder.buildGetAPIKeysCommand(clientDBID, startOffset, limit), CreatedAPIKey::new);
 	}
 
 	public void setClientChannelGroup(int channelGroupID, int channelID, int clientDBID) {
@@ -1861,7 +1588,61 @@ public class Ts3BasicAPI {
 	private void setConnected(boolean connected) {
 		this.connected = connected;
 	}
+	
+	public <T> T executeCommandGetObject(String command, Transformator<T> transformator) {
+		String[] result = writer.executeReadCommand(command);
+		if (checkError(result, command))
+			return null;
+		return transformator.transformResult(result[0]);
+	}
+	
+	private int executeCommandGetIntResult(String command, String property) {
+		String[] result = writer.executeReadCommand(command);
+		if (checkError(result, command))
+			return -1;
+		return Integer.parseInt(Formatter.get(result[0], property));
+	}
+	
+	private String executeCommandGetStringPropResult(String command, String property) {
+		String[] result = writer.executeReadCommand(command);
+		if (checkError(result, command))
+			return null;
+		return Formatter.get(result[0], property);
+	}
+	
+	private <T> List<T> executeCommandGetListResult(String command, Transformator<T> transformator) {
+		List<T> resultList = new ArrayList<>();
+		String[] result = writer.executeReadCommand(command);
+		if (checkError(result, command))
+			return resultList;
+		
+		for (String info : splitResult(result)) {
+			if (!info.isBlank())
+				resultList.add(transformator.transformResult(info));
+		}
+		return resultList;
+	}
+	
+	private <T> List<Integer> executeCommandGetListIntPropResult(String command, String property) {
+		return executeCommandGetListResult(command, new Transformator<Integer>() {
 
+			@Override
+			public Integer transformResult(String result) {
+				return Integer.parseInt(Formatter.get(result, property));
+			}
+		});
+	}
+
+	private List<String> executeCommandGetListStringPropResult(String command, String property) {
+		return executeCommandGetListResult(command, new Transformator<String>() {
+
+			@Override
+			public String transformResult(String result) {
+				return Formatter.toNormalFormat(Formatter.get(result, property));
+			}
+		});
+	}
+	
 	private boolean checkError(String result, String cmd) {
 		boolean error = false;
 

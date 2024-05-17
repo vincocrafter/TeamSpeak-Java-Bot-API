@@ -141,7 +141,9 @@ public class QueryReader {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void run() {
-				while(cacheManager.isAlive());
+				try {
+					cacheManager.join();
+				} catch (InterruptedException e1) {}
 				
 				try {					
 					if (query.getConfig().isEventCallType(EventCallType.NEW)) { // New one
