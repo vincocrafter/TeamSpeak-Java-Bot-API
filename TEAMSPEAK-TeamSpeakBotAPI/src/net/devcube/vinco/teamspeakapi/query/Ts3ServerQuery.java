@@ -25,6 +25,7 @@ import net.devcube.vinco.teamspeakapi.api.api.property.TSPermission;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger.TSLogLevel;
 import net.devcube.vinco.teamspeakapi.api.async.Ts3AsyncAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
@@ -33,8 +34,8 @@ import net.devcube.vinco.teamspeakapi.query.manager.QueryReader;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 /**
- * @apiNote This is the mainclass of the TeamSpeak Query API, it handles the
- *          connection between the client and the server and set the API up.
+ * @apiNote This class serves as the main entry point for the TeamSpeak Query API. It manages the 
+ * connection between the client and the server, as well as the setup of the API components.
  */
 
 public class Ts3ServerQuery {
@@ -55,19 +56,20 @@ public class Ts3ServerQuery {
 	private KeepAliveThread keepAliveThread = new KeepAliveThread(this);
 
 	/**
-	 * Connect's the Socket to the Server
+	 * Establishes a connection to the TeamSpeak server, logs in with the provided credentials,
+	 * and connects the TeamSpeak query client to the specified virtual server.
 	 * 
-	 * @param hostname
-	 * @param port
-	 * @param username
-	 * @param password
-	 * @param virtualServerID
-	 * @param queryNickName
-	 * @param defaultchannelID
-	 * 
-	 * @throws IOException
-	 * @throws QueryLoginException
+	 * @param hostname         The hostname or IP address of the TeamSpeak server.
+	 * @param port             The port number of the TeamSpeak server.
+	 * @param username         The username for authentication.
+	 * @param password         The password for authentication.
+	 * @param virtualServerID  The ID of the virtual server to connect to.
+	 * @param queryNickName    The nickname for the query client.
+	 * @param defaultchannelID The ID of the default channel to join (-1 if none).
+	 * @throws IOException         If an I/O error occurs while connecting to the server.
+	 * @throws QueryLoginException If the login process fails.
 	 */
+
 
 	public void connect(String hostname, int port, String username, String password, int virtualServerID, String queryNickName, int defaultchannelID) throws IOException, QueryLoginException {
 		connect(hostname, port);
@@ -77,7 +79,18 @@ public class Ts3ServerQuery {
 		if (defaultchannelID != -1)
 			syncAPI.goToChannel(defaultchannelID);
 	}
+	
+	/**
+	 * Establishes a connection to the TeamSpeak server using the specified hostname and port.
+	 * Initializes the query reader, writer, cache manager, and APIs.
+	 * Starts the reader thread and the keep-alive thread.
+	 * 
+	 * @param hostname The hostname or IP address of the TeamSpeak server.
+	 * @param port     The port number of the TeamSpeak server.
+	 * @throws IOException If an I/O error occurs while connecting to the server.
+	 */
 
+	
 	public void connect(String hostname, int port) throws IOException {
 		this.socket = new Socket(hostname, port);
 		this.reader = new QueryReader(this, socket);
@@ -85,13 +98,11 @@ public class Ts3ServerQuery {
 		this.asyncAPI = new Ts3AsyncAPI(this);
 		this.cache = new CacheManager(this);
 		this.basicAPI = new Ts3BasicAPI(this);
-		this.syncAPI  = new Ts3SyncAPI(this);
+		this.syncAPI = new Ts3SyncAPI(this);
 		reader.start(); // starts the reader Thread
 		socket.setKeepAlive(true);
 		keepAliveThread.start(); // starts KeepAlivThread
 	}
-
-	
 
 	/**
 	 * Stops the Query, Socket and all Threads
@@ -112,15 +123,12 @@ public class Ts3ServerQuery {
 		}
 	}
 
-	
-
 	public void checkQueryPermissions() {
 		Set<Integer> queryPermissions = syncAPI.getQueryPermissions();
 		TSPermission.checkQueryConnectPermissions(queryPermissions);
 		TSPermission.checkQueryActionPermissions(queryPermissions);
 		TSPermission.checkQueryInformationPermissions(queryPermissions);
 	}
-
 
 	/**
 	 * @return the Queryconfig
@@ -225,73 +233,13 @@ public class Ts3ServerQuery {
 	 */
 
 	public synchronized void debug(DebugOutputType type, String debug) {
-		int logLevel = -1;
-		if (config.getDebuglist().isEmpty())
+		if (config.getDebuglist().isEmpty() || (!config.isEverything() && !config.isInDebug(type)))
 			return;
-		
-		switch (type) {
-		case GENERAL:
-			if (config.isGeneralDebug() || config.isEverything()) {
-				logLevel = Logger.INFO;
-			}
-			break;
-		case EVENTMANAGER:
-			if (config.isEventManagerDebug() || config.isEverything()) {
-				logLevel = Logger.EVENT_MANAGER;
-			}
-			break;
-		case KEEPALIVETHREAD:
-			if (config.isKeepAliveThreadDebug() || config.isEverything()) {
-				logLevel = Logger.INFO;
-			}
-			break;
-		case QUERY:
-			if (config.isQueryDebug() || config.isEverything()) {
-				logLevel = Logger.QUERY;
-			}
-			break;
-		case QUERYREADER:
-			if (config.isQueryReaderDebug() || config.isEverything()) {
-				logLevel = Logger.QUERY_READER;
-			}
-			break;
-		case QUERYREADERQUEUE:
-			if (config.isQueryReaderQueueDebug() || config.isEverything()) {
-				logLevel = Logger.QUERY_READER_QUEUE;
-			}
-			break;
-		case QUERYWRITER:
-			if (config.isQueryWriterDebug() || config.isEverything()) {
-				logLevel = Logger.QUERY_WRITER;
-			}
-			break;
-		case WARNING:
-			if (config.isWarningDebug() || config.isEverything()) {
-				logLevel = Logger.WARING;
-			}
-			break;
-		case ERROR:
-			if (config.isErrorDebug() || config.isEverything()) {
-				logLevel = Logger.ERROR;
-			}
-			break;
-		case CACHEMANAGER:
-			if (config.isCacheManagerDebug() || config.isEverything()) {
-				logLevel = Logger.CACHE_MANAGER;
-			}
-			break;
-		default:
-			if (config.isInDebug(type) || config.isEverything()) {
-				logLevel = Logger.EVENT_MANAGER;
-			}
-			break;
-		}
-		if (logLevel != -1) {
-			if (config.isDebugType(DebugType.CONSOLE) || config.isDebugType(DebugType.BOTH))
-				logger.log(logLevel, debug);
-			if (config.isDebugType(DebugType.FILE) || config.isDebugType(DebugType.BOTH))
-				logger.logFile(logLevel, debug);
-		}
 
+		TSLogLevel logLevel = type.getLogLevel();
+		if (config.isDebugType(DebugType.CONSOLE) || config.isDebugType(DebugType.BOTH))
+			logger.log(logLevel, debug);
+		if (config.isDebugType(DebugType.FILE) || config.isDebugType(DebugType.BOTH))
+			logger.logFile(logLevel, debug);
 	}
 }

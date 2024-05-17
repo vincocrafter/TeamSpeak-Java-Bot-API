@@ -8,15 +8,29 @@ import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class Logger {
 
-	public static final int INFO = 1;
-	public static final int ERROR = 2;
-	public static final int WARING = 3;
-	public static final int QUERY = 4;
-	public static final int EVENT_MANAGER = 5;
-	public static final int QUERY_WRITER = 6;
-	public static final int QUERY_READER = 7;
-	public static final int QUERY_READER_QUEUE = 8;
-	public static final int CACHE_MANAGER = 9;
+	public static enum TSLogLevel {
+		
+		INFO("INFO"), 
+		ERROR("ERROR"), 
+		WARNING("WARNING"),
+		QUERY("QUERY"),
+		EVENT_MANAGER("EVENT MANAGER"),
+		QUERY_WRITER("QUERY WRITER"),
+		QUERY_READER("QUERY READER"),
+		QUERY_READER_QUEUE("QUERY READER QUEUE"),
+		CACHE_MANAGER("CACHE MANAGER");
+
+		private String value = "";
+
+		private TSLogLevel(String s) {
+			this.value = s;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+		
+	}
 	
 	private Ts3ServerQuery serverQuery;
 
@@ -25,13 +39,13 @@ public class Logger {
 	}
 
 	/**
-	 * Format -> [THREADNAME] [HH:mm:ss/.SSS] [Type] : message
+	 * Format -> [THREADNAME] [dd/mm/yyyy] [HH:mm:ss/.SSS] [Type] : message
 	 * 
 	 * @param logLevel
 	 * @param message
 	 */
 
-	private String buildDebugMessage(int logLevel, Object message) {
+	private String buildDebugMessage(TSLogLevel logLevel, Object message) {
 		StringBuilder logMessage = new StringBuilder();
 		
 		StringBuilder prefix = new StringBuilder();
@@ -41,58 +55,24 @@ public class Logger {
 		}
 		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
 
-		String type = "";
-
-		switch (logLevel) {
-		case 1:
-			type = "[INFO]";
-			break;
-		case 2:
-			type = "[ERROR]";
-			break;
-		case 3:
-			type = "[WARNING]";
-			break;
-		case 4:
-			type = "[QUERY]";
-			break;
-		case 5:
-			type = "[EVENT MANAGER]";
-			break;
-		case 6:
-			type = "[QUERY WRITER]";
-			break;
-		case 7:
-			type = "[QUERY READER]";
-			break;
-		case 8:
-			type = "[QUERY READER QUEUE]";
-			break;
-		case 9:
-			type = "[CACHE MANAGER]";
-			break;
-		default:
-			type = "[OTHER]";
-			break;
-		}
 		logMessage.append(prefix);
-		logMessage.append(type);
+		logMessage.append(logLevel.getValue());
 		logMessage.append(" : ");
 		logMessage.append(message);
 		return logMessage.toString();
 	}
 
-	public synchronized void log(int logLevel, Object message) {
+	public synchronized void log(TSLogLevel logLevel, Object message) {
 		System.out.println(buildDebugMessage(logLevel, message));
 	}
 
 	/**
-	 * Format -> [THREADNAME] [YYYY/MM/dd] [HH:mm:ss.SSS] [Type] : message
+	 * Format -> [THREADNAME] [dd/MM/YYYY] [HH:mm:ss.SSS] [Type] : message
 	 * 
 	 * @param logLevel
 	 * @param message
 	 */
-	public synchronized void logFile(int logLevel, String logFilePath, Object message) {
+	public synchronized void logFile(TSLogLevel logLevel, String logFilePath, Object message) {
 		writeInLog(logFilePath, buildDebugMessage(logLevel, message));
 	}
 
@@ -102,7 +82,7 @@ public class Logger {
 	 * @param logLevel
 	 * @param message
 	 */
-	public synchronized void logFile(int logLevel, Object message) {
+	public synchronized void logFile(TSLogLevel logLevel, Object message) {
 		String date = serverQuery.getLogDate();
 		if (!new File("Logs").exists()) {
 			new File("Logs/").mkdir();

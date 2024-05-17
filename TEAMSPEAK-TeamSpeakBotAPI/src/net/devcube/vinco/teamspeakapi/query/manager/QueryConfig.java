@@ -137,46 +137,6 @@ public class QueryConfig {
 	public boolean isEverything() {
 		return isInDebug(DebugOutputType.EVERYTHING);
 	}
-
-	public boolean isGeneralDebug() {
-		return isInDebug(DebugOutputType.GENERAL);
-	}
-	
-	public boolean isErrorDebug() {
-		return isInDebug(DebugOutputType.ERROR);
-	}
-
-	public boolean isWarningDebug() {
-		return isInDebug(DebugOutputType.WARNING);
-	}
-
-	public boolean isEventManagerDebug() {
-		return isInDebug(DebugOutputType.EVENTMANAGER);
-	}
-
-	public boolean isKeepAliveThreadDebug() {
-		return isInDebug(DebugOutputType.KEEPALIVETHREAD);
-	}
-
-	public boolean isQueryDebug() {
-		return isInDebug(DebugOutputType.QUERY);
-	}
-
-	public boolean isQueryReaderDebug() {
-		return isInDebug(DebugOutputType.QUERYREADER);
-	}
-
-	public boolean isQueryReaderQueueDebug() {
-		return isInDebug(DebugOutputType.QUERYREADERQUEUE);
-	}
-
-	public boolean isQueryWriterDebug() {
-		return isInDebug(DebugOutputType.QUERYWRITER);
-	}
-	
-	public boolean isCacheManagerDebug() {
-		return isInDebug(DebugOutputType.CACHEMANAGER);
-	}
 	
 	/**
 	 * Get a list of all selected Types of debugging

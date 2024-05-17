@@ -11,37 +11,54 @@
  */
 package net.devcube.vinco.teamspeakapi.api.api.util;
 
-/**
- * Idea of specify the type of Debug the programmer wants from the API
- * 
- */
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger.TSLogLevel;
 
+/**
+ * Enum representing different types of debug output.
+ */
 public enum DebugOutputType {
-	
-	EVERYTHING, 
-	GENERAL, 
-	EVENTMANAGER, 
-	KEEPALIVETHREAD, 
-	QUERY, 
-	QUERYREADER, 
-	QUERYWRITER, 
-	ERROR, 
-	WARNING,
-	QUERYREADERQUEUE, 
-	CACHEMANAGER,
-	
-	//to select debug for a specific Event
-	E_CHANNEL_CREATED, 
-	E_CHANNEL_DELETED, 
-	E_CHANNEL_DESCRIPTION_EDITED, 
-	E_CHANNEL_EDITED, 
-	E_CHANNEL_PASSWORD_CHANGED,
-	E_CHANNEL_MOVED, 
-	E_CLIENT_JOIN, 
-	E_CLIENT_LEAVE, 
-	E_CLIENT_MOVE, 
-	E_PRIVILEGEKEY_USED, 
-	E_SERVER_EDITED, 
-	E_TEXT_MESSAGE;
-	
+  
+    EVERYTHING(TSLogLevel.INFO),  
+    GENERAL(TSLogLevel.INFO),              
+    EVENTMANAGER(TSLogLevel.INFO),  
+    KEEPALIVETHREAD(TSLogLevel.INFO),    
+    QUERY(TSLogLevel.QUERY),             
+    QUERYREADER(TSLogLevel.QUERY_READER), 
+    QUERYWRITER(TSLogLevel.QUERY_WRITER),  
+    ERROR(TSLogLevel.ERROR),               
+    WARNING(TSLogLevel.WARNING),           
+    QUERYREADERQUEUE(TSLogLevel.QUERY_READER_QUEUE), 
+    CACHEMANAGER(TSLogLevel.CACHE_MANAGER),            
+    
+    E_CHANNEL_CREATED(TSLogLevel.EVENT_MANAGER),       
+    E_CHANNEL_DELETED(TSLogLevel.EVENT_MANAGER),       
+    E_CHANNEL_DESCRIPTION_EDITED(TSLogLevel.EVENT_MANAGER),  
+    E_CHANNEL_EDITED(TSLogLevel.EVENT_MANAGER),               
+    E_CHANNEL_PASSWORD_CHANGED(TSLogLevel.EVENT_MANAGER),     
+    E_CHANNEL_MOVED(TSLogLevel.EVENT_MANAGER),              
+    E_CLIENT_JOIN(TSLogLevel.EVENT_MANAGER),                 
+    E_CLIENT_LEAVE(TSLogLevel.EVENT_MANAGER),                
+    E_CLIENT_MOVE(TSLogLevel.EVENT_MANAGER),                 
+    E_PRIVILEGEKEY_USED(TSLogLevel.EVENT_MANAGER),           
+    E_SERVER_EDITED(TSLogLevel.EVENT_MANAGER),              
+    E_TEXT_MESSAGE(TSLogLevel.EVENT_MANAGER);
+
+	private final TSLogLevel logLevel;
+
+    /**
+     * Constructor for DebugOutputType enum.
+     * @param logLevel The log level associated with the debug output type.
+     */
+    DebugOutputType(TSLogLevel logLevel) {
+        this.logLevel = logLevel;
+    }
+
+    /**
+     * Get the log level associated with the debug output type.
+     * @return The log level.
+     */
+    public TSLogLevel getLogLevel() {
+        return logLevel;
+    }
 }
+
