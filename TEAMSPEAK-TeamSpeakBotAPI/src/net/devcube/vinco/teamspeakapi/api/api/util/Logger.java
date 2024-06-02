@@ -56,7 +56,7 @@ public class Logger {
 		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
 
 		logMessage.append(prefix);
-		logMessage.append(logLevel.getValue());
+		logMessage.append("[").append(logLevel.getValue()).append("]");
 		logMessage.append(" : ");
 		logMessage.append(message);
 		return logMessage.toString();

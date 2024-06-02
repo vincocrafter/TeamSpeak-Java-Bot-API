@@ -20,7 +20,7 @@ public enum DebugOutputType {
   
     EVERYTHING(TSLogLevel.INFO),  
     GENERAL(TSLogLevel.INFO),              
-    EVENTMANAGER(TSLogLevel.INFO),  
+    EVENTMANAGER(TSLogLevel.EVENT_MANAGER),  
     KEEPALIVETHREAD(TSLogLevel.INFO),    
     QUERY(TSLogLevel.QUERY),             
     QUERYREADER(TSLogLevel.QUERY_READER), 

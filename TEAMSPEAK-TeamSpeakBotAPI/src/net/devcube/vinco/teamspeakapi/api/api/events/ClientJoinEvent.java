@@ -113,7 +113,7 @@ public class ClientJoinEvent extends BaseEvent {
 		return toBol(toInt(get("client_is_priority_speaker")));
 	}
 	
-	public String getClientPoneticName() {
+	public String getClientPhoneticName() {
 		return Formatter.toNormalFormat(get("client_nickname_phonetic"));
 	}
 	
