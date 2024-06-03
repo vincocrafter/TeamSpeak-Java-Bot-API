@@ -8,7 +8,7 @@ jobs:
 
     services:
       teamspeak:
-        image: ts_server_image:latest
+        image: docker/ts_server_image
         ports:
           - 9987:9987/udp
           - 10011:10011
@@ -17,9 +17,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Build Docker image
-        run: docker build -t ts_server_image:latest docker/
 
       - name: Set up JDK
         uses: actions/setup-java@v2
