@@ -1,0 +1,39 @@
+name: TeamSpeak Server Test
+
+on: [push]
+
+jobs:
+  test-teamspeak:
+    runs-on: ubuntu-latest
+
+    services:
+      teamspeak:
+        image: docker/ts_server_image
+        ports:
+          - 9987:9987/udp
+          - 10011:10011
+          - 30033:30033
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Download JUnit
+        run: curl -o junit-platform-console-standalone.jar https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.8.2/junit-platform-console-standalone-1.8.2.jar
+
+      - name: Compile Java files
+        run: javac -d out $(find TEAMSPEAK-TeamSpeakBotAPI/src test/java -name "*.java")
+
+      - name: Wait for TeamSpeak Server to be ready
+        run: sleep 30
+
+      - name: Run JUnit Tests
+        run: java -cp .:out:junit-platform-console-standalone.jar org.junit.platform.console.ConsoleLauncher --scan-class-path
+        env:
+          TS3_SERVER_PASSWORD: ${{ secrets.TS3_SERVER_PASSWORD }}
