@@ -233,6 +233,11 @@ public class Ts3BasicAPI {
 
 	public void quit() {
 		writer.executeReadErrorCommand(CommandBuilder.buildQuitCommand());
+
+		if (isConnected()) {
+			query.debug(DebugOutputType.QUERY, "Query logged out successful");
+			setConnected(false);
+		}
 	}
 
 	/**
