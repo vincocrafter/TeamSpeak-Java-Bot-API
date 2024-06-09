@@ -36,7 +36,6 @@ public class TestDebugRegister {
 	@BeforeAll
 	public static void connectQuery() {
 		query = new Ts3ServerQuery();
-		query.getConfig().setFloodRate(FloodRate.DEFAULT_TEAMSPEAK);
 		String password = System.getenv("TS3_SERVER_PASSWORD");
 
 		try {

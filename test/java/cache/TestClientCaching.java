@@ -13,6 +13,8 @@ package cache;
 
 import java.io.IOException;
 
+import net.devcube.vinco.teamspeakapi.api.api.util.CacheType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -33,8 +35,8 @@ public class TestClientCaching {
 	@BeforeAll
 	public static void connectQuery() {
 		query = new Ts3ServerQuery();
-		query.getConfig().setFloodRate(FloodRate.DEFAULT_TEAMSPEAK);
 		String password = System.getenv("TS3_SERVER_PASSWORD");
+		query.getConfig().addCacheItem(CacheType.CLIENTS);
 
 		try {
 			query.connect("localhost", 10011, "serveradmin", password, 1, "CachingTest", -1);

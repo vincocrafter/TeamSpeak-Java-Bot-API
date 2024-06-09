@@ -10,16 +10,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Copy DataBase
+        run: cp ./docker/ts3server.sqlitedb ./docker/data/
+
       - name: Load Docker image
         run: docker load -i docker/ts_server_image.tar
 
       - name: Start TeamSpeak Server
         run: |
           docker run -d --name teamspeak \
+            -v ./docker/data:/var/ts3server/ \
             -p 9987:9987/udp \
             -p 10011:10011 \
             -p 30033:30033 \
-            -e TS3SERVER_LICENSE=accept \
             ts_server_image:latest
 
       - name: Set up JDK
@@ -35,7 +38,7 @@ jobs:
         run: javac -d out -cp junit-platform-console-standalone.jar $(find TEAMSPEAK-TeamSpeakBotAPI/src test/java/ -name "*.java")
 
       - name: Wait for TeamSpeak Server to be ready
-        run: sleep 20
+        run: sleep 10
 
       - name: Run JUnit Tests
         run: java -cp out:junit-platform-console-standalone.jar org.junit.platform.console.ConsoleLauncher --class-path out --scan-class-path
