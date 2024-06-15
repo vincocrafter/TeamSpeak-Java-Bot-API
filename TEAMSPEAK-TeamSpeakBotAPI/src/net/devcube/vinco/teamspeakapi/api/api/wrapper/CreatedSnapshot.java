@@ -30,7 +30,7 @@ public class CreatedSnapshot extends DefaultInfo {
 	}
 	
 	public int getVersion() {
-		return toInt(get("version"));
+		return toIntI("version");
 	}
 	
 	public String getSalt() {

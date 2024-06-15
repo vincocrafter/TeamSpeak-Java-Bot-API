@@ -31,11 +31,11 @@ public class CreatedQueryLogin extends DefaultInfo {
 	}
 	
 	public int getClientDataBaseID() {
-		return toInt(get("cldbid"));
+		return toIntI("cldbid");
 	}
 	
 	public int getVirtualServerID() {
-		return toInt(get("sid"));
+		return toIntI("sid");
 	}
 	
 	public int getServerID() {

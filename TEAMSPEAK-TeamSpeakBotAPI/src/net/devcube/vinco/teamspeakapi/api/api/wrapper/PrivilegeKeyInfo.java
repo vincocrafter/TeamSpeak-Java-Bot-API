@@ -29,15 +29,15 @@ public class PrivilegeKeyInfo extends DefaultInfo {
 	}
 
 	public int getServerGroup() {
-		return toInt(get("token_id1"));
+		return toIntI("token_id1");
 	}
 
 	public int getChannelID() {
-		return toInt(get("token_id2"));
+		return toIntI("token_id2");
 	}
 
 	public long getCreatedTime() {
-		return toLong(get("token_created"));
+		return toLongI("token_created");
 	}
 
 	public String getDescription() {
@@ -45,7 +45,7 @@ public class PrivilegeKeyInfo extends DefaultInfo {
 	}
 
 	public int getKeyType() {
-		return toInt(get("token_type"));
+		return toIntI("token_type");
 	}
 	
 	@Override

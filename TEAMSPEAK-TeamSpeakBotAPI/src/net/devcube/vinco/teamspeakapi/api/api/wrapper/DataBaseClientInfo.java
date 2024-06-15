@@ -26,7 +26,7 @@ public class DataBaseClientInfo extends DefaultInfo {
 	}
 	
 	public int getClientDataBaseID() {
-		return toInt(get("client_database_id"));
+		return toIntI("client_database_id");
 	}
 
 	public int getID() {
@@ -42,15 +42,15 @@ public class DataBaseClientInfo extends DefaultInfo {
 	}
 
 	public long getCreatingTime() {
-		return toLong(get("client_created"));
+		return toLongI("client_created");
 	}
 
 	public long getLastConnection() {
-		return toLong(get("client_lastconnected"));
+		return toLongI("client_lastconnected");
 	}
 
 	public int getTotalConnections() {
-		return toInt(get("client_totalconnections"));
+		return toIntI("client_totalconnections");
 	}
 
 	public String getLastIP() {
@@ -65,6 +65,30 @@ public class DataBaseClientInfo extends DefaultInfo {
 		return Formatter.toNormalFormat(get("client_description"));
 	}
 	
+	public String getAvatar() {
+		return get("client_flag_avatar");
+	}
+
+	public int getMonthBytesUploaded() {
+		return toIntI("client_month_bytes_uploaded");
+	}
+
+	public int getMonthBytesDownloaded() {
+		return toIntI("client_month_bytes_downloaded");
+	}
+
+	public int getTotalBytesUploaded() {
+		return toIntI("client_total_bytes_uploaded");
+	}
+
+	public int getTotalBytesDownloaded() {
+		return toIntI("client_total_bytes_downloaded");
+	}
+
+	public String getBase64HashUID() {
+		return get("client_base64HashClientUID");
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("DataBaseClient[");

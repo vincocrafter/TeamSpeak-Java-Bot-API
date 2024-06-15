@@ -40,23 +40,23 @@ public class QueryClientInfo extends DefaultInfo {
 	}
 	
 	public int getClientID() {
-		return toInt(get("client_id"));
+		return toIntI("client_id");
 	}
 	
 	public int getChannelID() {
-		return toInt(get("client_channel_id"));
+		return toIntI("client_channel_id");
 	}
 		
 	public int getDataBaseID() {
-		return toInt(get("client_database_id"));
+		return toIntI("client_database_id");
 	}
 	
 	public int getVirtualServerID() {
-		return toInt(get("virtualserver_id"));
+		return toIntI("virtualserver_id");
 	}
 	
 	public int getVirtualServerPort() {
-		return toInt(get("virtualserver_port"));
+		return toIntI("virtualserver_port");
 	}
 	
 	public String getVirtualServerUUID() {

@@ -47,7 +47,7 @@ public class BanInfo extends DefaultInfo {
      */
 	
 	public int getBanID() {
-		return toInt(get("banid"));
+		return toIntI("banid");
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class BanInfo extends DefaultInfo {
      */
 	
 	public long getCreatingTime() {
-		return toLong(get("created"));
+		return toLongI("created");
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class BanInfo extends DefaultInfo {
      */
 	
 	public int getBanDuration() {
-		return toInt(get("duration"));
+		return toIntI("duration");
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class BanInfo extends DefaultInfo {
      */
 
 	public int getInvokerClientDataBaseID() {
-		return toInt(get("invokercldbid"));
+		return toIntI("invokercldbid");
 	}
 	
 	/**

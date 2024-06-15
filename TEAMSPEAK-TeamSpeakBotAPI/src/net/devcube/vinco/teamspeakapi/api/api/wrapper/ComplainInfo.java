@@ -14,7 +14,7 @@ public class ComplainInfo extends DefaultInfo {
 	}
 
 	public int getTargetClientDataBaseID() {
-		return toInt(get("tcldbid"));
+		return toIntI("tcldbid");
 	}
 
 	public String getTargetName() {
@@ -22,7 +22,7 @@ public class ComplainInfo extends DefaultInfo {
 	}
 
 	public int getSenderClientDataBaseID() {
-		return toInt(get("fcldbid"));
+		return toIntI("fcldbid");
 	}
 
 	public String getSenderName() {
@@ -34,7 +34,7 @@ public class ComplainInfo extends DefaultInfo {
 	}
 
 	public long getTime() {
-		return toLong(get("timestamp"));
+		return toLongI("timestamp");
 	}
 	
 	@Override

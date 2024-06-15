@@ -28,7 +28,7 @@ public class CreatedVirtualServer extends DefaultInfo {
 	}
 	
 	public int getServerID() {
-		return toInt(get("sid"));
+		return toIntI("sid");
 	}
 	
 	public int getID() {
@@ -36,7 +36,7 @@ public class CreatedVirtualServer extends DefaultInfo {
 	}
 	
 	public int getPort() {
-		return toInt(get("virtualserver_port"));
+		return toIntI("virtualserver_port");
 	}
 	
 	public String getKey() {

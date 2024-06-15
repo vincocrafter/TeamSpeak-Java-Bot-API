@@ -16,9 +16,9 @@ public class ChannelInfo extends DefaultInfo {
 	}
 
 	public int getChannelID() {
-		return toInt(get("cid"));
+		return toIntI("cid");
 	}
-	
+		
 	public int getID() {
 		return getChannelID();
 	}
@@ -29,6 +29,10 @@ public class ChannelInfo extends DefaultInfo {
 	
 	public int getChannelId() {
 		return getChannelID();
+	}
+	
+	public int getChannelParentID() {
+		return toIntI("pid");
 	}
 	
 	public String getOrginalName() {
@@ -44,7 +48,7 @@ public class ChannelInfo extends DefaultInfo {
 	}
 
 	public String getDescription() {
-		return Formatter.toNormalFormat(get("channel_topic"));
+		return Formatter.toNormalFormat(get("channel_description"));
 	}
 
 	public String getPassword() {
@@ -52,11 +56,11 @@ public class ChannelInfo extends DefaultInfo {
 	}
 
 	public int getQuality() {
-		return toInt(get("channel_codec_quality"));
+		return toIntI("channel_codec_quality");
 	}
 
 	public ChannelCodec getCodec() {
-		int codec = toInt(get("channel_codec"));
+		int codec = toIntI("channel_codec");
 		
 		for (ChannelCodec channelcodec : ChannelCodec.values()) {
 			if (channelcodec.getValue() == codec) {
@@ -67,35 +71,35 @@ public class ChannelInfo extends DefaultInfo {
 	}
 
 	public int getMaxClients() {
-		return toInt(get("channel_maxclients"));
+		return toIntI("channel_maxclients");
 	}
 
 	public int getMaxFamilyClients() {
-		return toInt(get("channel_maxfamilyclients"));
+		return toIntI("channel_maxfamilyclients");
 	}
 	
 	public int getOrder() {
-		return toInt(get("channel_order"));
+		return toIntI("channel_order");
 	}
 
 	public int getNeededTalkPower() {
-		return toInt(get("channel_needed_talk_power"));
+		return toIntI("channel_needed_talk_power");
 	}
 
 	public boolean isPermanent() {
-		return toBol(toInt(get("channel_flag_permanent")));
+		return toBolI(get("channel_flag_permanent"));
 	}
 
 	public boolean isSemiPermanent() {
-		return toBol(toInt(get("channel_flag_semi_permanent")));
+		return toBolI("channel_flag_semi_permanent");
 	}
 
 	public boolean isDefault() {
-		return toBol(toInt(get("channel_flag_default")));
+		return toBolI("channel_flag_default");
 	}
 
 	public boolean hasPassword() {
-		return toBol(toInt(get("channel_flag_password")));
+		return toBolI("channel_flag_password");
 	}
 	
 	public String getFilePath() {
@@ -112,23 +116,56 @@ public class ChannelInfo extends DefaultInfo {
 	}
 	
 	public int getDeleteDelay() {
-		return toInt(get("channel_delete_delay"));
+		return toIntI("channel_delete_delay");
 	}
 
 	public int getSecondsEmpty() {
-		return toInt(get("seconds_empty"));
+		return toIntI("seconds_empty");
 	}
 
 	public int getIconID() {
-		return toInt(get("channel_icon_id"));
+		return toIntI("channel_icon_id");
+	}
+
+	public String getCodecLatencyFactor() {
+		return get("channel_codec_latency_factor");
 	}
 	
-	public int getTotalClients() {
-		return toInt(get("total_clients"));
+	public boolean isEncrypted() {
+		return toBolI("channel_codec_is_unencrypted");
 	}
 	
-	public int getNeededSubscribePower() {
-		return toInt(get("channel_needed_subscribe_power"));
+	
+	public String getUUID() {
+		return get("channel_unique_identifier");
+	}
+	
+	public boolean hasMaxClientsUnlimited() {
+		return toBolI("channel_flag_maxclients_unlimited");
+	}
+	
+	public boolean hasMaxFamilyClientsUnlimited() {
+		return toBolI("channel_flag_maxfamilyclients_unlimited");
+	}
+	
+	public boolean hasMaxFamilyClientsInherited() {
+		return toBolI("channel_flag_maxfamilyclients_inherited");
+	}
+	
+	public boolean isForcedSilence() {
+		return toBolI("channel_forced_silence");
+	}
+	
+	public String getPhoneticName() {
+		return get("channel_name_phonetic");
+	}
+	
+	public String getBannerGfxURL() {
+		return get("channel_banner_gfx_url");
+	}
+	
+	public String getBannerMode() {
+		return get("channel_banner_mode");
 	}
 	
 	@Override

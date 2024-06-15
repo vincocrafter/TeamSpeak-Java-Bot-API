@@ -35,15 +35,15 @@ public class CreatedAPIKey extends DefaultInfo {
 	}
 
 	public int getID() {
-		return toInt(get("id"));
+		return toIntI("id");
 	}
 
 	public int getServerID() {
-		return toInt(get("sid"));
+		return toIntI("sid");
 	}
 
 	public int getClientDataBaseID() {
-		return toInt(get("cldbid"));
+		return toIntI("cldbid");
 	}
 
 	public APIScope getScope() {
@@ -63,11 +63,11 @@ public class CreatedAPIKey extends DefaultInfo {
 	}
 	
 	public long getTimeCreated() {
-		return toLong(get("created_at"));
+		return toLongI("created_at");
 	}
 	
 	public long getTimeExpire() {
-		return toLong(get("expires_at"));
+		return toLongI("expires_at");
 	}
 	
 	@Override

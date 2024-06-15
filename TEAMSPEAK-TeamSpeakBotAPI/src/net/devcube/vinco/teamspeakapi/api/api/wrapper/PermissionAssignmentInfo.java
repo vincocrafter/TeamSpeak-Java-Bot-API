@@ -27,40 +27,31 @@ public class PermissionAssignmentInfo extends DefaultInfo {
 	}
 	
 	public int getTier() {
-		return toInt(get("t"));
+		return toIntI("t");
 	}
 	
 	public int getFirstID() {
-		return toInt(get("id1"));
+		return toIntI("id1");
 	}
 	
 	public int getSecondID() {
-		return toInt(get("id2"));
+		return toIntI("id2");
 	}
 	
 	public int getPermID() {
-		return toInt(get("p"));
+		return toIntI("p");
 	}
 	
 	public int getPermValue() {
-		if (get("v") == null)
-			return -1;
-		
-		return toInt(get("v"));
+		return toIntI("v");
 	}
 	
 	public boolean isNegated() {
-		if (get("n") == null)
-			return false;
-		
-		return toBol(get("n"));
+		return toBolI("n");
 	}
 	
 	public boolean isSkip() {
-		if (get("s") == null)
-			return false;
-		
-		return toBol(get("s"));
+		return toBolI("s");
 	}
 	
 	@Override

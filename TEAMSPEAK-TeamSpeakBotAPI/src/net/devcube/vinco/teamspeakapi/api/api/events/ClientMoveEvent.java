@@ -6,62 +6,127 @@ import java.util.List;
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
+/**
+ * Represents an event where one or more clients have moved channels.
+ */
 public class ClientMoveEvent extends BaseEvent {
 
-	
-	public ClientMoveEvent(String[] infos, Ts3ServerQuery serverQuery) {
-		super(infos, serverQuery);
-	}
+    /**
+     * Constructs a ClientMoveEvent object with the provided information and server query instance.
+     *
+     * @param infos       An array of strings containing event information.
+     * @param serverQuery The Ts3ServerQuery instance associated with the event.
+     */
+    public ClientMoveEvent(String[] infos, Ts3ServerQuery serverQuery) {
+        super(infos, serverQuery);
+    }
 
-	public List<Integer> getClientIDs() {
-		List<Integer> res = new ArrayList<>();
-		String clids = get("clid");
-		if (clids.contains("|")) {
-			for (String clid : clids.split("\\|")) {
-				res.add(toInt(clid));
-			}
-		} else {
-			res.add(toInt(get("clid")));
-		}
-		
-		return res;
-	}
-	
-	public int getClientID() {
-		return getClientIDs().get(0);
-	}
+    /**
+     * Retrieves the IDs of the clients involved in the move event.
+     *
+     * @return A list of client IDs affected by the move event.
+     */
+    public List<Integer> getClientIDs() {
+        List<Integer> res = new ArrayList<>();
+        String clids = get("clid");
+        if (clids.contains("|")) {
+            for (String clid : clids.split("\\|")) {
+                res.add(toInt(clid));
+            }
+        } else {
+            res.add(toInt(clids));
+        }
+        return res;
+    }
 
-	public int getReasonID() {
-		return toInt(get("reasonid"));
-	}
+    /**
+     * Retrieves the ID of the primary client involved in the move event.
+     *
+     * @return The ID of the primary client that was moved.
+     */
+    public int getClientID() {
+        return getClientIDs().get(0);
+    }
 
-	public int getTargetChannelID() {
-		return toInt(get("ctid"));
-	}
+    /**
+     * Retrieves the reason ID associated with the move event.
+     *
+     * @return The reason ID indicating the cause of the client move.
+     */
+    public int getReasonID() {
+        return toIntI("reasonid");
+    }
 
-	public boolean isTargetChannelID(int id) {
-		return getTargetChannelID() == id;
-	}
+    /**
+     * Retrieves the target channel ID to which the clients were moved.
+     *
+     * @return The ID of the channel where the clients were moved.
+     */
+    public int getTargetChannelID() {
+        return toIntI("ctid");
+    }
 
-	public boolean hasBeenMoved() {
-		return getReasonID() == 1;
-	}
+    /**
+     * Checks if the clients were moved to the specified target channel ID.
+     *
+     * @param id The channel ID to check against the target channel ID.
+     * @return true if the clients were moved to the specified channel ID, false otherwise.
+     */
+    public boolean isTargetChannelID(int id) {
+        return getTargetChannelID() == id;
+    }
 
-	public int getInvokerID() {
-		if (hasBeenMoved())
-			return toInt(get("invokerid"));
-		return -1;
-	}
-	
-	public String getInvokerName() {
-		return get("invokername");
-	}
-	
-	public String getInvokerUUID() {
-		return get("invokeruid");
-	}
-	
-	public String toString() {
-		return "ClientMoveEvent [ClientIDs=" + getClientIDs() + ",ReasonID=" + getReasonID() + ",TargetChannelID=" + getTargetChannelID() + "]";
-	}
+    /**
+     * Checks if the move event was initiated by a client move action.
+     *
+     * @return true if the move event was initiated by a client move action, false otherwise.
+     */
+    public boolean hasBeenMoved() {
+        return getReasonID() == 1;
+    }
+
+    /**
+     * Retrieves the ID of the client who initiated the move event.
+     *
+     * @return The ID of the client who initiated the move, or -1 if not applicable.
+     */
+    public int getInvokerID() {
+        if (hasBeenMoved())
+            return toIntI("invokerid");
+        return -1;
+    }
+
+    /**
+     * Retrieves the name of the client who initiated the move event.
+     *
+     * @return The name of the client who initiated the move.
+     */
+    public String getInvokerName() {
+        return get("invokername");
+    }
+
+    /**
+     * Retrieves the unique identifier of the client who initiated the move event.
+     *
+     * @return The UUID of the client who initiated the move.
+     */
+    public String getInvokerUUID() {
+        return get("invokeruid");
+    }
+
+    /**
+     * Returns a string representation of the ClientMoveEvent object.
+     *
+     * @return A string representation containing ClientIDs, ReasonID, and TargetChannelID.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ClientMoveEvent");
+        sb.append("[ClientIDs=").append(getClientIDs())
+          .append(",ReasonID=").append(getReasonID())
+          .append(",TargetChannelID=").append(getTargetChannelID())
+          .append("]");
+        return sb.toString();
+    }
 }
+

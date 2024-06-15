@@ -28,7 +28,7 @@ public class FileTransferInfo extends DefaultInfo {
 	}
 
 	public int getClientID() {
-		return toInt(get("clid"));
+		return toIntI("clid");
 	}
 	
 	public String getFilePath() {
@@ -48,27 +48,27 @@ public class FileTransferInfo extends DefaultInfo {
 	}
 	
 	public long getSize() {
-		return toLong(get("size"));
+		return toLongI("size");
 	}
 	
 	public long getSizeDone() {
-		return toLong(get("sizedone"));
+		return toLongI("sizedone");
 	}
 	
 	public int getClientFileTransferID() {
-		return toInt(get("clientftfid"));
+		return toIntI("clientftfid");
 	}
 	
 	public int getServerFileTransferID() {
-		return toInt(get("serverftfid"));
+		return toIntI("serverftfid");
 	}
 	
 	public int getStatus() {
-		return toInt(get("status"));
+		return toIntI("status");
 	}
 	
 	public double getCurrentSpeed() {
-		return toDouble(get("current_speed"));
+		return toDoubleI("current_speed");
 	}
 	
 	@Override

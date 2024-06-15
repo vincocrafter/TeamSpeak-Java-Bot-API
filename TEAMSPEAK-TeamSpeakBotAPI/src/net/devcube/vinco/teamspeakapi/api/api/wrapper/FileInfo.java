@@ -27,7 +27,7 @@ public class FileInfo extends DefaultInfo {
 	}
 
 	public int getChannelID() {
-		return toInt(get("cid"));
+		return toIntI("cid");
 	}
 	
 	public String getPath() {
@@ -39,15 +39,15 @@ public class FileInfo extends DefaultInfo {
 	}
 	
 	public long getSize() {
-		return toLong(get("size"));
+		return toLongI("size");
 	}
 	
 	public long getDateTime() {
-		return toLong(get("datetime"));
+		return toLongI("datetime");
 	}
 	
 	public int getFileTypeInt() {
-		return toInt(get("type"));
+		return toIntI("type");
 	}
 	
 	public FileType getFileType() {

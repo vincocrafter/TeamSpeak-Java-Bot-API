@@ -14,7 +14,7 @@ public class OfflineMessageInfo extends DefaultInfo {
 	}
 
 	public int getMessageID() {
-		return toInt(get("msgid"));
+		return toIntI("msgid");
 	}
 	
 	public int getID() {
@@ -34,11 +34,11 @@ public class OfflineMessageInfo extends DefaultInfo {
 	}
 
 	public long getTime() {
-		return toLong(get("time"));
+		return toLongI("time");
 	}
 	
 	public boolean hasRead() {
-		return toBol(get("flag_read"));
+		return toBolI("flag_read");
 	}
 	
 	@Override

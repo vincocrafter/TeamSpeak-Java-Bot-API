@@ -29,11 +29,11 @@ public class InstanceInfo extends DefaultInfo {
 	}
 	
 	public int getDataBaseVersion() {
-		return toInt(get("serverinstance_database_version"));
+		return toIntI("serverinstance_database_version");
 	}
 	
 	public int getFileTransferPort() {
-		return toInt(get("serverinstance_filetransfer_port"));
+		return toIntI("serverinstance_filetransfer_port");
 	}
 	
 	public BigInteger getMaxDownloadTotalBandwidth() {
@@ -45,46 +45,46 @@ public class InstanceInfo extends DefaultInfo {
 	}
 	
 	public int getGuestServerQueryGroup() {
-		return toInt(get("serverinstance_guest_serverquery_group"));
+		return toIntI("serverinstance_guest_serverquery_group");
 	}
 	
 	public int getServerQueryFloodCommands() {
-		return toInt(get("serverinstance_serverquery_flood_commands"));
+		return toIntI("serverinstance_serverquery_flood_commands");
 	}
 	
 	public int getServerQueryFloodTime() {
-		return toInt(get("serverinstance_serverquery_flood_time"));
+		return toIntI("serverinstance_serverquery_flood_time");
 	}
 	
 	public int getServerQueryBanTime() {
-		return toInt(get("serverinstance_serverquery_ban_time"));
+		return toIntI("serverinstance_serverquery_ban_time");
 	}
 	
 	public int getTemplateServerAdminGroup() {
-		return toInt(get("serverinstance_template_serveradmin_group"));
+		return toIntI("serverinstance_template_serveradmin_group");
 	}
 	
 	public int getTemplateServerDefaultGroup() {
-		return toInt(get("serverinstance_template_serverdefault_group"));
+		return toIntI("serverinstance_template_serverdefault_group");
 	}
 	
 	public int getTemplateChannelAdminGroup() {
-		return toInt(get("serverinstance_template_channeladmin_group"));
+		return toIntI("serverinstance_template_channeladmin_group");
 	}
 	
 	public int getTemplateChannelDefaultGroup() {
-		return toInt(get("serverinstance_template_channeldefault_group"));
+		return toIntI("serverinstance_template_channeldefault_group");
 	}
 		
 	public int getPermissionsVersion() {
-		return toInt(get("serverinstance_permissions_version"));
+		return toIntI("serverinstance_permissions_version");
 	}
 	
 	public int getPendingConnectionsPerIP() {
-		return toInt(get("serverinstance_pending_connections_per_ip"));
+		return toIntI("serverinstance_pending_connections_per_ip");
 	}
 	
 	public int getServerQueryMaxConnectionsPerIP() {
-		return toInt(get("serverinstance_serverquery_max_connections_per_ip"));
+		return toIntI("serverinstance_serverquery_max_connections_per_ip");
 	}
 }

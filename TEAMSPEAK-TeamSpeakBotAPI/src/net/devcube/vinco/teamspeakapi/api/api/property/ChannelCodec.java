@@ -5,7 +5,9 @@ public enum ChannelCodec {
    CODEC_SPEEX_NARROWBAND(0),
    CODEC_SPEEX_WIDEBAND(1),
    CODEC_SPEEX_ULTRAWIDEBAND(2),
-   CODEC_CELT_MONO(3);
+   CODEC_CELT_MONO(3),
+   OPUS_VOICE(4),
+   OPUS_MUSIC(5);
 
    private int value = 0;
 

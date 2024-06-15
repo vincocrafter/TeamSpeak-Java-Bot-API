@@ -16,7 +16,7 @@ public class ServerGroupInfo extends DefaultInfo {
 	}
 	
 	public int getServerGroupID() {
-		return toInt(get("sgid"));
+		return toIntI("sgid");
 	}
 	
 	public int getID() {
@@ -33,7 +33,7 @@ public class ServerGroupInfo extends DefaultInfo {
 	
 
 	private int getTypeID() {
-		return toInt(get("type"));
+		return toIntI("type");
 	}
 
 	public ServerGroupType getType() {
@@ -49,19 +49,19 @@ public class ServerGroupInfo extends DefaultInfo {
 	}
 
 	public long getIconID() {
-		return toLong(get("iconid"));
+		return toLongI("iconid");
 	}
 
 	public boolean isSaved() {
-		return toBol(Integer.parseInt(get("savedb")));
+		return toBolI("savedb");
 	}
 
 	public int getSortID() {
-		return toInt(get("sortid"));
+		return toIntI("sortid");
 	}
 	
 	public int getNameModeInt() {
-		return toInt(get("namemode"));
+		return toIntI("namemode");
 	}
 	
 	public NameMode getNameMode() {
@@ -75,11 +75,11 @@ public class ServerGroupInfo extends DefaultInfo {
 	}
 	
 	public int getNeededModifyPower() {
-		return toInt(get("n_modifyp"));
+		return toIntI("n_modifyp");
 	}
 
 	public int getNeededMemberAddPower() {
-		return toInt(get("n_member_addp"));
+		return toIntI("n_member_addp");
 	}
 
 	public int getNeededMemberRemovePower() {

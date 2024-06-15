@@ -24,7 +24,7 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	public int getChannelGroupID() {
-		return toInt(get("cgid"));
+		return toIntI("cgid");
 	}
 	
 	public String getName() {
@@ -36,7 +36,7 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	private int getTypeID() {
-		return toInt(get("type"));
+		return toIntI("type");
 	}
 
 	public ChannelGroupType getType() {
@@ -50,17 +50,17 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 
 	public boolean isSaved() {
-		return toBol(toInt(get("savedb")));
+		return toBolI("savedb");
 	}
 	
 	public int getSortID() {
-		return toInt(get("sortid"));
+		return toIntI("sortid");
 	}
 	
 	public int getNameModeInt() {
-		return toInt(get("namemode"));
+		return toIntI("namemode");
 	}
-	
+		
 	public NameMode getNameMode() {
 		int nameMode = getNameModeInt();
 		for (NameMode modes : NameMode.values()) {
@@ -72,15 +72,19 @@ public class ChannelGroupInfo extends DefaultInfo {
 	}
 	
 	public int getNeededModifyPower() {
-		return toInt(get("n_modifyp"));
+		return toIntI("n_modifyp");
 	}
 
 	public int getNeededMemberAddPower() {
-		return toInt(get("n_member_addp"));
+		return toIntI("n_member_addp");
 	}
 
 	public int getNeededMemberRemovePower() {
-		return toInt(get("n_member_removep"));
+		return toIntI("n_member_removep");
+	}
+	
+	public int getIconID() {
+		return toIntI("iconid");
 	}
 	
 	public String toString() {

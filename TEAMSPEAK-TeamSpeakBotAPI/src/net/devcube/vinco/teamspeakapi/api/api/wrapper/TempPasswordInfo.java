@@ -44,15 +44,15 @@ public class TempPasswordInfo extends DefaultInfo {
 	}
 	
 	public long getStartTime() {
-		return toLong(get("start"));
+		return toLongI("start");
 	}
 	
 	public long getEndTime() {
-		return toLong(get("end"));
+		return toLongI("end");
 	}
 	
 	public int getTargetChannelID() {
-		return toInt(get("tcid"));
+		return toIntI("tcid");
 	}
 	
 	@Override

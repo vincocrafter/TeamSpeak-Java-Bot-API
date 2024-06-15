@@ -1,7 +1,8 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.EncryptionMode;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerStatus;
@@ -55,7 +56,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getEncryptionModeInt() {
-		return toInt(get("virtualserver_codec_encryption_mode"));
+		return toIntI("virtualserver_codec_encryption_mode");
 	}
 
 	public EncryptionMode getEncryptionMode() {
@@ -69,7 +70,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getServerID() {
-		return toInt(get("virtualserver_id"));
+		return toIntI("virtualserver_id");
 	}
 
 	public int getID() {
@@ -89,19 +90,19 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getMaxclients() {
-		return toInt(get("virtualserver_maxclients"));
+		return toIntI("virtualserver_maxclients");
 	}
 
 	public int getChannels() {
-		return toInt(get("virtualserver_channelsonline"));
+		return toIntI("virtualserver_channelsonline");
 	}
 
 	public long getCreatingTime() {
-		return toLong(get("virtualserver_created"));
+		return toLongI("virtualserver_created");
 	}
 
 	public int getOnlineClientsSize() {
-		return toInt(get("virtualserver_clientsonline"));
+		return toIntI("virtualserver_clientsonline");
 	}
 
 	public String getHostMessage() {
@@ -109,7 +110,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getHostMessageMode() {
-		return toInt(get("virtualserver_hostmessage_mode"));
+		return toIntI("virtualserver_hostmessage_mode");
 	}
 
 	public String getDefaultFilePath() {
@@ -117,15 +118,15 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getDefaultServerGroup() {
-		return toInt(get("virtualserver_default_server_group"));
+		return toIntI("virtualserver_default_server_group");
 	}
 
 	public int getDefaultChannelGroup() {
-		return toInt(get("virtualserver_default_channel_group"));
+		return toIntI("virtualserver_default_channel_group");
 	}
 
 	public int getDefaultChannelAdminGroup() {
-		return toInt(get("virtualserver_default_channel_admin_group"));
+		return toIntI("virtualserver_default_channel_admin_group");
 	}
 
 	public BigInteger getMaxDownloadTotalBandwidth() {
@@ -137,7 +138,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public boolean hasPassword() {
-		return toBol(toInt(get("virtualserver_flag_password")));
+		return toBolI("virtualserver_flag_password");
 	}
 
 	public String getHostBannerURL() {
@@ -145,19 +146,19 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getComplainAutoBanCount() {
-		return toInt(get("virtualserver_complain_autoban_count"));
+		return toIntI("virtualserver_complain_autoban_count");
 	}
 
 	public int getAutoBanTime() {
-		return toInt(get("virtualserver_complain_autoban_time"));
+		return toIntI("virtualserver_complain_autoban_time");
 	}
 
 	public int getComplainRemoveTime() {
-		return toInt(get("virtualserver_complain_remove_time"));
+		return toIntI("virtualserver_complain_remove_time");
 	}
 
 	public int getMinClientsBeforeForcedSilence() {
-		return toInt(get("virtualserver_min_clients_in_channel_before_forced_silence"));
+		return toIntI("virtualserver_min_clients_in_channel_before_forced_silence");
 	}
 
 	public int getPrioritySpeakerDimmModificator() {
@@ -166,75 +167,71 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getClientConnections() {
-		return toInt(get("virtualserver_client_connections"));
+		return toIntI("virtualserver_client_connections");
 	}
 
 	public int getQueryConnections() {
-		return toInt(get("virtualserver_query_client_connections"));
+		return toIntI("virtualserver_query_client_connections");
 	}
 
 	public int getServerPort() {
-		return toInt(get("virtualserver_port"));
+		return toIntI("virtualserver_port");
 	}
 
 	public boolean isAutoStart() {
-		return toBol(toInt(get("virtualserver_autostart")));
+		return toBolI("virtualserver_autostart");
 	}
 
 	public int getSecurityLevel() {
-		return toInt(get("virtualserver_needed_identity_security_level"));
+		return toIntI("virtualserver_needed_identity_security_level");
 	}
 
 	public boolean isLogClient() {
-		return toBol(toInt(get("virtualserver_log_client")));
+		return toBolI("virtualserver_log_client");
 	}
 
 	public boolean isLogQuery() {
-		return toBol(toInt(get("virtualserver_log_query")));
+		return toBolI("virtualserver_log_query");
 	}
 
 	public boolean isLogChannel() {
-		return toBol(toInt(get("virtualserver_log_channel")));
+		return toBolI("virtualserver_log_channel");
 	}
 
 	public boolean isLogPermissions() {
-		return toBol(toInt(get("virtualserver_log_permissions")));
+		return toBolI("virtualserver_log_permissions");
 	}
 
 	public boolean isLogServer() {
-		return toBol(toInt(get("virtualserver_log_server")));
+		return toBolI("virtualserver_log_server");
 	}
 
 	public boolean isLogFiletransfer() {
-		return toBol(toInt(get("virtualserver_log_filetransfer")));
+		return toBolI("virtualserver_log_filetransfer");
 	}
 
 	public int getReservedSlots() {
-		return toInt(get("virtualserver_reserved_slots"));
+		return toIntI("virtualserver_reserved_slots");
 	}
 
 	public long getServerIconID() {
-		return toLong(get("virtualserver_icon_id"));
+		return toLongI("virtualserver_icon_id");
 	}
 
 	public double getTotalPacketlossSpeech() {
-		return toDouble(get("virtualserver_total_packetloss_speech"));
+		return toDoubleI("virtualserver_total_packetloss_speech");
 	}
 
 	public double getTotalPacketlossKeepAlive() {
-		return toDouble(get("virtualserver_total_packetloss_keepalive"));
+		return toDoubleI("virtualserver_total_packetloss_keepalive");
 	}
 
 	public double getTotalPacketlossControl() {
-		return toDouble(get("virtualserver_total_packetloss_control"));
-	}
-
-	public double getTotalPing() {
-		return toDouble(get("virtualserver_total_ping"));
+		return toDoubleI("virtualserver_total_packetloss_control");
 	}
 
 	public int getQuerysOnlineSize() {
-		return toInt(get("virtualserver_queryclientsonline"));
+		return toIntI("virtualserver_queryclientsonline");
 	}
 
 	public String getHostbannerGFXURL() {
@@ -242,19 +239,19 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getHostBannerGFXInterval() {
-		return toInt(get("virtualserver_hostbanner_gfx_interval"));
+		return toIntI("virtualserver_hostbanner_gfx_interval");
 	}
 
 	public int getAntifloodPointsTickReduce() {
-		return toInt(get("virtualserver_antiflood_points_tick_reduce"));
+		return toIntI("virtualserver_antiflood_points_tick_reduce");
 	}
 
 	public int getAntifloodPointsNeededCommandBlock() {
-		return toInt(get("virtualserver_antiflood_points_needed_command_block"));
+		return toIntI("virtualserver_antiflood_points_needed_command_block");
 	}
 
 	public int getAntifloodPointsNeededIPBlock() {
-		return toInt(get("virtualserver_antiflood_points_needed_ip_block"));
+		return toIntI("virtualserver_antiflood_points_needed_ip_block");
 	}
 
 	public String getHostbuttonTooltip() {
@@ -278,19 +275,19 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getMonthBytesDownloaded() {
-		return toInt(get("virtualserver_month_bytes_downloaded"));
+		return toIntI("virtualserver_month_bytes_downloaded");
 	}
 
 	public int getMonthBytesUploaded() {
-		return toInt(get("virtualserver_month_bytes_uploaded"));
+		return toIntI("virtualserver_month_bytes_uploaded");
 	}
 
 	public int getTotalBytesDownloaded() {
-		return toInt(get("virtualserver_total_bytes_downloaded"));
+		return toIntI("virtualserver_total_bytes_downloaded");
 	}
 
 	public int getTotalBytesUploaded() {
-		return toInt(get("virtualserver_total_bytes_uploaded"));
+		return toIntI("virtualserver_total_bytes_uploaded");
 	}
 
 	public String getMachineID() {
@@ -298,7 +295,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public long getMinClientVersion() {
-		return toLong(get("virtualserver_min_client_version"));
+		return toLongI("virtualserver_min_client_version");
 	}
 
 	public String getPhoneticName() {
@@ -310,31 +307,31 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public boolean isWeblistEnabled() {
-		return toBol(toInt(get("virtualserver_weblist_enabled")));
+		return toBolI("virtualserver_weblist_enabled");
 	}
 
 	public boolean isAskForPrivilegeKey() {
-		return toBol(toInt(get("virtualserver_ask_for_privilegekey")));
+		return toBolI("virtualserver_ask_for_privilegekey");
 	}
 
 	public int getHostbannerMode() {
-		return toInt(get("virtualserver_hostbanner_mode"));
+		return toIntI("virtualserver_hostbanner_mode");
 	}
 
 	public int getChannelTempDeleteDefaultDelay() {
-		return toInt(get("virtualserver_channel_temp_delete_delay_default"));
+		return toIntI("virtualserver_channel_temp_delete_delay_default");
 	}
 
 	public long getMinAndroidVersion() {
-		return toLong(get("virtualserver_min_android_version"));
+		return toLongI("virtualserver_min_android_version");
 	}
 
 	public long getMinIOSVersion() {
-		return toLong(get("virtualserver_min_ios_version"));
+		return toLongI("virtualserver_min_ios_version");
 	}
 
 	public int getAntifloodPointsNeededPluginBlock() {
-		return toInt(get("virtualserver_antiflood_points_needed_plugin_block"));
+		return toIntI("virtualserver_antiflood_points_needed_plugin_block");
 	}
 
 	public String getCapabilityExtensions() {
@@ -346,65 +343,76 @@ public class VirtualServerInfo extends DefaultInfo {
 	}
 
 	public int getPacketsSendSpeech() {
-		return toInt(get("connection_packets_sent_speech"));
+		return toIntI("connection_packets_sent_speech");
 	}
 
 	public int getBytesPacketsSendSpeech() {
-		return toInt(get("connection_bytes_sent_speech"));
+		return toIntI("connection_bytes_sent_speech");
 	}
 
 	public int getPacketsRecivedSpeech() {
-		return toInt(get("connection_packets_received_speech"));
+		return toIntI("connection_packets_received_speech");
 	}
 
 	public int getBytesPacketsRecivedSpeech() {
-		return toInt(get("connection_bytes_received_speech"));
+		return toIntI("connection_bytes_received_speech");
 	}
 
 	public int getPacketsSendKeepalive() {
-		return toInt(get("connection_packets_sent_keepalive"));
+		return toIntI("connection_packets_sent_keepalive");
 	}
 
 	public int getBytesPacketsSendKeepalive() {
-		return toInt(get("connection_bytes_sent_keepalive"));
+		return toIntI("connection_bytes_sent_keepalive");
 	}
 
 	public int getPacketsRecivedKeepalive() {
-		return toInt(get("connection_packets_received_keepalive"));
+		return toIntI("connection_packets_received_keepalive");
 	}
 
 	public int getBytesPacketsRecivedKeepalive() {
-		return toInt(get("connection_bytes_received_keepalive"));
+		return toIntI("connection_bytes_received_keepalive");
 	}
 
 	public int getPacketsSendControl() {
-		return toInt(get("connection_packets_sent_control"));
+		return toIntI("connection_packets_sent_control");
 	}
 
 	public int getBytesPacketsSendControl() {
-		return toInt(get("connection_bytes_sent_control"));
+		return toIntI("connection_bytes_sent_control");
 	}
 
 	public int getPacketsRecivedControl() {
-		return toInt(get("connection_packets_received_control"));
+		return toIntI("connection_packets_received_control");
 	}
 
 	public int getBytesPacketsRecivedControl() {
-		return toInt(get("connection_bytes_received_control"));
+		return toIntI("connection_bytes_received_control");
 	}
 
 	public ConnectionInfo getConnectionInfo() {
 		if (connectionInfo == null) {
-			this.connectionInfo = new ConnectionInfo(Arrays.copyOfRange(getInfos(), 92, getInfos().length));
-
-			connectionInfo.addInfo("connection_filetransfer_bandwidth_sent", get("connection_filetransfer_bandwidth_sent"));
-			connectionInfo.addInfo("connection_filetransfer_bandwidth_received", get("connection_filetransfer_bandwidth_received"));
-			connectionInfo.addInfo("connection_filetransfer_bytes_sent_total", get("connection_filetransfer_bytes_sent_total"));
-			connectionInfo.addInfo("connection_filetransfer_bytes_received_total", get("connection_filetransfer_bytes_received_total"));
-
-			connectionInfo.addInfo("connection_connected_time", get("virtualserver_uptime"));
-			connectionInfo.addInfo("connection_packetloss_total", String.valueOf(get("virtualserver_total_packetloss_total")));
-			connectionInfo.addInfo("connection_ping", String.valueOf(getTotalPing()));
+			this.connectionInfo = new ConnectionInfo("");
+			List<String> copyInfos = new ArrayList<>();
+			copyInfos.add("connection_filetransfer_bandwidth_sent");
+			copyInfos.add("connection_filetransfer_bandwidth_received");
+			copyInfos.add("connection_filetransfer_bytes_sent_total");
+			copyInfos.add("connection_filetransfer_bytes_received_total");
+			copyInfos.add("connection_packets_sent_total");
+			copyInfos.add("connection_bytes_sent_total");
+			copyInfos.add("connection_packets_received_total");
+			copyInfos.add("connection_bytes_received_total");
+			copyInfos.add("connection_bandwidth_sent_last_second_total");
+			copyInfos.add("connection_bandwidth_sent_last_minute_total");
+			copyInfos.add("connection_bandwidth_received_last_second_total");
+			copyInfos.add("connection_bandwidth_received_last_minute_total");
+			
+			for (String infos : copyInfos) {
+				copyInfoTo(infos, connectionInfo, infos);
+			}
+			copyInfoTo("virtualserver_uptime", connectionInfo, "connection_connected_time");
+			copyInfoTo("virtualserver_total_packetloss_total", connectionInfo, "connection_packetloss_total");
+			copyInfoTo("virtualserver_total_ping", connectionInfo, "connection_ping");
 		}
 		return connectionInfo;
 	}
