@@ -35,17 +35,18 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	@EventHandler
 	public void onChannelCreate(ChannelCreateEvent e) {
 		if (e.getConfig().isChannelsCached()) {
-			e.getCache().updateChannelsListCache(); // only update channellist info
-			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+			CacheManager cache = e.getServerQuery().getCache();
+			cache.updateChannelsListCache(); // only update channellist info
+			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
 		}
-
 	}
 
 	@EventHandler
 	public void onChannelDeleted(ChannelDeletedEvent e) {
 		if (e.getConfig().isChannelsCached()) {
-			e.getCache().updateChannelsListCache(); // only update channellist info
-			e.getCache().cacheRemoveChannel(e.getChannelID());
+			CacheManager cache = e.getServerQuery().getCache();
+			cache.removeChannelListCacheChannel(e.getChannelID()); // only update channellist info
+			cache.cacheRemoveChannel(e.getChannelID());
 		}
 	}
 
@@ -57,16 +58,20 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	@EventHandler
 	public void onChannelEdit(ChannelEditedEvent e) {
 		if (e.getConfig().isChannelsCached()) {
-			e.getCache().updateChannelsListCache(); // only update channellist info
-			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+			CacheManager cache = e.getServerQuery().getCache();
+			cache.updateChannelsListCache(); // only update channellist info
+			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
 		}
+		
+		
 	}
 
 	@EventHandler
 	public void onChannelMoved(ChannelMovedEvent e) {
 		if (e.getConfig().isChannelsCached()) {
-			e.getCache().updateChannelsListCache(); // only update channellist info
-			e.getCache().updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+			CacheManager cache = e.getServerQuery().getCache();
+			cache.updateChannelsListCache(); // only update channellist info
+			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
 		}
 	}
 
@@ -77,21 +82,16 @@ public class CacheManagerUpdater extends TsEventAdapter {
 
 	@EventHandler
 	public void onClientJoin(ClientJoinEvent e) {
-		CacheManager cache = e.getCache();
+		CacheManager cache = e.getServerQuery().getCache();
 
 		if (e.getConfig().isClientsCached()) {
 			cache.updateClientListCache(); // only update clientlist info
 			cache.updateClientCache(e.getClientID()); // only update clientinfo of client
 		}
-
+		
 		if (e.getConfig().isDataBaseCached()) {
-			int dbID = 0;
-			if (e.getConfig().isClientsCached()) {
-				dbID = Integer.parseInt(Formatter.get(cache.getClientInfo(e.getClientID()), "client_database_id="));
-			} else {
-				dbID = e.getSyncAPI().getClientDataBaseIDByUUID(e.getClientUUID());
-			}
-			cache.updateDBClientCache(dbID); // only update databaseinfo of client
+			cache.updateDBClientCache(e.getClientDataBaseID()); // only update databaseinfo of client
+			cache.updateDBClientsListCache();
 		}
 	}
 
@@ -99,19 +99,24 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	public void onClientLeave(ClientLeaveEvent e) {
 		CacheManager cache = e.getServerQuery().getCache();
 
+		if (e.getConfig().isDataBaseCached()) {
+			cache.updateDBClientsListCache();
+		}
+
 		if (!e.getConfig().isClientsCached())
 			return;
 
+		int clientID = e.getClientID();
 		if (e.getConfig().isDataBaseCached()) // update Database cache is only possible if client caching is enabled
-			cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(e.getClientID()), "client_database_id="))); // only update databaseinfo of client
-
-		cache.updateClientListCache(); // only update clientlist info
-		cache.cacheRemoveClient(e.getClientID());
+			cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(clientID), "client_database_id="))); // only update databaseinfo of client
+		
+		cache.removeClientListCacheClient(clientID);
+		cache.cacheRemoveClient(clientID);
 	}
 
 	@EventHandler
 	public void onClientMove(ClientMoveEvent e) {
-		CacheManager cache = e.getCache();
+		CacheManager cache = e.getServerQuery().getCache();
 
 		if (e.getConfig().isClientsCached()) {
 			cache.updateClientListCache(); // only update clientlist info
@@ -120,7 +125,7 @@ public class CacheManagerUpdater extends TsEventAdapter {
 			int invoker = e.getInvokerID();
 			if (invoker != -1)
 				ids.add(invoker); // update clientinfo of invoker
-
+						
 			cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
 		}
 
@@ -143,8 +148,9 @@ public class CacheManagerUpdater extends TsEventAdapter {
 	@EventHandler
 	public void onServerEdit(ServerEditedEvent e) {
 		if (e.getConfig().isVirtualServerCached()) {
-			e.getServerQuery().getCache().updateVirtualServerCache(); // only update virtual server properties
-			e.getServerQuery().getCache().updateVirtualServerListCache(); // only update list of virtualservers
+			CacheManager cache = e.getServerQuery().getCache();
+			cache.updateVirtualServerCache(); // only update virtual server properties
+			cache.updateVirtualServerListCache(); // only update list of virtualservers
 		}
 	}
 

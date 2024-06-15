@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.CommandBuilder;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
@@ -119,12 +120,30 @@ public class CacheManager {
 		}
 		
 		query.debug(DebugOutputType.CACHEMANAGER, "Preparing caching process took " + (System.currentTimeMillis() - startTime) + " Miliseconds to finish!");
-
 	}
 
+	public void clearCache() {
+		cache.clear();
+	}
+	
 
 	public void updateClientListCache() {
 		cache.put(CLIENT_LIST, getInformation(CommandBuilder.buildGetClientsCommand())); // update clientlist
+	}
+	
+	protected void addClientListCacheClient(String information) {
+		cache.put(CLIENT_LIST, getClientsList().concat("|").concat(information));
+	}
+	
+	protected void removeClientListCacheClient(int clientID) {
+		String clientList = getClientsList();
+		StringJoiner newList = new StringJoiner("|");
+		for (String clients : clientList.split(TS_INFO_SEPARATOR)) {
+			if (!clients.contains("clid=" + clientID)) {
+				newList.add(clients);
+			}
+		}
+		cache.put(CLIENT_LIST, newList.toString());
 	}
 
 	public void updateClientCache(int clientID) {
@@ -148,6 +167,17 @@ public class CacheManager {
 	
 	public void updateChannelsListCache() {
 		cache.put(CHANNEL_LIST, getInformation(CommandBuilder.buildGetChannelsCommand())); // update Channellist
+	}
+	
+	protected void removeChannelListCacheChannel(int channelID) {
+		String channelList = getChannelsList();
+		StringJoiner newList = new StringJoiner("|");
+		for (String channels : channelList.split(TS_INFO_SEPARATOR)) {
+			if (!channels.contains("cid=" + channelID)) {
+				newList.add(channels);
+			}
+		}
+		cache.put(CHANNEL_LIST, newList.toString());
 	}
 	
 	public void updateChannelCache(int channelID) {
@@ -197,11 +227,11 @@ public class CacheManager {
 		cache.put(PERMS_LIST, pList);
 		
 		//Would store the List of permission ids as seperated list like 1 2 3...
-		 StringBuilder ids = new StringBuilder();
+		 StringJoiner ids = new StringJoiner(" ");
 		for (String perm : pList.split("permid=")) {
 			String permID = perm.split(" ")[0];
 			if (!permID.isEmpty())
-				ids.append(permID).append(" ");
+				ids.add(permID);
 		}
 		cache.put(PERMS_LIST + SEPARATOR + "IDS", ids.toString());
 	}
