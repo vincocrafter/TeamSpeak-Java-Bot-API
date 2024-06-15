@@ -410,10 +410,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	public List<ChannelInfo> getChannelsDetailed() {
 		List<ChannelInfo> resultList = new ArrayList<ChannelInfo>();
 		getChannelsByCommand("channellist").forEach(channels -> {
-			ChannelInfo chInfo = getChannel(channels.getID());
-			chInfo.addInfo("total_clients", channels.get("total_clients"));
-			chInfo.addInfo("channel_needed_subscribe_power", channels.get("channel_needed_subscribe_power"));
-			resultList.add(chInfo);
+			resultList.add(getChannel(channels.getID()));
 		});
 		return resultList;
 	}

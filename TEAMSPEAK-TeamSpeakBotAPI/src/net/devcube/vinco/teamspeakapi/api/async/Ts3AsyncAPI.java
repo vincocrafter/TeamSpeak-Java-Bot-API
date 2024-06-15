@@ -937,7 +937,11 @@ public class Ts3AsyncAPI {
 
 			@Override
 			public Integer transformResult(String result) {
-				return Integer.parseInt(Formatter.get(result, property));
+				try {
+					return Integer.parseInt(Formatter.get(result, property));
+				} catch (NumberFormatException e) {
+					return -2;
+				}
 			}
 
 		});

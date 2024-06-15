@@ -405,10 +405,10 @@ public class Ts3BasicAPI {
 	public ConnectionInfo getConnectionInfo() {
 		return executeCommandGetObject(CommandBuilder.buildGetConnectionInfoCommand(), ConnectionInfo::new);
 	}
+	
 	public String getVersion() {
 		return writer.executeReadCommand(CommandBuilder.buildGetVersionCommand())[0];
 	}
-
 
 	public OfflineMessageInfo getOfflineMessage(int messageID) {
 		return executeCommandGetObject(CommandBuilder.buildGetOfflineMessageCommand(messageID), OfflineMessageInfo::new);
@@ -1481,10 +1481,16 @@ public class Ts3BasicAPI {
 	 *                                Type of servergroup to choose between
 	 *                                ServerQuery group, template or normal group.
 	 * 
-	 * @return
+	 * @return -1 if the targetServerGroupID is NOT 0. And the new servergroup id otherwise.
 	 */
 
 	public int copyServerGroup(int sourceServerGroupID, int targetServerGroupID, String serverGroupName, ServerGroupType serverGroupType) {
+		String cmd = CommandBuilder.buildCopyServerGroupCommand(sourceServerGroupID, targetServerGroupID, serverGroupName, serverGroupType);
+		if (targetServerGroupID != 0) {
+			writer.executeReadErrorCommand(cmd);
+			return -1;
+		}
+		
 		return executeCommandGetIntResult(CommandBuilder.buildCopyServerGroupCommand(sourceServerGroupID, targetServerGroupID, serverGroupName, serverGroupType), "sgid=");
 	}
 
