@@ -393,7 +393,7 @@ public class VirtualServerInfo extends DefaultInfo {
 	public ConnectionInfo getConnectionInfo() {
 		if (connectionInfo == null) {
 			this.connectionInfo = new ConnectionInfo("");
-			List<String> copyInfos = new ArrayList<>();
+			List<String> copyInfos = new ArrayList<>(12);
 			copyInfos.add("connection_filetransfer_bandwidth_sent");
 			copyInfos.add("connection_filetransfer_bandwidth_received");
 			copyInfos.add("connection_filetransfer_bytes_sent_total");

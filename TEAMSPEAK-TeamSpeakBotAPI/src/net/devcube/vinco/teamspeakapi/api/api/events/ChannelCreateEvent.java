@@ -183,7 +183,7 @@ public class ChannelCreateEvent extends BaseEvent {
     /**
      * Retrieves the channel's delete delay in seconds.
      *
-     * @return The delete delay of the channel.
+     * @return The delete-delay of the channel.
      */
     public int getDeleteDelay() {
         return toIntI("channel_delete_delay");

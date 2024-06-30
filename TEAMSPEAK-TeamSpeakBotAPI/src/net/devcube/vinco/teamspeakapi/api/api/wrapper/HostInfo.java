@@ -52,7 +52,7 @@ public class HostInfo extends DefaultInfo {
 	public Connection getConnection() {
 		if (hostConnection == null) {
 			this.hostConnection = new Connection("");
-			List<String> copyInfos = new ArrayList<>();
+			List<String> copyInfos = new ArrayList<>(10);
 			
 			copyInfos.add("connection_filetransfer_bandwidth_sent");
 			copyInfos.add("connection_filetransfer_bandwidth_received");

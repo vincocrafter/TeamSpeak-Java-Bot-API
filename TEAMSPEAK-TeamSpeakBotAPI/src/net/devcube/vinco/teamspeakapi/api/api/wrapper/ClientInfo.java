@@ -209,16 +209,11 @@ public class ClientInfo extends DefaultInfo {
 	 */
 
 	public List<Integer> getServerGroups() {
-		String servergroups = get("client_servergroups");
-		List<Integer> arraylist = new ArrayList<Integer>();
-		if (servergroups.contains(",")) {
-			for (String ids : servergroups.split(",")) {
-				arraylist.add(toInt(ids));
-			}
-		} else {
-			arraylist.add(toInt(servergroups));
+		String[] split = get("client_servergroups").split(",");
+		List<Integer> arraylist = new ArrayList<>(split.length);
+		for (String ids : split) {
+			arraylist.add(toInt(ids));
 		}
-
 		return arraylist;
 	}
 
@@ -591,7 +586,7 @@ public class ClientInfo extends DefaultInfo {
 	public Connection getConnection() {
 		if (clientConnection == null) {
 			this.clientConnection = new Connection("");
-			List<String> copyInfos = new ArrayList<>();
+			List<String> copyInfos = new ArrayList<>(10);
 			copyInfos.add("connection_connected_time");
 			copyInfos.add("connection_filetransfer_bandwidth_sent");
 			copyInfos.add("connection_filetransfer_bandwidth_received");

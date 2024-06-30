@@ -87,7 +87,7 @@ public class ChannelInfo extends DefaultInfo {
 	}
 
 	public boolean isPermanent() {
-		return toBolI(get("channel_flag_permanent"));
+		return toBolI("channel_flag_permanent");
 	}
 
 	public boolean isSemiPermanent() {

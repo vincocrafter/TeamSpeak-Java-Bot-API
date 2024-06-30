@@ -3,13 +3,13 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
-public class ComplainInfo extends DefaultInfo {
+public class ComplaintInfo extends DefaultInfo {
 
-	public ComplainInfo(String[] infos) {
+	public ComplaintInfo(String[] infos) {
 		super(infos);
 	}
 	
-	public ComplainInfo(String infos) {
+	public ComplaintInfo(String infos) {
 		super(infos);
 	}
 

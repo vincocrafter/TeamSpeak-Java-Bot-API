@@ -18,10 +18,10 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Logger.TSLogLevel;
  */
 public enum DebugOutputType {
   
-    EVERYTHING(TSLogLevel.INFO),  
-    GENERAL(TSLogLevel.INFO),              
+    EVERYTHING(TSLogLevel.INFO),
+    GENERAL(TSLogLevel.INFO),
     EVENTMANAGER(TSLogLevel.EVENT_MANAGER),  
-    KEEPALIVETHREAD(TSLogLevel.INFO),    
+    KEEPALIVETHREAD(TSLogLevel.INFO),
     QUERY(TSLogLevel.QUERY),             
     QUERYREADER(TSLogLevel.QUERY_READER), 
     QUERYWRITER(TSLogLevel.QUERY_WRITER),  

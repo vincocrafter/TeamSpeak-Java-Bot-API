@@ -13,6 +13,7 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.APIScope;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
@@ -85,16 +86,15 @@ public class CommandBuilder {
 	}
 
 	public static String buildLogoutCommand() {
-		return new StringBuilder("logout").toString();
+		return "logout";
 	}
 
 	public static String buildQuitCommand() {
-		return new StringBuilder("quit").toString();
+		return "quit";
 	}
 
 	public static String buildgetQueryInfoCommand() {
-		StringBuilder cmd = new StringBuilder("whoami");
-		return cmd.toString();
+		return "whoami";
 	}
 
 	public static String buildGetVirtualServerIDByPort(int port) {
@@ -110,7 +110,7 @@ public class CommandBuilder {
 	}
 
 	public static String buildGetPermissionListCommand() {
-		return new StringBuilder("permissionlist").toString();
+		return "permissionlist";
 	}
 
 	public static String buildGetPermissionNameByIDCommand(int permissionID) {
@@ -161,15 +161,15 @@ public class CommandBuilder {
 	}
 
 	public static String buildGetChannelGroupsCommand() {
-		return new StringBuilder("channelgrouplist").toString();
+		return "channelgrouplist";
 	}
 
 	public static String buildGetServerInfoCommand() {
-		return new StringBuilder("serverinfo").toString();
+		return "serverinfo";
 	}
 
 	public static String buildGetConnectionInfoCommand() {
-		return new StringBuilder("serverrequestconnectioninfo").toString();
+		return "serverrequestconnectioninfo";
 	}
 
 	public static String buildGetOfflineMessageCommand(int messageID) {
@@ -195,11 +195,11 @@ public class CommandBuilder {
 	}
 
 	public static String buildGetOfflineMessagesCommand() {
-		return new StringBuilder("messagelist").toString();
+		return "messagelist";
 	}
 
 	public static String buildGetHostInfoCommand() {
-		return new StringBuilder("hostinfo").toString();
+		return "hostinfo";
 	}
 
 	public static String buildGetClientIDsByUUIDsCommand(List<String> clientUUIDs) {
@@ -320,15 +320,15 @@ public class CommandBuilder {
 	}
 
 	public static String buildGetPrivilegeKeysCommand() {
-		return new StringBuilder("privilegekeylist").toString();
+		return "privilegekeylist";
 	}
 
 	public static String buildGetComplainsCommand() {
-		return new StringBuilder("complainlist").toString();
+		return "complainlist";
 	}
 
 	public static String buildGetBansCommand() {
-		return new StringBuilder("banlist").toString();
+		return "banlist";
 	}
 
 	public static String buildGetVirtualServersCommand() {
@@ -339,7 +339,7 @@ public class CommandBuilder {
 	}
 	
 	public static String buildGetVersionCommand() {
-		return new StringBuilder("version").toString();
+		return "version";
 	}
 
 	public static String buildAddBanCommand(String ip, String name, String clientUUID, String myTSID, long banTime, String banReason) {
@@ -375,7 +375,7 @@ public class CommandBuilder {
 	}
 	
 	public static String buildRemoveAllBansCommand() {
-		return new StringBuilder("bandelall").toString();
+		return "bandelall";
 	}
 
 	public static String buildStartVirtualServerCommand(int virtualServerID) {
@@ -400,7 +400,7 @@ public class CommandBuilder {
 	}
 	
 	public static String buildResetPermissionsCommand() {
-		return new StringBuilder("permreset").toString();
+		return "permreset";
 	}
 
 	public static String buildAddChannelPermissionsCommand(int channelID, List<Permission> permissions) {
@@ -1034,45 +1034,38 @@ public class CommandBuilder {
 	}
 	
 	public static String buildUnRegisterAllEventsCommand() {
-		return new StringBuilder("servernotifyunregister").toString();
+		return "servernotifyunregister";
 	}
 
 	public static String buildObjectArray(List<? extends Object> objects, String key) {
-		StringBuilder list = new StringBuilder();
-		objects.forEach(object -> {
-			if (!object.equals(objects.get(0)))
-				list.append("|");
-			list.append(key).append("=").append(Formatter.toTsFormat(object.toString()));
-		});
+		StringJoiner list = new StringJoiner("|");
+	    objects.forEach(object -> {
+	    	list.add(new StringBuilder(key).append("=").append(Formatter.toTsFormat(object.toString())));
+	    });
+		
 		return list.toString();
 	}
 
 	public static String buildAddPermsArray(List<Permission> permissions) {
-		StringBuilder list = new StringBuilder();
+		StringJoiner result = new StringJoiner("|");
 		permissions.forEach(perms -> {
-			if (perms.getName() != null) {
-				if (perms.getID() != permissions.get(0).getID() && !perms.getName().equals(permissions.get(0).getName()))
-					list.append("|");
-			} else {
-				if (perms.getID() != permissions.get(0).getID())
-					list.append("|");
-			}
-
+			StringJoiner permBuilder = new StringJoiner(" ");
+			
 			if (perms.getPermID() != -1) {
-				list.append("permid=").append(perms.getPermID());
-				if (perms.getName() == null)
-					list.append(" ");
+				permBuilder.add(new StringBuilder("permid=").append(perms.getPermID()));
 			}
-
-			if (perms.getName() != null)
-				list.append("permsid=").append(perms.getName());
+			
+			if (perms.getName() != null && !perms.getName().isEmpty())
+				permBuilder.add(new StringBuilder("permsid=").append(perms.getName()));
+			
 			if (perms.getValue() != -1)
-				list.append(" permvalue=").append(perms.getValue());
+				permBuilder.add(new StringBuilder("permvalue=").append(perms.getValue()));
 
-			list.append(" permnegated=").append(Formatter.toInt(perms.isNegated()));
-			list.append(" permskip=").append(Formatter.toInt(perms.isSkip()));
+			permBuilder.add(new StringBuilder("permnegated=").append(Formatter.toInt(perms.isNegated())));
+			permBuilder.add(new StringBuilder("permskip=").append(Formatter.toInt(perms.isSkip())));
+			result.add(permBuilder.toString());
 		});
-		return list.toString();
+		return result.toString();
 	}
 
 }

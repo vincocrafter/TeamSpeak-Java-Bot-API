@@ -20,7 +20,6 @@ public class CreatedVirtualServer extends DefaultInfo {
 	 */
 	public CreatedVirtualServer(String[] infos) {
 		super(infos);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public CreatedVirtualServer(String infos) {

@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
 import net.devcube.vinco.teamspeakapi.api.api.property.ClientType;
@@ -163,19 +164,14 @@ public class ClientJoinEvent extends BaseEvent {
      *
      * @return An ArrayList containing the IDs of server groups.
      */
-    public ArrayList<Integer> getClientServerGroups() {
-        String servergroups = get("client_servergroups");
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        if (servergroups.contains(",")) {
-            String[] splitGroups = servergroups.split(",");
-            for (String groupID : splitGroups) {
-                result.add(toInt(groupID));
-            }
-        } else {
-            result.add(toInt(servergroups));
-        }
-        return result;
-    }
+    public List<Integer> getServerGroups() {
+		String[] split = get("client_servergroups").split(",");
+		List<Integer> arraylist = new ArrayList<>(split.length);
+		for (String ids : split) {
+			arraylist.add(toInt(ids));
+		}
+		return arraylist;
+	}
 
     /**
      * Checks if the client is marked as away.

@@ -120,8 +120,7 @@ public class CacheManagerUpdater extends TsEventAdapter {
 
 		if (e.getConfig().isClientsCached()) {
 			cache.updateClientListCache(); // only update clientlist info
-			Set<Integer> ids = new HashSet<>();
-			ids.addAll(e.getClientIDs()); // update clientinfo of moved clients
+			Set<Integer> ids = new HashSet<>(e.getClientIDs()); // update clientinfo of moved clients
 			int invoker = e.getInvokerID();
 			if (invoker != -1)
 				ids.add(invoker); // update clientinfo of invoker
