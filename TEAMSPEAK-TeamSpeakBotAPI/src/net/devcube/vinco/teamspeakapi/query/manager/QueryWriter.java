@@ -13,35 +13,38 @@
 package net.devcube.vinco.teamspeakapi.query.manager;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.Command;
 import net.devcube.vinco.teamspeakapi.api.api.util.CommandFuture;
 import net.devcube.vinco.teamspeakapi.api.api.util.CommandFuture.Transformator;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 public class QueryWriter {
 
-	private Ts3ServerQuery query;
-	
+	private QueryConfig config;
+	private QueryReader reader;
+	private Logger logger;
+
 	long timeout = -1;
 
-	public QueryWriter(Ts3ServerQuery query) {
-		this.query = query;
-		this.timeout = query.getConfig().getConnectionTimeout();
+	public QueryWriter(QueryConfig config, Logger logger, QueryReader reader) {
+		this.config = config;
+		this.timeout = config.getConnectionTimeout();
+		this.logger = logger;
+		this.reader = reader;
 	}
-	
+
 	/**
 	 * All commands executed here and send to the server
-	 * 
+	 *
 	 * @param command
 	 */
 	private void executeCommand(Command command) {
-		query.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command.getCommand() + ")");
-		query.getReader().addCommand(command);
+		logger.debug(DebugOutputType.QUERYWRITER, "Executing Command > (" + command.getCommand() + ")");
+		reader.addCommand(command);
 	}
 
 	/**
@@ -70,8 +73,8 @@ public class QueryWriter {
 		executeCommand(cmd);
 		while (!cmd.isFinished());
 		List<String> packets = cmd.getPackets();
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
-		query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+		logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
+		logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
 		return new String[] { cmd.getResult(), cmd.getError() };
 	}
 
@@ -84,7 +87,7 @@ public class QueryWriter {
 	 * response.
 	 * 
 	 * 
-	 * @param command
+	 * @param cmd
 	 *                    Command that is send to the server.
 	 * @return {Normal Packet, Error}
 	 */
@@ -101,25 +104,23 @@ public class QueryWriter {
 	 * @return CommandFuture Class containing an information about the result.
 	 */
 
-	
+
 	public <T> CommandFuture<T> executeAsyncCommand(String command, Transformator<T> transformator) {
 		Command cmd = new Command(command);
 
 		FutureTask<Command> task = new FutureTask<>(new Callable<Command>() {
 
 			@Override
-			public Command call() throws Exception {
-				query.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
-				query.getReader().addCommand(cmd);
+			public Command call() {
+				logger.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
+				reader.addCommand(cmd);
 				while (!cmd.isFinished());
-				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
-				query.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+				logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
+				logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
 				return cmd;
 			}
-
 		});
 		new Thread(task, "ASYN").start();
 		return new CommandFuture<T>(task, transformator);
 	}
-
 }

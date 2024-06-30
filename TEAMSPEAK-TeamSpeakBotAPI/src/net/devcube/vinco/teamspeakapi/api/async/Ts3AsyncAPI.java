@@ -37,7 +37,7 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.BanInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ClientInfo;
-import net.devcube.vinco.teamspeakapi.api.api.wrapper.ComplainInfo;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.ComplaintInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ConnectionInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedAPIKey;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedQueryLogin;
@@ -56,25 +56,15 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.TempPasswordInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.VirtualServerInfo;
-import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 public class Ts3AsyncAPI {
 
-	private Ts3ServerQuery query;
 	private QueryWriter writer;
 	protected static final String TS_INFO_SEPARATOR = "\\|";
 
-	public Ts3AsyncAPI(Ts3ServerQuery query) {
-		this.query = query;
-		this.writer = query.getWriter();
-	}
-
-	/**
-	 * @return the query
-	 */
-	public Ts3ServerQuery getQuery() {
-		return query;
+	public Ts3AsyncAPI(QueryWriter writer) {
+		this.writer = writer;
 	}
 
 	public CommandFuture<String> getHelp() {
@@ -323,8 +313,8 @@ public class Ts3AsyncAPI {
 		});
 	}
 
-	public CommandFuture<List<ChannelInfo>> getChannelsByName(String channelName) {
-		return getChannelsByCommand(CommandBuilder.buildGetChannelsByNameCommand(channelName));
+	public CommandFuture<Map<Integer, String>> getChannelsByName(String channelName) {
+		return executeCommandGetHashMapIntStringResult(CommandBuilder.buildGetChannelsByNameCommand(channelName), "cid=", "channel_name=");
 	}
 
 	private CommandFuture<List<ChannelInfo>> getChannelsByCommand(String command) {
@@ -355,16 +345,16 @@ public class Ts3AsyncAPI {
 		return executeCommandGetHashMapIntListResult(CommandBuilder.buildGetChannelGroupsByChannelIDCommand(channelID), "cldbid=", "cgid=");
 	}
 
-	public CommandFuture<List<ComplainInfo>> getComplainsByClient(int clientDataBaseID) {
-		return executeCommandGetListResult(CommandBuilder.buildGetComplainsByClientCommand(clientDataBaseID), ComplainInfo::new);
+	public CommandFuture<List<ComplaintInfo>> getComplainsByClient(int clientDataBaseID) {
+		return executeCommandGetListResult(CommandBuilder.buildGetComplainsByClientCommand(clientDataBaseID), ComplaintInfo::new);
 	}
 
 	public CommandFuture<List<PrivilegeKeyInfo>> getPrivilegeKeys() {
 		return executeCommandGetListResult(CommandBuilder.buildGetPrivilegeKeysCommand(), PrivilegeKeyInfo::new);
 	}
 
-	public CommandFuture<List<ComplainInfo>> getComplains() {
-		return executeCommandGetListResult(CommandBuilder.buildGetComplainsCommand(), ComplainInfo::new);
+	public CommandFuture<List<ComplaintInfo>> getComplains() {
+		return executeCommandGetListResult(CommandBuilder.buildGetComplainsCommand(), ComplaintInfo::new);
 	}
 
 	public CommandFuture<List<BanInfo>> getBans() {
@@ -913,7 +903,24 @@ public class Ts3AsyncAPI {
 
 		});
 	}
+	
+	private CommandFuture<Map<Integer, String>> executeCommandGetHashMapIntStringResult(String command, String keyProp, String valueProp) {
+		return writer.executeAsyncCommand(command, new Transformator<Map<Integer, String>>() {
 
+			@Override
+			public Map<Integer, String> transformResult(String result) {
+				Map<Integer, String> resultMap = new HashMap<>();
+				for (String info : splitResult(result)) {
+					int key = Integer.parseInt(Formatter.toNormalFormat(Formatter.get(info, keyProp)));
+					String value = Formatter.toNormalFormat(Formatter.get(info, valueProp));
+					resultMap.put(key, value);
+				}
+				return resultMap;
+			}
+
+		});
+	}
+	
 	private CommandFuture<Map<Integer, List<String>>> executeCommandGetHashMapListStringResult(String command, String keyProp, String valueProp) {
 		return writer.executeAsyncCommand(command, new Transformator<Map<Integer, List<String>>>() {
 

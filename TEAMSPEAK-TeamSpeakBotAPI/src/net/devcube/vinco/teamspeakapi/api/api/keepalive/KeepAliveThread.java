@@ -12,20 +12,21 @@
 package net.devcube.vinco.teamspeakapi.api.api.keepalive;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
-import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AsyncAPI;
 
 public class KeepAliveThread {
 
-	private static final int SLEEP = 240_000; //Default Time for Timeout are 300 Seconds
-	private final Ts3ServerQuery query;
+	private final int SLEEP = 240_000; //Default Time for Timeout are 300 Seconds
+	private final Ts3AsyncAPI async;
+	private final Logger logger;
 	private Thread keepAliveThread;
-	
-	
-	public KeepAliveThread(Ts3ServerQuery query) {
-		this.query = query;
+
+	public KeepAliveThread(Ts3AsyncAPI async, Logger logger) {
+		this.async = async;
+		this.logger = logger;
 	}
-	
-	
+
 	/**
 	 * Starts the KeepAliveThread.
 	 * 
@@ -36,7 +37,7 @@ public class KeepAliveThread {
 	 * a KeepAlive message to the server and retrieves the version of the TeamSpeak server asynchronously.
 	 */
 	public void start() {
-		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
+		logger.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been started");
 		
 		keepAliveThread = new Thread(new Runnable() {
 			
@@ -49,8 +50,8 @@ public class KeepAliveThread {
 						break;
 					}
 					
-					query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
-					query.getAsyncAPI().getVersion();
+					logger.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveMessage has been send");
+					async.getVersion();
 				}
 				
 			}
@@ -67,7 +68,7 @@ public class KeepAliveThread {
 	 */
 	public void interrupt() {
 		keepAliveThread.interrupt();
-		query.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has beeen stopped");
+		logger.debug(DebugOutputType.KEEPALIVETHREAD, "KeepAliveThread has been stopped");
 	}
 	
 	/**
@@ -80,7 +81,7 @@ public class KeepAliveThread {
 	/**
 	 * @return the sleep durantion in ms
 	 */
-	public static int getSleep() {
+	public int getSleep() {
 		return SLEEP;
 	}
 

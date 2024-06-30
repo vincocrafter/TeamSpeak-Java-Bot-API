@@ -32,16 +32,19 @@ import net.devcube.vinco.teamspeakapi.api.api.events.TextMessageEvent;
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownEventException;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 
 public class EventManager {
 
 	Ts3ServerQuery query;
-	private List<TsEvent> events = new ArrayList<TsEvent>();
+	private Logger logger;
+	private List<TsEvent> events = new ArrayList<>();
 
 	public EventManager(Ts3ServerQuery query) {
 		this.query = query;
+		this.logger = query.getLogger();
 	}
 
 	public List<TsEvent> getEvents() {
@@ -50,40 +53,40 @@ public class EventManager {
 
 	public void registerEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
-			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
+			logger.debug(DebugOutputType.ERROR, "The selected Event was null!");
 			throw new UnknownEventException("The selected Event was null!");
 		}
-		query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
+		logger.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
 		events.add(event);
 	}
 
 	public void addTs3Listener(TsEvent event) {
 		if (event != null) {
-			query.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
+			logger.debug(DebugOutputType.EVENTMANAGER, "Registering Event : " + event.getClass().getName());
 			events.add(event);
 		}
 	}
 
 	public void unregisterEvent(TsEvent event) throws UnknownEventException {
 		if (event == null) {
-			query.debug(DebugOutputType.ERROR, "The selected Event was null!");
+			logger.debug(DebugOutputType.ERROR, "The selected Event was null!");
 			throw new UnknownEventException("The selected Event was null!");
 		}
 		if (events.contains(event)) {
-			query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
+			logger.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
 			events.remove(event);
 		} else {
-			query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
+			logger.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 		}
 	}
 
 	public void removeTs3Listener(TsEvent event) {
 		if (event != null) {
 			if (events.contains(event)) {
-				query.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
+				logger.debug(DebugOutputType.EVENTMANAGER, "Unregistering Event : " + event.getClass().getName());
 				events.remove(event);
 			} else {
-				query.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
+				logger.debug(DebugOutputType.EVENTMANAGER, "Event was not found" + event.getClass().getName());
 			}
 		}
 	}
@@ -92,7 +95,6 @@ public class EventManager {
 	 * Old Event Call
 	 * 
 	 * @param infos
-	 * @param eventName
 	 * @throws UnknownEventException
 	 * @deprecated
 	 */
@@ -237,12 +239,12 @@ public class EventManager {
 							meth.invoke(registeredEvent, event);
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 							if (e.getClass() != null && e.getCause() != null) {
-								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' from Class '" + registeredEvent.getClass().getName()
+								logger.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' from Class '" + registeredEvent.getClass().getName()
 										+ "' caused by " + e.getCause().getClass().getName() + "!");
 							} else if (e.getCause() != null) {
-								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' caused by " + e.getCause().getClass().getName() + "!");
+								logger.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' caused by " + e.getCause().getClass().getName() + "!");
 							} else {
-								query.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' !");
+								logger.debug(DebugOutputType.ERROR, "Got an Exception from calling Eventmethod '" + meth.getName() + "' !");
 							}
 
 							e.printStackTrace();
@@ -295,54 +297,53 @@ public class EventManager {
 
 	/**
 	 * debugs selected Events
-	 * 
-	 * @param eventName
-	 * @param infos
-	 * @see EventManager#callNewEvent()
-	 * @see QueryConfig
+	 *
+	 * @param infos eventInformation
+	 * @see EventManager#callNewEvent(String[])
+	 * @see QueryConfig isEventCallType()
 	 * @see DebugOutputType
 	 */
 	private void debugNewEvent(String[] infos) {
 		String eventName = infos[0];
 		String information = Formatter.connectString(infos);
-		query.debug(DebugOutputType.EVENTMANAGER, "Event " + eventName + " was called");
+		logger.debug(DebugOutputType.EVENTMANAGER, "Event " + eventName + " was called");
 
 		switch (eventName) {
 		case "notifychannelcreated": // CHANNEL CREATED
-			query.debug(DebugOutputType.E_CHANNEL_CREATED, "Channel Created Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_CREATED, "Channel Created Event: " + information);
 			break;
 		case "notifychanneldeleted": // CHANNEL DELETED
-			query.debug(DebugOutputType.E_CHANNEL_DELETED, "Channel Deleted Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_DELETED, "Channel Deleted Event: " + information);
 			break;
 		case "notifychanneldescriptionchanged": // CHANNEL DESCRIPTION CHANGED
-			query.debug(DebugOutputType.E_CHANNEL_DESCRIPTION_EDITED, "Channel Description Edited Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_DESCRIPTION_EDITED, "Channel Description Edited Event: " + information);
 			break;
 		case "notifychanneledited": // CHANNEL EDITED
-			query.debug(DebugOutputType.E_CHANNEL_EDITED, "Channel Edited Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_EDITED, "Channel Edited Event: " + information);
 			break;
 		case "notifychannelpasswordchanged": // CHANNEL PASSWORD CHANGED
-			query.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, "Channel Password Changed Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_PASSWORD_CHANGED, "Channel Password Changed Event: " + information);
 			break;
 		case "notifychannelmoved": // CHANNEL MOVED
-			query.debug(DebugOutputType.E_CHANNEL_MOVED, "Channel Moved Event: " + information);
+			logger.debug(DebugOutputType.E_CHANNEL_MOVED, "Channel Moved Event: " + information);
 			break;
 		case "notifycliententerview": // CLIENT JOIN EVENT
-			query.debug(DebugOutputType.E_CLIENT_JOIN, "Client Join Event: " + information);
+			logger.debug(DebugOutputType.E_CLIENT_JOIN, "Client Join Event: " + information);
 			break;
 		case "notifyclientleftview": // CLIENT LEAVE EVENT
-			query.debug(DebugOutputType.E_CLIENT_LEAVE, "Client Leave Event: " + information);
+			logger.debug(DebugOutputType.E_CLIENT_LEAVE, "Client Leave Event: " + information);
 			break;
 		case "notifyclientmoved": // CLIENT MOVED
-			query.debug(DebugOutputType.E_CLIENT_MOVE, "Client Move Event: " + information);
+			logger.debug(DebugOutputType.E_CLIENT_MOVE, "Client Move Event: " + information);
 			break;
 		case "notifytokenused": // TOKEN USED EVENT
-			query.debug(DebugOutputType.E_PRIVILEGEKEY_USED, "Token Used Event: " + information);
+			logger.debug(DebugOutputType.E_PRIVILEGEKEY_USED, "Token Used Event: " + information);
 			break;
 		case "notifyserveredited": // SERVER EDITED
-			query.debug(DebugOutputType.E_SERVER_EDITED, "Server Edited Event: " + information);
+			logger.debug(DebugOutputType.E_SERVER_EDITED, "Server Edited Event: " + information);
 			break;
 		case "notifytextmessage": // TEXT MESSAGE SEND
-			query.debug(DebugOutputType.E_TEXT_MESSAGE, "Text Message Event: " + information);
+			logger.debug(DebugOutputType.E_TEXT_MESSAGE, "Text Message Event: " + information);
 			break;
 		default:
 		}

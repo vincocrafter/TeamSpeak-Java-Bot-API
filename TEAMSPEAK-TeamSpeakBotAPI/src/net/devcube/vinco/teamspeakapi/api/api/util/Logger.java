@@ -3,8 +3,10 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 
 public class Logger {
 
@@ -32,10 +34,35 @@ public class Logger {
 		
 	}
 	
-	private Ts3ServerQuery serverQuery;
+	private QueryConfig config;
 
-	public Logger(Ts3ServerQuery serverQuery) {
-		this.serverQuery = serverQuery;
+	public Logger(QueryConfig config) {
+		this.config = config;
+	}
+
+	/**
+	 * New debug Method for more specified debugging and logging. Uses QueryConfig
+	 * for console and/or file debugging.
+	 *
+	 * @param type
+	 *                  Type of the debugmessage
+	 * @param debug
+	 *                  message
+	 * @see DebugOutputType
+	 * @see DebugType
+	 * @see QueryConfig
+	 * @see Logger
+	 */
+
+	public synchronized void debug(DebugOutputType type, String debug) {
+		if (config.getDebugList().isEmpty() || (!config.isEverything() && !config.isInDebug(type)))
+			return;
+
+		TSLogLevel logLevel = type.getLogLevel();
+		if (config.isDebugType(DebugType.CONSOLE) || config.isDebugType(DebugType.BOTH))
+			log(logLevel, debug);
+		if (config.isDebugType(DebugType.FILE) || config.isDebugType(DebugType.BOTH))
+			logFile(logLevel, debug);
 	}
 
 	/**
@@ -50,10 +77,10 @@ public class Logger {
 		
 		StringBuilder prefix = new StringBuilder();
 		prefix.append("[").append(Thread.currentThread().getName()).append("]").append(" ");
-		if (serverQuery.getConfig().isShowDate()) {
-			prefix.append("[").append(serverQuery.getDate()).append("]").append(" ");
+		if (config.isShowDate()) {
+			prefix.append("[").append(getDate()).append("]").append(" ");
 		}
-		prefix.append("[").append(serverQuery.getTime()).append("]").append(" ");
+		prefix.append("[").append(getTime()).append("]").append(" ");
 
 		logMessage.append(prefix);
 		logMessage.append("[").append(logLevel.getValue()).append("]");
@@ -83,7 +110,7 @@ public class Logger {
 	 * @param message
 	 */
 	public synchronized void logFile(TSLogLevel logLevel, Object message) {
-		String date = serverQuery.getLogDate();
+		String date = getLogDate();
 		if (!new File("Logs").exists()) {
 			new File("Logs/").mkdir();
 		}
@@ -116,5 +143,29 @@ public class Logger {
 		}
 	}
 	
+	private String getTime() {
+		String format = "";
+		if (config.isShowTimeMilliseconds()) {
+			format = "HH:mm:ss.SSS";
+		} else {
+			format = "HH:mm:ss";
+		}
+		SimpleDateFormat simpledateformat = new SimpleDateFormat(format);
+		Date date = new Date();
+
+		return simpledateformat.format(date);
+	}
+
+	private String getDate() {
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("dd/MM/YYYY");
+		Date date = new Date();
+		return simpledateformat.format(date);
+	}
+
+	private String getLogDate() {
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("YYYY/MM/dd");
+		Date date = new Date();
+		return simpledateformat.format(date);
+	}
 	
 }

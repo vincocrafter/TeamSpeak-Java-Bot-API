@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManager;
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownChannelInfoException;
 import net.devcube.vinco.teamspeakapi.api.api.exception.wrapper.UnknownClientInfoException;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
@@ -33,6 +34,7 @@ import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.TextMessageType;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerProperty;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.BanInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelInfo;
@@ -50,6 +52,8 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.TempPasswordInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.VirtualServerInfo;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
+import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
 /**
  * Main Class to Interact with the TeamSpeakServer in any way.
@@ -66,8 +70,8 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	 * @param query
 	 *                        class
 	 */
-	public Ts3SyncAPI(Ts3ServerQuery query) {
-		super(query);
+	public Ts3SyncAPI(QueryConfig config, Logger logger, QueryWriter writer, CacheManager cache) {
+		super(config, logger, writer, cache);
 	}
 
 	public String getFullHelp() {
@@ -813,6 +817,9 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		return createChannel(channelName, new HashMap<>());
 	}
 
+	public int createPermanentChannel(String channelName) {
+		return createChannel(channelName, Collections.singletonMap(ChannelProperty.CHANNEL_FLAG_PERMANENT, "1"));
+	}
 	public void deleteChannel(ChannelInfo channel, boolean force) {
 		deleteChannel(channel.getChannelID(), force);
 	}
@@ -1350,12 +1357,27 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		sendClientMessage(client.getClientID(), message);
 	}
 	
+	/**
+	 * Same as sendClientMessage(int, String)
+	 * @see Ts3SyncAPI#sendClientMessage(int, String)
+	 * @param clientID
+	 * @param message
+	 */
+	
 	public void sendPrivateMessage(int clientID, String message) {
 		sendClientMessage(clientID, message);
 	}
 	
+	/**
+	 * Same as sendClientMessage(ClientInfo, String)
+	 * @see Ts3SyncAPI#sendClientMessage(ClientInfo, String)
+	 * @param client
+	 * @param message
+	 * 
+	 */
+	
 	public void sendPrivateMessage(ClientInfo client, String message) {
-		sendClientMessage(client.getClientID(), message);
+		sendClientMessage(client, message);
 	}
 	
 	public void sendChannelMessage(String message) {
@@ -1646,7 +1668,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		registerEvent(EventType.TEXT_CHANNEL);
 		registerEvent(EventType.TEXT_PRIVATE);
 		registerEvent(EventType.PRIVILEGE_KEY_USED);
-		query.debug(DebugOutputType.QUERY, "Registered all Events");
+		logger.debug(DebugOutputType.QUERY, "Registered all Events");
 	}
 	
 	public void stopServerProcess() {

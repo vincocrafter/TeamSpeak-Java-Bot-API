@@ -20,10 +20,10 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.connection.QueryConnection;
+import net.devcube.vinco.teamspeakapi.query.connection.SocketConnection;
 
 public class QueryConfig {
-
-	private Ts3ServerQuery query;
 
 	private boolean showTimeMilliseconds = false;
 	private boolean showDate = false;
@@ -42,25 +42,15 @@ public class QueryConfig {
 	 * Idea of specify more accurate the types of output, array to select more as one
 	 * type for more detailed debugging
 	 * 
-	 * @see Ts3ServerQuery#debug()
+	 * @see net.devcube.vinco.teamspeakapi.api.api.util.Logger#debug(DebugOutputType, String) 
 	 */
 	private Set<DebugOutputType> debuglist = new HashSet<>();
-	
 	private Set<CacheType> cacheList = new HashSet<>();
-	
 	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
 	private long connectionTimeout = 2000;
-	
-	
-	public QueryConfig(Ts3ServerQuery query) {
-		this.query = query;
-	}
+	private QueryConnection connection = new SocketConnection();
+	public QueryConfig() {
 
-	/**
-	 * @return the query
-	 */
-	public Ts3ServerQuery getQuery() {
-		return query;
 	}
 
 	/**
@@ -104,7 +94,7 @@ public class QueryConfig {
 	 * 
 	 * @return the debuglist
 	 */
-	public Set<DebugOutputType> getDebuglist() {
+	public Set<DebugOutputType> getDebugList() {
 		return debuglist;
 	}
 
@@ -125,7 +115,7 @@ public class QueryConfig {
 	 * Used by the Query to retrieve which debugs should
 	 * be debugged.
 	 * @see QueryConfig#addDebugItem(DebugOutputType)
-	 * @see Ts3ServerQuery#debug(DebugOutputType, String)
+	 * @see net.devcube.vinco.teamspeakapi.api.api.util.Logger#debug(DebugOutputType, String)
 	 * @param debugOutputType
 	 * @return
 	 */
@@ -257,5 +247,13 @@ public class QueryConfig {
 	 */
 	public long getConnectionTimeout() {
 		return connectionTimeout;
+	}
+
+	public void setConnection(QueryConnection connection) {
+		this.connection = connection;
+	}
+
+	public QueryConnection getConnection() {
+		return connection;
 	}
 }
