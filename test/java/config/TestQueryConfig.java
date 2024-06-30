@@ -1,66 +1,73 @@
 /**
  * Projekt: TEAMSPEAK - TestBot
- *
+ * <p>
  * Autor : Vincent
- *
- * Jahr 2023  
- *
+ * <p>
+ * Jahr 2023
+ * <p>
  * Datum : 03.07.2023
- * 
+ * <p>
  * Uhrzeit : 20:00:02
  */
 package config;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugType;
 import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
 import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
+import net.devcube.vinco.teamspeakapi.query.connection.SocketConnection;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestQueryConfig {
 
-	private static Ts3ServerQuery query;
+    private static Ts3ServerQuery query;
 
-	@BeforeAll
-	public static void connectQuery() {
-		query = new Ts3ServerQuery();
-		String password = System.getenv("TS3_SERVER_PASSWORD");
+    @BeforeAll
+    public static void connectQuery() {
+        query = new Ts3ServerQuery();
+        String password = System.getenv("TS3_SERVER_PASSWORD");
+        assertDoesNotThrow(new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                query.connect("localhost", 10011, "serveradmin", password, 1, "ConfigTest", -1);
+            }
+        });
+    }
 
-		try {
-			query.connect("localhost", 10011, "serveradmin", password, 1, "EventTest", -1);
-		} catch (IOException | QueryLoginException e) {
-			Assertions.fail();
-		}
-	}
-	
-	@AfterAll
-	public static void stopQuery() {
-		query.stopQuery();
-		Assertions.assertFalse(query.getSyncAPI().isConnected());
-	}
+    @AfterAll
+    public static void stopQuery() {
+        query.stopQuery();
+    }
 
-	@Test
-	public void testConfig() {
-		QueryConfig config = query.getConfig();
-		config.setShowTimeMilliseconds(true);
-		config.setShowDate(true);
-		config.setEventCallType(EventCallType.BOTH);
-		config.setFloodRate(FloodRate.custom(100));
+    @Test
+    public void testConfig() {
+        QueryConfig config = query.getConfig();
 
-		Assertions.assertTrue(config.isShowTimeMilliseconds());
-		Assertions.assertTrue(config.isShowDate());
-		Assertions.assertTrue(config.getEventCallType() == EventCallType.BOTH);
-		Assertions.assertEquals(100, config.getFloodRate().getValue());
-	}
+        assertSame(config.getFloodRate(), FloodRate.DEFAULT_TSAPI);
+        assertSame(config.getDebugType(), DebugType.CONSOLE);
+        assertSame(config.getEventCallType(), EventCallType.NEW);
+        assertTrue(config.getConnection() instanceof SocketConnection);
+        assertFalse(config.isShowTimeMilliseconds());
+        assertFalse(config.isShowDate());
+
+        config.setFloodRate(FloodRate.custom(100));
+        config.setDebugType(DebugType.BOTH);
+        config.setEventCallType(EventCallType.BOTH);
+        config.setShowTimeMilliseconds(true);
+        config.setShowDate(true);
+
+        assertEquals(100, config.getFloodRate().getValue());
+        assertSame(config.getDebugType(), DebugType.BOTH);
+        assertSame(config.getEventCallType(), EventCallType.BOTH);
+        assertTrue(config.isShowTimeMilliseconds());
+        assertTrue(config.isShowDate());
+    }
 
 }
