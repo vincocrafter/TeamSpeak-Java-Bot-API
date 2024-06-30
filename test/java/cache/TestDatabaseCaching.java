@@ -78,6 +78,6 @@ public class TestDatabaseCaching {
         assertEquals("uaw\\/BPP2sVGuP7KjSbvyPWV9nNA=", dbClient.getUUID(), "UUID should match the expected UUID");
         assertEquals(1717667384, dbClient.getCreatingTime(), "Created timestamp should match the expected timestamp");
         assertEquals(1717667389, dbClient.getLastConnection(), "Last connected timestamp should match the expected timestamp");
-        assertEquals("Description of Client21", dbClient.getDescription(), "Description should match the expected description");
+        assertEquals("Description of Client17", dbClient.getDescription(), "Description should match the expected description");
     }
 }
