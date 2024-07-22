@@ -69,17 +69,18 @@ public class QueryWriter {
 	 * @return {Normal Packet, Error}
 	 */
 	public String[] executeReadCommand(String command) {
-		Command cmd = new Command(command);
+		Command cmd = new Command(command, null);
 		executeCommand(cmd);
-		while (!cmd.isFinished());
+		long start = System.currentTimeMillis();
+		while (!cmd.isFinished()) {
+			if ((System.currentTimeMillis() - start) > timeout) {
+				return null;
+			}
+		}
 		List<String> packets = cmd.getPackets();
 		logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + packets.size());
 		logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
 		return new String[] { cmd.getResult(), cmd.getError() };
-	}
-
-	public String[] executeReadCommand(StringBuilder command) {
-		return executeReadCommand(command.toString());
 	}
 
 	/**
@@ -106,21 +107,22 @@ public class QueryWriter {
 
 
 	public <T> CommandFuture<T> executeAsyncCommand(String command, Transformator<T> transformator) {
-		Command cmd = new Command(command);
+    CommandFuture<T> future = new CommandFuture<>(transformator);
+	Command cmd = new Command(command, future);
+	reader.addCommand(cmd);
+	FutureTask<Command> task = new FutureTask<>(new Callable<Command>() {
 
-		FutureTask<Command> task = new FutureTask<>(new Callable<Command>() {
-
-			@Override
-			public Command call() {
-				logger.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
-				reader.addCommand(cmd);
-				while (!cmd.isFinished());
-				logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
-				logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
-				return cmd;
-			}
-		});
-		new Thread(task, "ASYN").start();
-		return new CommandFuture<T>(task, transformator);
-	}
+        @Override
+        public Command call() {
+            logger.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
+			while (!cmd.isFinished());
+            logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
+            logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");
+            return cmd;
+        }
+    });
+    future.setTask(task);
+	new Thread(task, Thread.currentThread().getName()).start();
+    return future;
+}
 }

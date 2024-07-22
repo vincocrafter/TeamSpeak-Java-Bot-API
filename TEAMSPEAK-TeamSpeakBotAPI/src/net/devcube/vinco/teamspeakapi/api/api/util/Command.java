@@ -14,21 +14,25 @@ package net.devcube.vinco.teamspeakapi.api.api.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Command {
+public class Command<I> {
 	
 	private String command;
 	private List<String> packets;
 	private String error;
-	
-	
-	public Command(String command) {
+	private CommandFuture<I> future;
+	private AtomicBoolean finished = new AtomicBoolean(false);
+
+
+	public Command(String command, CommandFuture<I> future) {
 		this.command = command;
-		this.packets = new ArrayList<>();		
+		this.packets = new ArrayList<>();
+		this.future = future;
 	}
 	
-	public synchronized boolean isFinished() {
-		return error != null;
+	public boolean isFinished() {
+		return finished.get();
 	}
 		
 	/**
@@ -43,6 +47,10 @@ public class Command {
 	 */
 	public synchronized void setError(String error) {
 		this.error = error;
+		finished.set(true);
+		if (future != null && future.getOnFinish() != null) {
+			future.getOnFinish().accept(future.get());
+		}
 	}
 	
 	/**
@@ -57,7 +65,6 @@ public class Command {
 	    packets.forEach(resPackets::add);
 	    return resPackets.toString();
 	}
-	
 
 	/**
 	 * @return the error
@@ -65,5 +72,4 @@ public class Command {
 	public String getError() {
 		return error;
 	}
-	
 }

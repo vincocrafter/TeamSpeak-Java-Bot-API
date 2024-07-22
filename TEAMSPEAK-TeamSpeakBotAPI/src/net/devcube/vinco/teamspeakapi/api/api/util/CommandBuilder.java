@@ -249,6 +249,7 @@ public class CommandBuilder {
 		cmd.append(" -country");
 		cmd.append(" -ip");
 		cmd.append(" -badges");
+		cmd.append(" -icon");
 		return cmd.toString();
 	}
 
@@ -517,9 +518,10 @@ public class CommandBuilder {
 
 	public static String buildMoveChannelCommand(int channelID, int channelParentID, int order) {
 		StringBuilder cmd = new StringBuilder("channelmove");
-		cmd.append("cid=").append(channelID);
+		cmd.append(" cid=").append(channelID);
 		cmd.append(" cpid=").append(channelParentID);
-		cmd.append(" order=").append(order);
+		if (order != -1)
+			cmd.append(" order=").append(order);
 		return cmd.toString();
 	}
 
@@ -654,7 +656,7 @@ public class CommandBuilder {
 
 	public static String buildCreateFileDirectoryCommand(int channelID, String channelPassword, String dirName) {
 		StringBuilder cmd = new StringBuilder("ftcreatedir");
-		cmd.append("cid=").append(channelID);
+		cmd.append(" cid=").append(channelID);
 		cmd.append(" cpw=").append(channelPassword);
 		cmd.append(" dirname=").append(Formatter.toTsFormat(dirName));
 		return cmd.toString();
@@ -798,13 +800,16 @@ public class CommandBuilder {
 		return cmd.toString();
 	}
 
-	public static String buildCreatePrivilegeKeyCommand(PrivilegeKeyType keyType, int groupID, int channelID, String description) {
+	public static String buildCreatePrivilegeKeyCommand(PrivilegeKeyType keyType, int groupID, int channelID,
+														String description, String tokencustomset) {
 		StringBuilder cmd = new StringBuilder("privilegekeyadd");
 		cmd.append(" tokentype=").append(keyType.getValue());
 		cmd.append(" tokenid1=").append(groupID);
 		cmd.append(" tokenid2=").append(channelID);
 		if (description != null)
 			cmd.append(" tokendescription=").append(Formatter.toTsFormat(description));
+		if (tokencustomset != null)
+			cmd.append(" tokencustomset=").append(Formatter.toTsFormat(tokencustomset));
 		return cmd.toString();
 	}
 
@@ -1067,5 +1072,4 @@ public class CommandBuilder {
 		});
 		return result.toString();
 	}
-
 }

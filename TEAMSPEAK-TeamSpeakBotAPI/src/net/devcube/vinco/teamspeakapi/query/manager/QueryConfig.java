@@ -49,6 +49,7 @@ public class QueryConfig {
 	private FloodRate floodRate = FloodRate.DEFAULT_TSAPI;
 	private long connectionTimeout = 2000;
 	private QueryConnection connection = new SocketConnection();
+	
 	public QueryConfig() {
 
 	}

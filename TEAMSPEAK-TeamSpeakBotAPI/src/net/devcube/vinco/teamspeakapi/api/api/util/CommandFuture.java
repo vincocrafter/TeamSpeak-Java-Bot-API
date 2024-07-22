@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 public class CommandFuture<I> {
 	
@@ -22,11 +23,14 @@ public class CommandFuture<I> {
 	private FutureTask<Command> task;
 	private I value;
 	private Transformator<I> transformator;
-	
-	
-	public CommandFuture(FutureTask<Command> task, Transformator<I> transformator) {
-		this.task = task;
+	private Consumer<I> onFinish;
+
+	public CommandFuture(Transformator<I> transformator) {
 		this.transformator = transformator;
+	}
+
+	public void setTask(FutureTask<Command> task) {
+		this.task = task;
 	}
 
 	public I get() {
@@ -89,7 +93,15 @@ public class CommandFuture<I> {
 	private Command getCommand(long time, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 		return task.get(time, unit);
 	}
-	
+
+	public CommandFuture onFinish(Consumer<I> onFinish) {
+		this.onFinish = onFinish;
+		return this;
+	}
+
+	protected Consumer<I> getOnFinish() {
+		return onFinish;
+	}
 
 	/**
 	 * @return the task

@@ -17,8 +17,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManagerUpdater;
 import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
@@ -39,13 +39,14 @@ public class QueryReader {
     private Queue<Command> hover = new LinkedList<>();
     private boolean allowed = true;
     private Thread readerThread;
-    private Thread eventThread;
+    private ExecutorService userThreadPool;
 
     public QueryReader(QueryConfig config, Logger logger, EventManager eventManager) {
         this.config = config;
         this.connection = config.getConnection();
         this.logger = logger;
         this.eventManager = eventManager;
+        this.userThreadPool = Executors.newCachedThreadPool();
     }
 
 
@@ -86,8 +87,9 @@ public class QueryReader {
         if (isError(msg)) {// Error handling
             logger.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
             logger.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
-            if (!hover.isEmpty())
-                hover.poll().setError(msg);
+            if (!hover.isEmpty()) {
+                createTask("ASYN", () -> hover.poll().setError(msg));
+            }
             return;
         }
         if (isEvent(msg)) { // Event here
@@ -125,10 +127,11 @@ public class QueryReader {
          *
          * @see QueryConfig#isEventCallType()
          */
-        eventThread = new Thread(() -> {
+        createTask("EVMA", () -> {
             if (!config.getCachingList().isEmpty()) {
-                logger.debug(DebugOutputType.CACHEMANAGER, "Calling eventupdater for event " + infos[0]);
+                logger.debug(DebugOutputType.CACHEMANAGER, "Calling cacheupdate for event " + infos[0]);
                 eventManager.callNewEventClass(infos, new CacheManagerUpdater());
+                logger.debug(DebugOutputType.CACHEMANAGER, "Finished cacheupdate for event " + infos[0]);
             }
 
             try {
@@ -144,16 +147,19 @@ public class QueryReader {
                 logger.debug(DebugOutputType.ERROR, "Got an Exception from calling an event caused by " + e.getClass().getName() + "!");
                 e.printStackTrace();
             }
-        }, "EVMA");
-        eventThread.start();
+        });
     }
 
     private void setCommandSenderSleeping(int sleepTime) {
         allowed = false;
-
-        Executors.newScheduledThreadPool(1).schedule(() -> {
+        createTask("CommandSenderSleeping", () -> {
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                logger.debug(DebugOutputType.ERROR, "CommandSenderSleeping was interrupted!");
+            }
             allowed = true;
-        }, sleepTime, TimeUnit.MILLISECONDS);
+        });
     }
 
     public synchronized void stopThreads() {
@@ -161,11 +167,19 @@ public class QueryReader {
         commands.clear();
         hover.forEach(cmd -> cmd.setError("Stopped"));
         hover.clear();
-
-        if (eventThread != null)
-            eventThread.interrupt();
-
+        userThreadPool.shutdown();
         readerThread.interrupt();
+    }
+
+    private void createTask(String name, Runnable task) {
+        userThreadPool.submit(() -> {
+            try {
+                Thread.currentThread().setName(name);
+                task.run();
+            } catch (Throwable throwable) {
+                logger.debug(DebugOutputType.ERROR,name + " threw an exception:" + throwable.getMessage());
+            }
+        });
     }
 
     private boolean isError(String rs) {

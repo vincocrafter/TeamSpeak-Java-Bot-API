@@ -51,7 +51,6 @@ import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.TempPasswordInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.VirtualServerInfo;
-import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryConfig;
 import net.devcube.vinco.teamspeakapi.query.manager.QueryWriter;
 
@@ -1173,7 +1172,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public void addComplain(DataBaseClientInfo dataBaseClient, String message) {
-		addComplain(dataBaseClient.getClientDataBaseID(), message);
+		addComplaint(dataBaseClient.getClientDataBaseID(), message);
 	}
 
 	public void deleteComplain(int clientDBID, DataBaseClientInfo fromDataBaseClient) {
@@ -1314,7 +1313,7 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 	}
 
 	public String createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID) {
-		return createPrivilegeKey(keyType, groupID, channelID, null);
+		return createPrivilegeKey(keyType, groupID, channelID, null, null);
 	}
 
 	public void deletePrivilegeKey(PrivilegeKeyInfo privilegeKey) {
@@ -1637,8 +1636,8 @@ public class Ts3SyncAPI extends Ts3BasicAPI {
 		createPrivilegeKey(keyType, groupID, channelID);
 	}
 
-	public void createToken(PrivilegeKeyType keyType, int groupID, int channelID, String description) {
-		createPrivilegeKey(keyType, groupID, channelID, description);
+	public void createToken(PrivilegeKeyType keyType, int groupID, int channelID, String description, String customSet) {
+		createPrivilegeKey(keyType, groupID, channelID, description, customSet);
 	}
 
 	public void deleteToken(String token) {

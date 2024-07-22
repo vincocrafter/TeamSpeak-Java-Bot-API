@@ -722,8 +722,10 @@ public class Ts3AsyncAPI {
 		return executeCommandGetListFirstResult(CommandBuilder.buildGetPermOverviewCommand(clientDBID, channelID, permID), PermissionAssignmentInfo::new);
 	}
 
-	public CommandFuture<String> createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID, String description) {
-		return executeCommandGetStringPropResult(CommandBuilder.buildCreatePrivilegeKeyCommand(keyType, groupID, channelID, description), "token=");
+	public CommandFuture<String> createPrivilegeKey(PrivilegeKeyType keyType,
+													int groupID, int channelID, String description, String customSet) {
+		return executeCommandGetStringPropResult(CommandBuilder.buildCreatePrivilegeKeyCommand(keyType,
+				groupID, channelID, description, customSet), "token=");
 	}
 
 	public CommandFuture<Void> deletePrivilegeKey(String privilegeKey) {

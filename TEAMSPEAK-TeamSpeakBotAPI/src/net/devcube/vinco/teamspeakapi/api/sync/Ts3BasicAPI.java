@@ -204,7 +204,16 @@ public class Ts3BasicAPI {
      * @param channelID The ID of the channel to move the clients to. This is an integer value representing the unique identifier of the channel.
      */
     public void moveClientIDs(List<Integer> clientIDs, int channelID) {
-        writer.executeReadErrorCommand(CommandBuilder.buildMoveClientsCommand(clientIDs, channelID));
+        String cmd = CommandBuilder.buildMoveClientsCommand(clientIDs, channelID);
+        String res = writer.executeReadErrorCommand(cmd);
+
+        if (checkError(res, cmd))
+            return;
+
+        if (config.isQueryCached() && clientIDs.contains(getQueryInfo().getClientID())) {
+            cache.updateQueryPropsCache(cache.updateAttribute(cache.getQueryProperties(),
+                    "client_channel_id", String.valueOf(channelID)));
+        }
     }
 
     /**
@@ -356,6 +365,19 @@ public class Ts3BasicAPI {
         return permissions.stream()
                 .map(Permission::getID)
                 .collect(Collectors.toList());
+    }
+
+    public List<Integer> getPermissionIDs() {
+        if (config.isPermissionCached()) {
+            String permIDs = cache.getPermissionsIDsList();
+            List<Integer> idList = new ArrayList<>();
+            for (String idStr : permIDs.toString().split(" ")) {
+                idList.add(Integer.parseInt(idStr));
+            }
+            return idList;
+        } else {
+            return getPermissionIDs(getPermissionList());
+        }
     }
 
     /**
@@ -1102,7 +1124,6 @@ public class Ts3BasicAPI {
      * This method sends a command to the server to get the database client IDs.
      *
      * @param channelID      The ID of the channel to retrieve the database client IDs for.
-
      * @param channelgroupID The ID of the channel group to retrieve the database client IDs for.
      * @return A list of integers representing the database client IDs that have the specified channel group in the specified channel.
      * If an error occurs or no database client IDs are found, an empty list is returned.
@@ -1170,7 +1191,7 @@ public class Ts3BasicAPI {
      * @param clientDataBaseID The database ID of the client to get the complaints for.
      * @return A list of ComplainInfo objects representing the complaints about the specified client. If an error occurs or no complaints are found, an empty list is returned.
      */
-    public List<ComplaintInfo> getComplainsByClient(int clientDataBaseID) {
+    public List<ComplaintInfo> getComplaintsByClient(int clientDataBaseID) {
         return executeCommandGetListResult(CommandBuilder.buildGetComplainsByClientCommand(clientDataBaseID), ComplaintInfo::new);
     }
 
@@ -1188,7 +1209,7 @@ public class Ts3BasicAPI {
      *
      * @return A list of ComplainInfo objects representing the complaints. If an error occurs or no complaints are found, an empty list is returned.
      */
-    public List<ComplaintInfo> getComplains() {
+    public List<ComplaintInfo> getComplaints() {
         return executeCommandGetListResult(CommandBuilder.buildGetComplainsCommand(), ComplaintInfo::new);
     }
 
@@ -1224,7 +1245,7 @@ public class Ts3BasicAPI {
         if (config.isVirtualServerCached()) {
             List<VirtualServerInfo> resultList = new ArrayList<>();
             String vservers = cache.getVirtualServerList();
-            if (vservers == null)
+            if (vservers == null || vservers.isEmpty())
                 return resultList;
             for (String server : vservers.split(TS_INFO_SEPARATOR)) {
                 resultList.add(new VirtualServerInfo(server));
@@ -1404,7 +1425,9 @@ public class Ts3BasicAPI {
      */
 
     public void removeChannelClientPermission(int channelID, int clientdataBaseID, int permissionID, String permissionName) {
-        removeChannelClientPermissions(channelID, clientdataBaseID, Collections.singletonList(permissionID), Collections.singletonList(permissionName));
+        List<Integer> permIDs = permissionID != -1 ? Collections.singletonList(permissionID) : Collections.emptyList();
+        List<String> permNames = permissionName != null ? Collections.singletonList(permissionName) : Collections.emptyList();
+        removeChannelClientPermissions(channelID, clientdataBaseID, permIDs, permNames);
     }
 
     public void removeChannelClientPermissions(int channelID, int clientdataBaseID, List<Integer> permissions, List<String> permissionNames) {
@@ -1450,7 +1473,9 @@ public class Ts3BasicAPI {
      */
 
     public void removeChannelPermission(int channelID, int permissionID, String permissionName) {
-        removeChannelPermissions(channelID, Collections.singletonList(permissionID), Collections.singletonList(permissionName));
+        List<Integer> permIDs = permissionID != -1 ? Collections.singletonList(permissionID) : Collections.emptyList();
+        List<String> permNames = permissionName != null ? Collections.singletonList(permissionName) : Collections.emptyList();
+        removeChannelPermissions(channelID, permIDs, permNames);
     }
 
     public void removeChannelPermissions(int channelID, List<Integer> permissions, List<String> permissionNames) {
@@ -1467,7 +1492,7 @@ public class Ts3BasicAPI {
      * @param channelProperties A map containing the properties to edit and their new values. The keys are ChannelProperty objects and the values are strings representing the new property values.
      */
     public void editChannel(int channelID, Map<ChannelProperty, String> channelProperties) {
-        writer.executeReadCommand(CommandBuilder.buildEditChannelCommand(channelID, channelProperties));
+        writer.executeReadErrorCommand(CommandBuilder.buildEditChannelCommand(channelID, channelProperties));
     }
 
     /**
@@ -1504,8 +1529,26 @@ public class Ts3BasicAPI {
         writer.executeReadErrorCommand(CommandBuilder.buildAddChannelGroupPermissionsCommand(channelGroupID, permissions));
     }
 
+    /**
+     * Creates a copy of the channel group specified with sourceChannelGroupID.
+     *
+     * @param sourceChannelGroupID ID of a channel group the server should copy.
+     * @param targetChannelGroupID ID of a designated target  channel group (if is set to
+     *                             0 the server will create a new channel group)
+     * @param channelGroupName     Name of the new group (needed if targetChannelGroupID is set to 0, otherwise ignored
+     * @param channelGroupType     Type of channel group to choose between
+     *                             template or normal group.
+     * @return -1 if the targetChannelGroupID is NOT 0. And the new channel  group id otherwise.
+     */
+
     public int copyChannelGroup(int sourceChannelGroupID, int targetChannelGroupID, String channelGroupName, ChannelGroupType channelGroupType) {
-        return executeCommandGetIntResult(CommandBuilder.buildCopyChannelGroupCommand(sourceChannelGroupID, targetChannelGroupID, channelGroupName, channelGroupType), "cgid=");
+        String cmd = CommandBuilder.buildCopyChannelGroupCommand(sourceChannelGroupID, targetChannelGroupID, channelGroupName, channelGroupType);
+        if (targetChannelGroupID != 0) {
+            writer.executeReadErrorCommand(cmd);
+            return -1;
+        }
+
+        return executeCommandGetIntResult(cmd, "cgid=");
     }
 
     public void deleteChannelGroup(int channelGroupID, boolean force) {
@@ -1525,12 +1568,29 @@ public class Ts3BasicAPI {
      */
 
     public void removeChannelGroupPermission(int channelGroupID, int permissionID, String permissionName) {
-        removeChannelGroupPermissions(channelGroupID, Collections.singletonList(permissionID), Collections.singletonList(permissionName));
+        List<Integer> permIDs = permissionID != -1 ? Collections.singletonList(permissionID) : Collections.emptyList();
+        List<String> permNames = permissionName != null ? Collections.singletonList(permissionName) : Collections.emptyList();
+        removeChannelGroupPermissions(channelGroupID, permIDs, permNames);
     }
+
+    /**
+     * Removes a list of permissions from a specified channel group.
+     *
+     * @param channelGroupID  The ID of the channel group to remove the permissions from.
+     * @param permissions     The list of permissions ids to remove. If the list is empty, they will be ignored.
+     * @param permissionNames The list of permission names to remove. If the list is empty, they will be ignored.
+     */
 
     public void removeChannelGroupPermissions(int channelGroupID, List<Integer> permissions, List<String> permissionNames) {
         writer.executeReadErrorCommand(CommandBuilder.buildRemoveChannelGroupPermissionsCommand(channelGroupID, permissions, permissionNames));
     }
+
+    /**
+     * Changes the name of a channel group.
+     *
+     * @param channelGroupID The ID of the channel group to rename.
+     * @param channelName    The new name of the channel group.
+     */
 
     public void renameChannelGroup(int channelGroupID, String channelName) {
         writer.executeReadErrorCommand(CommandBuilder.buildRenameChannelGroupCommand(channelGroupID, channelName));
@@ -1541,7 +1601,7 @@ public class Ts3BasicAPI {
     }
 
     public void addClientPermission(int clientDataBaseID, int permissionID, String permissionName, int permissionValue, boolean permSkip) {
-        addClientPermissions(clientDataBaseID, Collections.singletonList(new Permission(permissionName, permissionID, permissionValue, permSkip, false)));
+        addClientPermissions(clientDataBaseID, Collections.singletonList(new Permission(permissionName, permissionID, permissionValue, false, permSkip)));
     }
 
     public void addClientPermissions(int clientDataBaseID, List<Permission> permissions) {
@@ -1565,7 +1625,10 @@ public class Ts3BasicAPI {
     }
 
     public void removeClientPermission(int clientDataBaseID, int permissionID, String permissionName) {
-        removeClientPermissions(clientDataBaseID, Collections.singletonList(permissionID), Collections.singletonList(permissionName));
+        List<Integer> permIDs = permissionID != -1 ? Collections.singletonList(permissionID) : Collections.emptyList();
+        List<String> permNames = permissionName != null ? Collections.singletonList(permissionName) : Collections.emptyList();
+
+        removeClientPermissions(clientDataBaseID, permIDs, permNames);
     }
 
     public void removeClientPermissions(int clientDataBaseID, List<Integer> permissions, List<String> permissionNames) {
@@ -1599,13 +1662,13 @@ public class Ts3BasicAPI {
     public void updateQueryName(String queryName) {
         if (config.isQueryCached()) {
             String info = cache.getQueryProperties();
-            cache.updateQueryPropsCache(cache.updateAttribute(info, "client_nickname=", Formatter.toTsFormat(queryName)));
+            cache.updateQueryPropsCache(cache.updateAttribute(info, "client_nickname", Formatter.toTsFormat(queryName)));
         }
 
         writer.executeReadErrorCommand(CommandBuilder.buildUpdateQueryNameCommand(queryName));
     }
 
-    public void addComplain(int clientDBID, String message) {
+    public void addComplaint(int clientDBID, String message) {
         writer.executeReadErrorCommand(CommandBuilder.buildAddComplainCommand(clientDBID, message));
     }
 
@@ -1678,7 +1741,7 @@ public class Ts3BasicAPI {
         String[] result = writer.executeReadCommand(cmd);
         if (checkError(result, cmd))
             return resultList;
-        for (String files : splitResult(result)) {
+        for (String files : result[0].split(System.lineSeparator())) {
             resultList.add(new FileInfo(files.concat(" cid=" + channelID)));
         }
         return resultList;
@@ -1705,6 +1768,7 @@ public class Ts3BasicAPI {
     public void renameFile(int channelID, String channelPassword, String oldFilePath, String newFilePath) {
         writer.executeReadErrorCommand(CommandBuilder.buildRenameFileCommand(channelID, channelPassword, oldFilePath, newFilePath));
     }
+
 
     public void moveFile(int channelID, String channelPassword, String oldFilePath, int newChannelID, String newChannelPassword, String newFilePath) {
         writer.executeReadErrorCommand(CommandBuilder.buildMoveFileCommand(channelID, channelPassword, oldFilePath, newChannelID, newChannelPassword, newFilePath));
@@ -1764,14 +1828,12 @@ public class Ts3BasicAPI {
         return executeCommandGetListResult(CommandBuilder.buildGetAssignmentsOfPermissionsCommand(permissions, permissionNames), PermissionAssignmentInfo::new);
     }
 
-    public Permission getQueryAssignmentOfPermission(int permissionID) {
-        return getQueryAssignmentsOfPermissions(Collections.singletonList(permissionID), new ArrayList<>())
-                .stream().findFirst().orElse(null);
+    public List<Permission> getQueryAssignmentOfPermission(int permissionID) {
+        return getQueryAssignmentsOfPermissions(Collections.singletonList(permissionID), new ArrayList<>());
     }
 
-    public Permission getQueryAssignmentOfPermission(String permissionName) {
-        return getQueryAssignmentsOfPermissions(new ArrayList<>(), Collections.singletonList(permissionName))
-                .stream().findFirst().orElse(null);
+    public List<Permission> getQueryAssignmentOfPermission(String permissionName) {
+        return getQueryAssignmentsOfPermissions(new ArrayList<>(), Collections.singletonList(permissionName));
     }
 
     public List<Permission> getQueryAssignmentsOfPermissions(List<Integer> permissions, List<String> permissionNames) {
@@ -1786,8 +1848,9 @@ public class Ts3BasicAPI {
         return getPermOverview(clientDBID, channelID, permID).get(0);
     }
 
-    public String createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID, String description) {
-        return executeCommandGetStringPropResult(CommandBuilder.buildCreatePrivilegeKeyCommand(keyType, groupID, channelID, description), "token=");
+    public String createPrivilegeKey(PrivilegeKeyType keyType, int groupID, int channelID, String description, String customSet) {
+        return executeCommandGetStringPropResult(CommandBuilder.buildCreatePrivilegeKeyCommand(keyType,
+                groupID, channelID, description, customSet), "token=");
     }
 
     public void deletePrivilegeKey(String privilegeKey) {
@@ -1905,7 +1968,7 @@ public class Ts3BasicAPI {
             return -1;
         }
 
-        return executeCommandGetIntResult(CommandBuilder.buildCopyServerGroupCommand(sourceServerGroupID, targetServerGroupID, serverGroupName, serverGroupType), "sgid=");
+        return executeCommandGetIntResult(cmd, "sgid=");
     }
 
     public void deleteServerGroup(int serverGroupID, boolean force) {
@@ -1925,7 +1988,10 @@ public class Ts3BasicAPI {
     }
 
     public void removeServerGroupPermission(int serverGroupID, int permissionID, String permissionName) {
-        removeServerGroupPermissions(serverGroupID, Collections.singletonList(permissionID), Collections.singletonList(permissionName));
+        List<Integer> permIDs = permissionID != -1 ? Collections.singletonList(permissionID) : Collections.emptyList();
+        List<String> permNames = permissionName != null ? Collections.singletonList(permissionName) : Collections.emptyList();
+
+        removeServerGroupPermissions(serverGroupID, permIDs, permNames);
     }
 
     public void removeServerGroupPermissions(int serverGroupID, List<Integer> permissions, List<String> permissionNames) {
@@ -2087,6 +2153,10 @@ public class Ts3BasicAPI {
             error = true;
         } else if (TSError.isError(result, TSError.INVALID_PERMISSION_ID)) {
             logger.debug(DebugOutputType.WARNING, "Permission could not be found by command: '" + cmd + "'");
+            error = true;
+        }
+
+        if (!TSError.isError(result, TSError.OK)) {
             error = true;
         }
 
