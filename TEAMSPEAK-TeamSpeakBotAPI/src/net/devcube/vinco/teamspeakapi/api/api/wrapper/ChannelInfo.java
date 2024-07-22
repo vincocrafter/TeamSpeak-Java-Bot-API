@@ -1,16 +1,12 @@
 package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
+import net.devcube.vinco.teamspeakapi.api.api.property.ChannelBannerMode;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelCodec;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ChannelInfo extends DefaultInfo {
 
-
-	public ChannelInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public ChannelInfo(String infos) {
 		super(infos);
 	}
@@ -35,7 +31,7 @@ public class ChannelInfo extends DefaultInfo {
 		return toIntI("pid");
 	}
 	
-	public String getOrginalName() {
+	public String getOriginalName() {
 		return get("channel_name");
 	}
 
@@ -131,13 +127,12 @@ public class ChannelInfo extends DefaultInfo {
 		return get("channel_codec_latency_factor");
 	}
 	
-	public boolean isEncrypted() {
+	public boolean isUnEncrypted() {
 		return toBolI("channel_codec_is_unencrypted");
 	}
-	
-	
+
 	public String getUUID() {
-		return get("channel_unique_identifier");
+		return Formatter.toNormalFormat(get("channel_unique_identifier"));
 	}
 	
 	public boolean hasMaxClientsUnlimited() {
@@ -164,8 +159,18 @@ public class ChannelInfo extends DefaultInfo {
 		return get("channel_banner_gfx_url");
 	}
 	
-	public String getBannerMode() {
-		return get("channel_banner_mode");
+	public int getBannerModeInt() {
+		return toIntI("channel_banner_mode");
+	}
+
+	public ChannelBannerMode getBannerMode() {
+		int mode = getBannerModeInt();
+		for (ChannelBannerMode bannerMode : ChannelBannerMode.values()) {
+			if (bannerMode.getValue() == mode) {
+				return bannerMode;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -175,6 +180,5 @@ public class ChannelInfo extends DefaultInfo {
 		result.append(",Name=").append(getName());
 		result.append("]");
 		return  result.toString();
-		
 	}
 }

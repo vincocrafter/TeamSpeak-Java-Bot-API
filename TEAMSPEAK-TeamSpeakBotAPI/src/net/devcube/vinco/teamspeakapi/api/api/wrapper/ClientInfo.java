@@ -18,18 +18,6 @@ public class ClientInfo extends DefaultInfo {
 	private Connection clientConnection;
 
 	/**
-	 * Constructs a new ClientInfo object with the given array of client
-	 * information.
-	 * 
-	 * @param infos
-	 *                  An array containing the client information.
-	 */
-
-	public ClientInfo(String[] infos) {
-		super(infos);
-	}
-
-	/**
 	 * Constructs a new ClientInfo object with the given client information string.
 	 * 
 	 * @param infos
@@ -407,7 +395,7 @@ public class ClientInfo extends DefaultInfo {
 	 */
 
 	public boolean hasMyTeamspeakID() {
-		return !getMyTeamspeakID().isEmpty();
+		return getMyTeamspeakID() != null && !getMyTeamspeakID().isEmpty();
 	}
 
 	/**
@@ -497,7 +485,7 @@ public class ClientInfo extends DefaultInfo {
 	 */
 
 	public boolean hasPhoneticName() {
-		return !getPhoneticName().isEmpty();
+		return getPhoneticName() != null && !getPhoneticName().isEmpty();
 	}
 
 	/**
@@ -611,9 +599,9 @@ public class ClientInfo extends DefaultInfo {
 		StringBuilder result = new StringBuilder("Client[");
 		result.append("UUID=").append(getUUID());
 		result.append(",ID=").append(getID());
+		result.append(",DBID=").append(getClientDataBaseID());
 		result.append(",Name=").append(getName());
 		result.append("]");
 		return result.toString();
-
 	}
 }

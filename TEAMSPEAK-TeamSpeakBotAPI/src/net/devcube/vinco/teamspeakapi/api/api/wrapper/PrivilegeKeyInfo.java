@@ -5,10 +5,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class PrivilegeKeyInfo extends DefaultInfo {
 
-	public PrivilegeKeyInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public PrivilegeKeyInfo(String infos) {
 		super(infos);
 	}
@@ -24,7 +20,6 @@ public class PrivilegeKeyInfo extends DefaultInfo {
 				return privilegekeytype;
 			}
 		}
-
 		return null;
 	}
 

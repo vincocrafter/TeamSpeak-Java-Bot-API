@@ -17,11 +17,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class FileInfo extends DefaultInfo {
 
-	
-	public FileInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public FileInfo(String infos) {
 		super(infos);
 	}
@@ -35,7 +30,11 @@ public class FileInfo extends DefaultInfo {
 	}
 	
 	public String getName() {
-		return Formatter.toNormalFormat(get("name"));
+		String name = Formatter.toNormalFormat(get("name"));
+		if (name.contains("/"))
+			name = name.substring(name.lastIndexOf("/") + 1);
+
+		return name;
 	}
 	
 	public long getSize() {
@@ -51,9 +50,17 @@ public class FileInfo extends DefaultInfo {
 	}
 	
 	public FileType getFileType() {
-		return getFileTypeInt() == 0 ? FileType.FILE : FileType.DIRECTORY;
+		return getFileTypeInt() == 1 ? FileType.FILE : FileType.DIRECTORY;
 	}
-	
+
+	public boolean isFile() {
+		return toBolI("type");
+	}
+
+	public boolean isDirectory() {
+		return !toBolI("type");
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("File[");

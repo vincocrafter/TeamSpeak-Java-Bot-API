@@ -2,10 +2,6 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 
 public class ConnectionInfo extends Connection {
 
-	public ConnectionInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public ConnectionInfo(String infos) {
 		super(infos);
 	}

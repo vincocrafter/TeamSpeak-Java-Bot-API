@@ -19,13 +19,6 @@ public class CreatedAPIKey extends DefaultInfo {
 	/**
 	 * @param infos
 	 */
-	public CreatedAPIKey(String[] infos) {
-		super(infos);
-	}
-	
-	/**
-	 * @param infos
-	 */
 	public CreatedAPIKey(String infos) {
 		super(infos);
 	}

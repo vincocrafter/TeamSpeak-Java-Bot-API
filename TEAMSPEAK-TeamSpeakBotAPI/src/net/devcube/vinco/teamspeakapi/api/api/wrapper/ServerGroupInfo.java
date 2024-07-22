@@ -7,10 +7,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ServerGroupInfo extends DefaultInfo {
 
-	public ServerGroupInfo(String[] infos) {
-		super(infos);
-	}
-
 	public ServerGroupInfo(String infos) {
 		super(infos);
 	}
@@ -44,7 +40,6 @@ public class ServerGroupInfo extends DefaultInfo {
 				return servergrouptype;
 			}
 		}
-
 		return null;
 	}
 
@@ -92,6 +87,6 @@ public class ServerGroupInfo extends DefaultInfo {
 		resultBuilder.append(",Name=").append(getName());
 		resultBuilder.append(",Type=").append(getType());
 		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		return resultBuilder.toString();
 	}
 }

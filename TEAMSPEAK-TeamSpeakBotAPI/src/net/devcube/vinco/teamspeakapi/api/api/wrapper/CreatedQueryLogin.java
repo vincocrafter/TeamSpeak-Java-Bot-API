@@ -19,13 +19,6 @@ public class CreatedQueryLogin extends DefaultInfo {
 	/**
 	 * @param infos
 	 */
-	public CreatedQueryLogin(String[] infos) {
-		super(infos);
-	}
-	
-	/**
-	 * @param infos
-	 */
 	public CreatedQueryLogin(String infos) {
 		super(infos);
 	}

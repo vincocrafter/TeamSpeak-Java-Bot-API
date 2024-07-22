@@ -9,17 +9,7 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
  */
 
 public class BanInfo extends DefaultInfo {
-	
-	/**
-     * Constructs a new BanInfo object with the given array of ban information.
-     * 
-     * @param infos An array containing the ban information.
-     */
-	
-	public BanInfo(String[] infos) {
-		super(infos);
-	}
-	
+
 	/**
      * Constructs a new BanInfo object with the given ban information string.
      * 
@@ -67,7 +57,7 @@ public class BanInfo extends DefaultInfo {
      */
 	
 	public String getClientUUID() {
-		return get("uid");
+		return Formatter.toNormalFormat(get("uid"));
 	}
 	
 	/**

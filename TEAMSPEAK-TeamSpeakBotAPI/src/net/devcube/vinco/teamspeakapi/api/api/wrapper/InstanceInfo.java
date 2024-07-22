@@ -17,13 +17,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class InstanceInfo extends DefaultInfo {
 
-	/**
-	 * @param infos
-	 */
-	public InstanceInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public InstanceInfo(String infos) {
 		super(infos);
 	}

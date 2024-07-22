@@ -18,13 +18,6 @@ public class CreatedSnapshot extends DefaultInfo {
 	/**
 	 * @param infos
 	 */
-	public CreatedSnapshot(String[] infos) {
-		super(infos);
-	}
-	
-	/**
-	 * @param infos
-	 */
 	public CreatedSnapshot(String infos) {
 		super(infos);
 	}
@@ -48,7 +41,6 @@ public class CreatedSnapshot extends DefaultInfo {
 		resultBuilder.append(",Salt=").append(getSalt());
 		resultBuilder.append(",Data=").append(getData());
 		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		return resultBuilder.toString();
 	}
-	
 }

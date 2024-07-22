@@ -62,67 +62,47 @@ public class DefaultInfo {
 		return Formatter.connectString(infos);
 	}
 
-	protected int toInt(String s) {
-		try {
-			return Integer.parseInt(s);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return -2;
-	}
+    protected int toInt(String s) {
+        return Integer.parseInt(s);
+    }
 
-	protected int toIntI(String s) {
-		return toInt(get(s));
-	}
-	
-	protected double toDouble(String s) {
-		try {
-			return Double.parseDouble(s);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return -2;
-	}
-	
-	protected double toDoubleI(String s) {
-		return toDouble(get(s));
-	}
-	
-	protected float toFloat(String s) {
-		try {
-			return Float.parseFloat(s);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return -2;
-	}
-	
-	protected double toFloatI(String s) {
-		return toFloat(get(s));
-	}
+    protected int toIntI(String s) {
+        return toInt(get(s));
+    }
 
-	protected long toLong(String s) {
-		try {
-			return Long.parseLong(s);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return -2;
-	}
-	
-	protected long toLongI(String s) {
-		return toLong(get(s));
-	}
-	
-	protected boolean toBol(int i) {
-		return i == 1;
-	}
-	
-	protected boolean toBolI(String s) {
-		return toIntI(s) == 1;
-	}
-	
-	protected boolean toBol(String s) {
-		return Boolean.parseBoolean(s);
-	}
+    protected double toDouble(String s) {
+        return Double.parseDouble(s);
+    }
+
+    protected double toDoubleI(String s) {
+        return toDouble(get(s));
+    }
+
+    protected float toFloat(String s) {
+        return Float.parseFloat(s);
+    }
+
+    protected double toFloatI(String s) {
+        return toFloat(get(s));
+    }
+
+    protected long toLong(String s) {
+        return Long.parseLong(s);
+    }
+
+    protected long toLongI(String s) {
+        return toLong(get(s));
+    }
+
+    protected boolean toBol(int i) {
+        return i == 1;
+    }
+
+    protected boolean toBolI(String s) {
+        return toIntI(s) == 1;
+    }
+
+    protected boolean toBol(String s) {
+        return Boolean.parseBoolean(s);
+    }
 }

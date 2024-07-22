@@ -8,17 +8,9 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 public class HostInfo extends DefaultInfo {
 	
 	private Connection hostConnection;
-	
-	public HostInfo(String[] infos) {
-		super(infos);
-	}
 
 	public HostInfo(String infos) {
 		super(infos);
-	}
-
-	public int getInstanceUptime() {
-		return toIntI("instance_uptime");
 	}
 
 	public int getVirtualServersRunning() {
@@ -77,12 +69,11 @@ public class HostInfo extends DefaultInfo {
 	@Override
 	public String toString() {
 		StringBuilder resultBuilder = new StringBuilder("HostInfo[");
-		resultBuilder.append("InstanceUptime=").append(getInstanceUptime());
-		resultBuilder.append(",VirtualServersRunning=").append(getVirtualServersRunning());
+		resultBuilder.append("VirtualServersRunning=").append(getVirtualServersRunning());
 		resultBuilder.append(",MaxClients=").append(getMaxClients());
 		resultBuilder.append(",ClientsOnline=").append(getClientsOnline());
 		resultBuilder.append(",Channels=").append(getChannels());
 		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		return resultBuilder.toString();
 	}
 }

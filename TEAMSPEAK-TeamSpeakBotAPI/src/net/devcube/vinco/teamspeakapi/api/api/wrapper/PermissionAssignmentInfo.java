@@ -15,13 +15,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class PermissionAssignmentInfo extends DefaultInfo {
 
-	/**
-	 * @param infos
-	 */
-	public PermissionAssignmentInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public PermissionAssignmentInfo(String infos) {
 		super(infos);
 	}

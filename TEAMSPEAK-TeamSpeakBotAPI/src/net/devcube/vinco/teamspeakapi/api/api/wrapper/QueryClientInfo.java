@@ -4,10 +4,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class QueryClientInfo extends DefaultInfo {
 
-	public QueryClientInfo(String[] infos) {
-		super(infos);
-	}
-
 	/**
 	 * @param infos
 	 */
@@ -71,7 +67,6 @@ public class QueryClientInfo extends DefaultInfo {
 		resultBuilder.append(",UUID=").append(getUUID());
 		resultBuilder.append(",VirtualServerID=").append(getVirtualServerID());
 		resultBuilder.append("]");
-		return  resultBuilder.toString();
+		return resultBuilder.toString();
 	}
-	
 }

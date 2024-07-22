@@ -7,10 +7,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ChannelGroupInfo extends DefaultInfo {
 
-	public ChannelGroupInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public ChannelGroupInfo(String infos) {
 		super(infos);
 	}
@@ -45,7 +41,6 @@ public class ChannelGroupInfo extends DefaultInfo {
 				return type;
 			}
 		}
-
 		return null;
 	}
 
@@ -94,6 +89,5 @@ public class ChannelGroupInfo extends DefaultInfo {
 		result.append(",Type=").append(getType());
 		result.append("]");
 		return  result.toString();
-		
 	}
 }

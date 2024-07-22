@@ -14,11 +14,7 @@ package net.devcube.vinco.teamspeakapi.api.api.wrapper;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 
 public class Connection extends DefaultInfo {
-	
-	public Connection(String[] infos) {
-		super(infos);
-	}
-	
+
 	public Connection(String infos) {
 		super(infos);
 	}

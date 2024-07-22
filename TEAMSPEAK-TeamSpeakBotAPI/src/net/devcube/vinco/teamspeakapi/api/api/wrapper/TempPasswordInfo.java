@@ -16,13 +16,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class TempPasswordInfo extends DefaultInfo {
 
-	/**
-	 * @param infos
-	 */
-	public TempPasswordInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public TempPasswordInfo(String infos) {
 		super(infos);
 	}

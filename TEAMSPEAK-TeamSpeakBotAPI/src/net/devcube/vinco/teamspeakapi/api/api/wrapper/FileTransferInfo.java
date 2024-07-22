@@ -16,13 +16,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class FileTransferInfo extends DefaultInfo {
 
-	/**
-	 * @param infos
-	 */
-	public FileTransferInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public FileTransferInfo(String infos) {
 		super(infos);
 	}

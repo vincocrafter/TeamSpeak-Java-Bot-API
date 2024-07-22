@@ -5,16 +5,12 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class DataBaseClientInfo extends DefaultInfo {
 
-	public DataBaseClientInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public DataBaseClientInfo(String infos) {
 		super(infos);
 	}
 	
 	public String getClientUUID() {
-		return get("client_unique_identifier");
+		return Formatter.toNormalFormat(get("client_unique_identifier"));
 	}
 	
 	public String getUniqueIdentifier() {

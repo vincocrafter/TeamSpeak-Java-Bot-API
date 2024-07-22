@@ -5,10 +5,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class ComplaintInfo extends DefaultInfo {
 
-	public ComplaintInfo(String[] infos) {
-		super(infos);
-	}
-	
 	public ComplaintInfo(String infos) {
 		super(infos);
 	}
@@ -18,7 +14,7 @@ public class ComplaintInfo extends DefaultInfo {
 	}
 
 	public String getTargetName() {
-		return get("tname");
+		return Formatter.toNormalFormat(get("tname"));
 	}
 
 	public int getSenderClientDataBaseID() {
