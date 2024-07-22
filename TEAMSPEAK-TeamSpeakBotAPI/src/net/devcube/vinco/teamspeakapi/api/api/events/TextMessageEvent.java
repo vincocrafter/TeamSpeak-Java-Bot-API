@@ -36,7 +36,7 @@ public class TextMessageEvent extends BaseEvent {
      * @return The name of the client who sent the message.
      */
     public String getClientName() {
-        return get("invokername");
+        return Formatter.toNormalFormat(get("invokername"));
     }
 
     /**

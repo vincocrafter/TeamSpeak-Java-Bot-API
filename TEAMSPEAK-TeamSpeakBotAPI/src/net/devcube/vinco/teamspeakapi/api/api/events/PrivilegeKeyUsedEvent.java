@@ -2,6 +2,7 @@ package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
 import net.devcube.vinco.teamspeakapi.api.api.property.PrivilegeKeyType;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 /**
@@ -43,7 +44,7 @@ public class PrivilegeKeyUsedEvent extends BaseEvent {
      * @return The UUID of the client who used the privilege key.
      */
     public String getClientUUID() {
-        return get("cluid");
+        return Formatter.toNormalFormat(get("cluid"));
     }
 
     /**
@@ -79,7 +80,7 @@ public class PrivilegeKeyUsedEvent extends BaseEvent {
      * @return The type of privilege key used, either CHANNEL_GROUP or SERVER_GROUP.
      */
     public PrivilegeKeyType getKeyType() {
-        return getChannelID() == 0 ? PrivilegeKeyType.CHANNEL_GROUP : PrivilegeKeyType.SERVER_GROUP;
+        return getChannelID() == 0 ? PrivilegeKeyType.SERVER_GROUP : PrivilegeKeyType.CHANNEL_GROUP;
     }
 
     /**
@@ -98,6 +99,5 @@ public class PrivilegeKeyUsedEvent extends BaseEvent {
           .append("]");
         return sb.toString();
     }
-
 }
 

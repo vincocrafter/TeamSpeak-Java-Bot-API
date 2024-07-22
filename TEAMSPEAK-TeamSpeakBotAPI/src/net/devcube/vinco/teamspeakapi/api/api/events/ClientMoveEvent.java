@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 /**
@@ -27,15 +28,18 @@ public class ClientMoveEvent extends BaseEvent {
      * @return A list of client IDs affected by the move event.
      */
     public List<Integer> getClientIDs() {
-        List<Integer> res = new ArrayList<>();
-        String clids = get("clid");
-        if (clids.contains("|")) {
-            for (String clid : clids.split("\\|")) {
-                res.add(toInt(clid));
-            }
-        } else {
+        String clids = get("clid").replace("clid=", "");
+        String[] split = clids.split("\\|");
+        List<Integer> res = new ArrayList<>(split.length);
+        if (split.length == 1) {
             res.add(toInt(clids));
+            return res;
         }
+
+        for (String ids : split) {
+            res.add(toInt(ids));
+        }
+
         return res;
     }
 
@@ -102,7 +106,7 @@ public class ClientMoveEvent extends BaseEvent {
      * @return The name of the client who initiated the move.
      */
     public String getInvokerName() {
-        return get("invokername");
+        return Formatter.toNormalFormat(get("invokername"));
     }
 
     /**
@@ -111,7 +115,7 @@ public class ClientMoveEvent extends BaseEvent {
      * @return The UUID of the client who initiated the move.
      */
     public String getInvokerUUID() {
-        return get("invokeruid");
+        return Formatter.toNormalFormat(get("invokeruid"));
     }
 
     /**
@@ -123,9 +127,9 @@ public class ClientMoveEvent extends BaseEvent {
     public String toString() {
         StringBuilder sb = new StringBuilder("ClientMoveEvent");
         sb.append("[ClientIDs=").append(getClientIDs())
-          .append(",ReasonID=").append(getReasonID())
-          .append(",TargetChannelID=").append(getTargetChannelID())
-          .append("]");
+                .append(",ReasonID=").append(getReasonID())
+                .append(",TargetChannelID=").append(getTargetChannelID())
+                .append("]");
         return sb.toString();
     }
 }

@@ -13,8 +13,8 @@ package net.devcube.vinco.teamspeakapi.api.api.property;
 
 public enum FileType {
 	
-   FILE(0),
-   DIRECTORY(1);
+   FILE(1),
+   DIRECTORY(0);
 
    private int value;
 

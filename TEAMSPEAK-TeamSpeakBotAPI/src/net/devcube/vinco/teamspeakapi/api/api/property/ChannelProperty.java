@@ -9,7 +9,7 @@ public enum ChannelProperty {
    CHANNEL_CODEC("channel_codec"),
    CHANNEL_CODEC_QUALITY("channel_codec_quality"),
    CHANNEL_MAXCLIENTS("channel_maxclients"),
-   CHANNEL_MAXFAMILYCLIENTS("channel_maxfamilfyclients"),
+   CHANNEL_MAXFAMILYCLIENTS("channel_maxfamilyclients"),
    CHANNEL_ORDER("channel_order"),
    CHANNEL_FLAG_PERMANENT("channel_flag_permanent"),
    CHANNEL_FLAG_SEMI_PERMANENT("channel_flag_semi_permanent"),
@@ -21,14 +21,16 @@ public enum ChannelProperty {
    CHANNEL_NAME_PHONETIC("channel_name_phonetic"),
    CHANNEL_ICON_ID("channel_icon_id"),
    CHANNEL_CODEC_IS_UNENCRYPTED("channel_codec_is_unencrypted"),
-   CHANNEL_PARENT_ID("cpid");
+   CHANNEL_DELETE_DELAY("channel_delete_delay"),
+   CHANNEL_PARENT_ID("cpid"),
+   CHANNEL_BANNER_GFX_URL("channel_banner_gfx_url"),
+   CHANNEL_BANNER_MODE("channel_banner_mode");
 
    private String value = "";
 
    private ChannelProperty(String s) {
       this.value = s;
    }
-
    public String getValue() {
       return this.value;
    }

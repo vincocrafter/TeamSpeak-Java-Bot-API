@@ -24,8 +24,8 @@ public class ClientLeaveEvent extends BaseEvent {
      * Note: Avoid using getClientInfo() or getClient() as the client is already offline,
      * resulting in null values.
      * 
-     * @see Ts3SyncAPI#getClientInfo()
-     * @see Ts3SyncAPI#getClient()
+     * @see net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI#getClientInfo(int) 
+     * @see net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI#getClient(int)
      */
 
     public int getClientID() {
@@ -102,7 +102,7 @@ public class ClientLeaveEvent extends BaseEvent {
      * @return the invoker UUID
      */
     public String getInvokerUUID() {
-        return get("invokeruid");
+        return Formatter.toNormalFormat(get("invokeruid"));
     }
 
     /**

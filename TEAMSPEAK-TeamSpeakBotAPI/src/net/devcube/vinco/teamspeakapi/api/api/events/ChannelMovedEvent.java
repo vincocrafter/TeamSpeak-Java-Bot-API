@@ -91,7 +91,7 @@ public class ChannelMovedEvent extends BaseEvent {
      * @return the invoker UUID
      */
     public String getInvokerUUID() {
-        return get("invokeruid");
+        return Formatter.toNormalFormat(get("invokeruid"));
     }
 
     /**
@@ -118,7 +118,6 @@ public class ChannelMovedEvent extends BaseEvent {
           .append(",InvokerID=").append(getInvokerID())
           .append(",InvokerName=").append(getInvokerName())
           .append(",InvokerUUID=").append(getInvokerUUID())
-          .append(",ClientID=").append(getClientID())
           .append("]");
         return sb.toString();
     }

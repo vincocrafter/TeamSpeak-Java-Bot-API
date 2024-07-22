@@ -2,6 +2,8 @@ package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
 import net.devcube.vinco.teamspeakapi.api.api.property.EncryptionMode;
+import net.devcube.vinco.teamspeakapi.api.api.property.HostBannerMode;
+import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
 /**
@@ -35,7 +37,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the client name
      */
     public String getClientName() {
-        return get("invokername");
+        return Formatter.toNormalFormat(get("invokername"));
     }
 
     /**
@@ -159,7 +161,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the edited host banner URL
      */
     public String getEditedHostBannerURL() {
-        return get("virtualserver_hostbanner_url");
+        return Formatter.toNormalFormat(get("virtualserver_hostbanner_url"));
     }
 
     /**
@@ -177,7 +179,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the edited host banner graphics URL
      */
     public String getEditedHostBannerGFXURL() {
-        return get("virtualserver_hostbanner_gfx_url");
+        return Formatter.toNormalFormat(get("virtualserver_hostbanner_gfx_url"));
     }
 
     /**
@@ -250,7 +252,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the edited host button URL
      */
     public String getEditedHostbuttonURL() {
-        return get("virtualserver_hostbutton_url");
+        return Formatter.toNormalFormat(get("virtualserver_hostbutton_url"));
     }
 
     /**
@@ -268,7 +270,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the edited host button graphics URL
      */
     public String getEditedHostbuttonGFXURL() {
-        return get("virtualserver_hostbutton_gfx_url");
+        return Formatter.toNormalFormat(get("virtualserver_hostbutton_gfx_url"));
     }
 
     /**
@@ -286,7 +288,7 @@ public class ServerEditedEvent extends BaseEvent {
      * @return the edited phonetic name
      */
     public String getEditedPhoneticName() {
-        return get("virtualserver_name_phonetic");
+        return Formatter.toNormalFormat(get("virtualserver_name_phonetic"));
     }
 
     /**
@@ -312,7 +314,7 @@ public class ServerEditedEvent extends BaseEvent {
      *
      * @return true if the host banner mode has been edited, false otherwise
      */
-    public boolean hasHostbannerModeBeenEdited() {
+    public boolean hasHostBannerModeBeenEdited() {
         return hasBeenEdited("virtualserver_hostbanner_mode");
     }
 
@@ -321,8 +323,18 @@ public class ServerEditedEvent extends BaseEvent {
      *
      * @return the edited host banner mode
      */
-    public int getEditedHostbannerMode() {
+    public int getEditedHostBannerModeInt() {
         return toIntI("virtualserver_hostbanner_mode");
+    }
+
+    public HostBannerMode getEditedHostBannerMode() {
+        int mode = getEditedHostBannerModeInt();
+        for (HostBannerMode hostBannerModes : HostBannerMode.values()) {
+            if (hostBannerModes.getValue() == mode) {
+                return hostBannerModes;
+            }
+        }
+        return null;
     }
 
     /**

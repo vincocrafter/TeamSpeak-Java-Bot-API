@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.EncryptionMode;
+import net.devcube.vinco.teamspeakapi.api.api.property.HostMessageMode;
 import net.devcube.vinco.teamspeakapi.api.api.property.VirtualServerStatus;
 import net.devcube.vinco.teamspeakapi.api.api.util.DefaultInfo;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
@@ -12,10 +13,6 @@ import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 public class VirtualServerInfo extends DefaultInfo {
 
 	private ConnectionInfo connectionInfo;
-
-	public VirtualServerInfo(String[] infos) {
-		super(infos);
-	}
 
 	public VirtualServerInfo(String infos) {
 		super(infos);
@@ -109,8 +106,18 @@ public class VirtualServerInfo extends DefaultInfo {
 		return Formatter.toNormalFormat(get("virtualserver_hostmessage"));
 	}
 
-	public int getHostMessageMode() {
+	public int getHostMessageModeInt() {
 		return toIntI("virtualserver_hostmessage_mode");
+	}
+
+	public HostMessageMode getHostMessageMode() {
+		int hostMessageMode = getHostMessageModeInt();
+		for (HostMessageMode messageMode : HostMessageMode.values()) {
+			if (messageMode.getValue() == hostMessageMode) {
+				return messageMode;
+			}
+		}
+		return null;
 	}
 
 	public String getDefaultFilePath() {

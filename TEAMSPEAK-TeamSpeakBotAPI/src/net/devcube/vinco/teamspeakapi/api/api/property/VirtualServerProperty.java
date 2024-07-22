@@ -13,9 +13,10 @@ public enum VirtualServerProperty {
    VIRTUALSERVER_DEFAULT_CHANNEL_ADMIN_GROUP("virtualserver_default_channel_admin_group"),
    VIRTUALSERVER_MAX_DOWNLOAD_TOTAL_BANDWIDTH("virtualserver_max_download_total_bandwidth"),
    VIRTUALSERVER_MAX_UPLOAD_TOTAL_BANDWIDTH("virtaulserver_max_upload_total_bandwidth"),
+   VIRTUALSERVER_HOSTBANNER_MODE("virtualserver_hostbanner_mode"),
    VIRTUALSERVER_HOSTBANNER_URL("virtualserver_hostbanner_url"),
    VIRTUALSERVER_HOSTBANNER_GFX_URL("virtualserver_hostbanner_gfx_url"),
-   VIRTUALSERVER_HOSTBANNER_GFX_INTERVAL("virtualserver_hostbanner_gfx_inerval"),
+   VIRTUALSERVER_HOSTBANNER_GFX_INTERVAL("virtualserver_hostbanner_gfx_interval"),
    VIRTUALSERVER_COMPLAIN_AUTOBAN_COUNT("virtualserver_complain_autoban_count"),
    VIRTUALSERVER_COMPLAIN_AUTOBAN_TIME("virtualserver_complain_autoban_time"),
    VIRTUALSERVER_COMPLAIN_REMOVE_TIME("virtualserver_complain_remove_time"),
@@ -44,11 +45,12 @@ public enum VirtualServerProperty {
    VIRTUALSERVER_MIN_IOS_VERSION("virutalserver_min_ios_version"),
    VIRTUALSERVER_MIN_WINPHONE_VERSION("virtualserver_min_winphone_version"),
    VIRTUALSERVER_NEEDED_IDENTITY_SECURITY_LEVEL("virtualserver_needed_identity_security_level"),
-   VIRTUALSERVER_NAME_PHONETIC("virtualserver_name_phoentic"),
+   VIRTUALSERVER_NAME_PHONETIC("virtualserver_name_phonetic"),
    VIRTUALSERVER_ICON_ID("virtualserver_icon_id"),
    VIRTUALSERVER_RESERVED_SLOTS("virtualserver_reserved_slots"),
    VIRTUALSERVER_WEBLIST_ENABLED("virtualserver_weblist_enabled"),
-   VIRTUALSERVER_CODEC_ENCRYPTION_MODE("virtualserver_codec_encryption_mode");
+   VIRTUALSERVER_CODEC_ENCRYPTION_MODE("virtualserver_codec_encryption_mode"),
+   VIRTUALSERVER_CHANNEL_TEMP_DELETE_DELAY_DEFAULT("virtualserver_channel_temp_delete_delay_default");
 
    private String value = "";
 

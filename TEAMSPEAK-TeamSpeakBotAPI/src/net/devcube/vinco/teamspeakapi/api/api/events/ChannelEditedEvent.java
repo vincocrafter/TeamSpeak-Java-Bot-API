@@ -1,6 +1,7 @@
 package net.devcube.vinco.teamspeakapi.api.api.events;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.BaseEvent;
+import net.devcube.vinco.teamspeakapi.api.api.property.ChannelCodec;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 
@@ -44,7 +45,7 @@ public class ChannelEditedEvent extends BaseEvent {
      * @return the client UUID
      */
     public String getClientUUID() {
-        return get("invokeruid");
+        return Formatter.toNormalFormat(get("invokeruid"));
     }
 
     /**
@@ -68,7 +69,7 @@ public class ChannelEditedEvent extends BaseEvent {
     private boolean hasBeenEdited(String value) {
 		return getSplitMap().containsKey(value);
 	}
-    
+
     /**
      * Gets the name of the channel.
      *
@@ -110,8 +111,18 @@ public class ChannelEditedEvent extends BaseEvent {
      *
      * @return the channel codec
      */
-    public String getEditedChannelCodec() {
-        return get("channel_codec");
+    public int getEditedChannelCodecInt() {
+        return toIntI("channel_codec");
+    }
+
+    public ChannelCodec getEditedChannelCodec() {
+        int codec = getEditedChannelCodecInt();
+        for (ChannelCodec channelcodec : ChannelCodec.values()) {
+            if (channelcodec.getValue() == codec) {
+                return channelcodec;
+            }
+        }
+        return null;
     }
 
     /**
