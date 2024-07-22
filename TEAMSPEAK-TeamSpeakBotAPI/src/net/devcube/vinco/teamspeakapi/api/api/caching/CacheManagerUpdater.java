@@ -1,161 +1,170 @@
 /**
  * Projekt: TEAMSPEAK - TeamSpeakBotJavaAPI
- *
+ * <p>
  * Autor : Vincent
- *
- * Jahr 2023  
- *
+ * <p>
+ * Jahr 2023
+ * <p>
  * Datum : 07.09.2023
- * 
+ * <p>
  * Uhrzeit : 21:21:53
  */
 package net.devcube.vinco.teamspeakapi.api.api.caching;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.devcube.vinco.teamspeakapi.api.api.event.EventHandler;
 import net.devcube.vinco.teamspeakapi.api.api.event.TsEventAdapter;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelCreateEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDeletedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelDescriptionEditedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelEditedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelMovedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ChannelPasswordChangedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ClientJoinEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ClientLeaveEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ClientMoveEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.PrivilegeKeyUsedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.ServerEditedEvent;
-import net.devcube.vinco.teamspeakapi.api.api.events.TextMessageEvent;
+import net.devcube.vinco.teamspeakapi.api.api.events.*;
 import net.devcube.vinco.teamspeakapi.api.api.util.Formatter;
 
 public class CacheManagerUpdater extends TsEventAdapter {
 
-	@EventHandler
-	public void onChannelCreate(ChannelCreateEvent e) {
-		if (e.getConfig().isChannelsCached()) {
-			CacheManager cache = e.getServerQuery().getCache();
-			cache.updateChannelsListCache(); // only update channellist info
-			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
-		}
-	}
+    @EventHandler
+    public void onChannelCreate(ChannelCreateEvent e) {
+        if (e.getConfig().isChannelsCached()) {
+            CacheManager cache = e.getServerQuery().getCache();
+            cache.updateChannelsListCache(); // only update channellist info
+            cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
+        }
+    }
 
-	@EventHandler
-	public void onChannelDeleted(ChannelDeletedEvent e) {
-		if (e.getConfig().isChannelsCached()) {
-			CacheManager cache = e.getServerQuery().getCache();
-			cache.removeChannelListCacheChannel(e.getChannelID()); // only update channellist info
-			cache.cacheRemoveChannel(e.getChannelID());
-		}
-	}
+    @EventHandler
+    public void onChannelDeleted(ChannelDeletedEvent e) {
+        if (e.getConfig().isChannelsCached()) {
+            CacheManager cache = e.getServerQuery().getCache();
+            cache.removeChannelListCacheChannel(e.getChannelID()); // only update channellist info
+            cache.cacheRemoveChannel(e.getChannelID());
+        }
+    }
 
-	@EventHandler
-	public void onChannelDescriptionChanged(ChannelDescriptionEditedEvent e) {
-		// Not needed, because ChannelEditedEvent
-	}
+    @EventHandler
+    public void onChannelEdit(ChannelEditedEvent e) {
+        if (e.getConfig().isChannelsCached()) {
+            int channelID = e.getChannelID();
+            CacheManager cache = e.getServerQuery().getCache();
+            List<String> blackList = new ArrayList<>();
+            blackList.add("cid");
+            blackList.add("reasonid");
+            blackList.add("invokername");
+            blackList.add("invokerid");
+            blackList.add("invokeruid");
+            blackList.add("notifychanneledited");
+            blackList.add("reasonid");
+            Set<String> elements = e.getSplitMap().keySet();
+            elements.removeAll(blackList);
 
-	@EventHandler
-	public void onChannelEdit(ChannelEditedEvent e) {
-		if (e.getConfig().isChannelsCached()) {
-			CacheManager cache = e.getServerQuery().getCache();
-			cache.updateChannelsListCache(); // only update channellist info
-			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
-		}
-		
-		
-	}
+            new Thread(() -> {
+                String chList = cache.getChannelListChannel(channelID);
+                for (String keys : elements) {
+                    chList = cache.updateAttribute(chList, keys, e.getSplitMap().get(keys));
+                }
+                cache.updateChannelListChannelProp(channelID, chList); // only update channellist info
+            }).start();
 
-	@EventHandler
-	public void onChannelMoved(ChannelMovedEvent e) {
-		if (e.getConfig().isChannelsCached()) {
-			CacheManager cache = e.getServerQuery().getCache();
-			cache.updateChannelsListCache(); // only update channellist info
-			cache.updateChannelCache(e.getChannelID()); // only update channelinfo of channel
-		}
-	}
+            new Thread(() -> {
+                String chInfo = cache.getChannelInfo(channelID);
+                for (String keys : elements) {
+                    chInfo = cache.updateAttribute(chInfo, keys, e.getSplitMap().get(keys));
+                }
+                cache.updateChannelCache(channelID, chInfo); // only update channelinfo of channe
+            }).start();
+        }
+    }
 
-	@EventHandler
-	public void onChannelPasswordChanged(ChannelPasswordChangedEvent e) {
-		// Not needed, because ChannelEditedEvent
-	}
+    @EventHandler
+    public void onChannelMoved(ChannelMovedEvent e) {
+        if (e.getConfig().isChannelsCached()) {
+            CacheManager cache = e.getServerQuery().getCache();
+            int channelID = e.getChannelID();
+            String chList = cache.getChannelListChannel(channelID);
+            chList = cache.updateAttribute(chList, "channel_order", String.valueOf(e.getOrder()));
+            chList = cache.updateAttribute(chList, "pid", String.valueOf(e.getChannelParentID()));
+            cache.updateChannelListChannelProp(channelID, chList);
 
-	@EventHandler
-	public void onClientJoin(ClientJoinEvent e) {
-		CacheManager cache = e.getServerQuery().getCache();
+            String chInfo = cache.getChannelInfo(channelID);
+            chInfo = cache.updateAttribute(chInfo, "channel_order", String.valueOf(e.getOrder()));
+            chInfo = cache.updateAttribute(chInfo, "pid", String.valueOf(e.getChannelParentID()));
+            cache.updateChannelCache(channelID, chInfo);
+        }
+    }
 
-		if (e.getConfig().isClientsCached()) {
-			cache.updateClientListCache(); // only update clientlist info
-			cache.updateClientCache(e.getClientID()); // only update clientinfo of client
-		}
-		
-		if (e.getConfig().isDataBaseCached()) {
-			cache.updateDBClientCache(e.getClientDataBaseID()); // only update databaseinfo of client
-			cache.updateDBClientsListCache();
-		}
-	}
+    @EventHandler
+    public void onClientJoin(ClientJoinEvent e) {
+        CacheManager cache = e.getServerQuery().getCache();
 
-	@EventHandler
-	public void onClientLeave(ClientLeaveEvent e) {
-		CacheManager cache = e.getServerQuery().getCache();
+        if (e.getConfig().isClientsCached()) {
+            cache.updateClientListCache(); // only update clientlist info
+            cache.updateClientCache(e.getClientID()); // only update clientinfo of client
+        }
 
-		if (e.getConfig().isDataBaseCached()) {
-			cache.updateDBClientsListCache();
-		}
+        if (e.getConfig().isDataBaseCached()) {
+            cache.updateDBClientCache(e.getClientDataBaseID()); // only update databaseinfo of client
+            cache.updateDBClientsListCache();
+        }
+    }
 
-		if (!e.getConfig().isClientsCached())
-			return;
+    @EventHandler
+    public void onClientLeave(ClientLeaveEvent e) {
+        CacheManager cache = e.getServerQuery().getCache();
 
-		int clientID = e.getClientID();
-		if (e.getConfig().isDataBaseCached()) // update Database cache is only possible if client caching is enabled
-			cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(clientID), "client_database_id="))); // only update databaseinfo of client
-		
-		cache.removeClientListCacheClient(clientID);
-		cache.cacheRemoveClient(clientID);
-	}
+        if (e.getConfig().isDataBaseCached()) {
+            cache.updateDBClientsListCache();
+        }
 
-	@EventHandler
-	public void onClientMove(ClientMoveEvent e) {
-		CacheManager cache = e.getServerQuery().getCache();
+        if (!e.getConfig().isClientsCached())
+            return;
 
-		if (e.getConfig().isClientsCached()) {
-			cache.updateClientListCache(); // only update clientlist info
-			Set<Integer> ids = new HashSet<>(e.getClientIDs()); // update clientinfo of moved clients
-			int invoker = e.getInvokerID();
-			if (invoker != -1)
-				ids.add(invoker); // update clientinfo of invoker
-						
-			cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
-		}
+        int clientID = e.getClientID();
+        if (e.getConfig().isDataBaseCached()) // update Database cache is only possible if client caching is enabled
+            cache.updateDBClientCache(Integer.parseInt(Formatter.get(cache.getClientInfo(clientID), "client_database_id="))); // only update databaseinfo of client
 
-		if (e.getConfig().isQueryCached()) {
-			String information = cache.getQueryProperties();
-			int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
-			if (!e.getClientIDs().contains(queryID)) // checks if the query has moved
-				return;
+        cache.removeClientListCacheClient(clientID);
+        cache.cacheRemoveClient(clientID);
+    }
 
-			information = cache.updateAttribute(information, "client_channel_id=", String.valueOf(e.getTargetChannelID()));
-			cache.updateQueryPropsCache(information);
-		}
-	}
+    @EventHandler
+    public void onClientMove(ClientMoveEvent e) {
+        CacheManager cache = e.getServerQuery().getCache();
+        List<Integer> movedClients = e.getClientIDs();
 
-	@EventHandler
-	public void onPrivilegeKeyUsed(PrivilegeKeyUsedEvent e) {
+        if (e.getConfig().isClientsCached()) {
+            new Thread(() -> {
+                cache.updateClientListCache(); // only update clientlist info
+                Set<Integer> ids = new HashSet<>(movedClients); // update clientinfo of moved clients
+                int invoker = e.getInvokerID();
+                if (invoker != -1)
+                    ids.add(invoker); // update clientinfo of invoker
+                cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
+            }).start();
+        }
 
-	}
+        if (e.getConfig().isQueryCached()) {
+            new Thread(() -> {
+                String information = cache.getQueryProperties();
+                int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
+                if (!movedClients.contains(queryID)) // checks if the query has moved
+                    return;
+                information = cache.updateAttribute(information, "client_channel_id", String.valueOf(e.getTargetChannelID()));
+                cache.updateQueryPropsCache(information);
+            }).start();
+        }
+    }
 
-	@EventHandler
-	public void onServerEdit(ServerEditedEvent e) {
-		if (e.getConfig().isVirtualServerCached()) {
-			CacheManager cache = e.getServerQuery().getCache();
-			cache.updateVirtualServerCache(); // only update virtual server properties
-			cache.updateVirtualServerListCache(); // only update list of virtualservers
-		}
-	}
+    @EventHandler
+    public void onPrivilegeKeyUsed(PrivilegeKeyUsedEvent e) {
 
-	@EventHandler
-	public void onTextMessage(TextMessageEvent e) {
+    }
 
-	}
-
+    @EventHandler
+    public void onServerEdit(ServerEditedEvent e) {
+        if (e.getConfig().isVirtualServerCached()) {
+            CacheManager cache = e.getServerQuery().getCache();
+            cache.updateVirtualServerCache(); // only update virtual server properties
+            cache.updateVirtualServerListCache(); // only update list of virtualservers
+        }
+    }
 }
