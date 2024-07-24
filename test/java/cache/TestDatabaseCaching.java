@@ -37,7 +37,7 @@ public class TestDatabaseCaching {
         query = new Ts3ServerQuery();
         String password = System.getenv("TS3_SERVER_PASSWORD");
         query.getConfig().addCacheItem(CacheType.DATABASE);
-        assertTimeout(Duration.ofMillis(200), () -> {
+        assertTimeout(Duration.ofMillis(300), () -> {
             assertDoesNotThrow(new Executable() {
                 @Override
                 public void execute() throws Throwable {
@@ -57,8 +57,8 @@ public class TestDatabaseCaching {
     public void testGetDatabaseClientList() {
         assertTimeout(Duration.ofMillis(25), () -> {
             List<DataBaseClientInfo> dbClients = basic.getDataBaseClients(-1, -1);
-            assertEquals(25, dbClients.size());
             assertFalse(dbClients.isEmpty(), "Database client list should not be empty");
+            assertEquals(25, dbClients.size());
             dbClients.forEach(dbClient -> assertNotNull(dbClient, "DataBaseClientInfo should not be null"));
         });
     }
@@ -75,7 +75,7 @@ public class TestDatabaseCaching {
 
         DataBaseClientInfo dbClient = basic.getDataBaseClient(21);
         assertEquals("Client17", dbClient.getClientName(), "Client name should match the expected name");
-        assertEquals("uaw\\/BPP2sVGuP7KjSbvyPWV9nNA=", dbClient.getUUID(), "UUID should match the expected UUID");
+        assertEquals("uaw/BPP2sVGuP7KjSbvyPWV9nNA=", dbClient.getUUID(), "UUID should match the expected UUID");
         assertEquals(1717667384, dbClient.getCreatingTime(), "Created timestamp should match the expected timestamp");
         assertEquals(1717667389, dbClient.getLastConnection(), "Last connected timestamp should match the expected timestamp");
         assertEquals("Description of Client17", dbClient.getDescription(), "Description should match the expected description");

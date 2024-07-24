@@ -13,6 +13,9 @@ jobs:
       - name: Copy DataBase
         run: cp ./docker/ts3server.sqlitedb ./docker/data/
 
+      - name: Copy Server Files
+        run: cp -R ./docker/files/ ./docker/data/
+
       - name: Load Docker image
         run: docker load -i docker/ts_server_image.tar
 

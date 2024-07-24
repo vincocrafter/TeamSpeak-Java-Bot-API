@@ -59,6 +59,7 @@ public class TestGroupsAndUsers {
     @Test
     public void testGroupsByUser() {
         assertEquals(15, basic.getServerGroupIDsByClient(2).size(), "User with id 2 should be in 15 server groups");
+        assertEquals(15, basic.getServerGroupNamesByClient(2).size(), "User with id 2 should be in 15 server groups");
         assertEquals(9, basic.getServerGroupIDsByClient(4).size(), "User with id 4 should be in 9 server groups");
 
         assertTrue(basic.getServerGroupIDsByClient(4).contains(6), "User with id 4 should be in server group 6");
@@ -85,6 +86,12 @@ public class TestGroupsAndUsers {
         assertEquals(3, basic.getChannelGroupsByChannelID(101).size(), "Channel with id 101 should have 3 channel groups");
         assertEquals(2, basic.getChannelGroupsByChannelID(101).get(14).size(), "Channel with id 101 should have channel group with id 14 and 2 clients");
         assertTrue(basic.getChannelGroupsByChannelID(101).get(14).contains(5), "Channel with id 101 should have channel group with id 14 and clients with id 5");
+    }
+
+    @Test
+    public void testUsersByChannelAndGroup() {
+        assertEquals(2, basic.getDatabaseIDsByChannelAndGroup(101, 14).size(), "Channel with id 101 and group with id 14 should have 2 users");
+        assertEquals(1, basic.getDatabaseIDsByChannelAndGroup(1, 16).size(), "Channel with id 1 and group with id 16 should have 1 user");
     }
 
 }

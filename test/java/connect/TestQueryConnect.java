@@ -11,7 +11,9 @@
  */
 package connect;
 
+import net.devcube.vinco.teamspeakapi.api.api.property.EventType;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
+import net.devcube.vinco.teamspeakapi.api.async.Ts3AsyncAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,21 +37,20 @@ public class TestQueryConnect {
     @Test
     public void testConnectionNormal() {
         Ts3ServerQuery query = new Ts3ServerQuery();
-
         assertTimeout(Duration.ofMillis(250), () -> {
             assertDoesNotThrow(() -> {
-                query.connect("localhost", 10011, "serveradmin", password, 1, "Test", -1);
+                query.connect("localhost", 10011, "serveradmin", password, 1, "Test", 1);
                 Ts3SyncAPI sync = query.getSyncAPI();
                 assertTrue(sync.isConnected());
                 QueryClientInfo info = sync.getQueryInfo();
-                assertEquals(info.getName(), "Test");
-                assertEquals(info.getUUID(), "serveradmin");
-                assertEquals(info.getDataBaseID(), 1);
-                assertEquals(info.getVirtualServerID(), 1);
+                assertEquals("Test", info.getName());
+                assertEquals("serveradmin", info.getUUID());
+                assertEquals(1, info.getDataBaseID());
+                assertEquals(1, info.getVirtualServerID());
                 assertEquals(25, sync.getDataBaseClients().size());
                 assertEquals(51, sync.getChannels().size());
-                assertTrue(sync.getServerGroups().size() >= 28);
-                assertTrue(sync.getChannelGroups().size() >= 24);
+                assertEquals(28, sync.getServerGroups().size());
+                assertEquals(24, sync.getChannelGroups().size());
                 query.stopQuery();
             });
         });
@@ -114,6 +115,44 @@ public class TestQueryConnect {
                     query.stopQuery();
                 }
             });
+        });
+    }
+
+    @Test
+    public void testConnectionWithoutSocketConnection() {
+        Ts3ServerQuery query = new Ts3ServerQuery();
+        query.getConfig().setConnection(null);
+        assertTimeout(Duration.ofMillis(200), () -> {
+            assertThrows(NullPointerException.class,new Executable() {
+
+                @Override
+                public void execute() throws Throwable {
+                    query.connect("localhost", 10011);
+                    query.stopQuery();
+                }
+            });
+        });
+    }
+
+    @Test
+    public void testConnectionAsync() {
+        Ts3ServerQuery query = new Ts3ServerQuery();
+        assertTimeout(Duration.ofMillis(250), () -> {
+            assertDoesNotThrow(new Executable() {
+                @Override
+                public void execute() throws Throwable {
+                    query.connect("localhost", 10011);
+                    Ts3AsyncAPI async = query.getAsyncAPI();
+                    async.login("serveradmin", password);
+                    async.selectVirtualServer(1, -1, "Test").onFinish(res -> {
+                        async.registerEvent(EventType.CHANNEL, 0);
+                        async.registerEvent(EventType.SERVER, -1);
+                    });
+                    query.getSyncAPI().getVersion();
+                    query.stopQuery();
+                }
+            });
+            assertFalse(query.getSyncAPI().isConnected());
         });
     }
 }

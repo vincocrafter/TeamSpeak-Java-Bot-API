@@ -14,6 +14,7 @@ package cache;
 import net.devcube.vinco.teamspeakapi.api.api.property.ChannelGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.property.ServerGroupType;
 import net.devcube.vinco.teamspeakapi.api.api.util.CacheType;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.ServerGroupInfo;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
@@ -63,10 +64,13 @@ public class TestGroupCaching {
             assertEquals(28, serverGroups.size(), "Server group list size should match the expected size");
             serverGroups.forEach(groups -> assertNotNull(groups, "Server group should not be null"));
         });
-        basic.createServerGroup("TestOtherServerGroup", ServerGroupType.NORMAL);
+        int createdServerGroup  = basic.createServerGroup("TestOtherServerGroup", ServerGroupType.NORMAL);
         assertEquals(28, basic.getServerGroups().size(), "Server group list size should match the old size");
         query.getCache().updateServerGroupsCache();
         assertEquals(29, basic.getServerGroups().size(), "Server group list size should match the actual size");
+        basic.deleteServerGroup(createdServerGroup, true);
+        query.getCache().updateServerGroupsCache();
+        assertEquals(28, basic.getServerGroups().size(), "Server group list size should match the old size");
 
     }
 
@@ -79,9 +83,12 @@ public class TestGroupCaching {
             channelGroups.forEach(groups -> assertNotNull(groups, "Channel group should not be null"));
         });
 
-        basic.createChannelGroup("TestOtherChannelGroup", ChannelGroupType.NORMAL);
+        int createdChannelGroup = basic.createChannelGroup("TestOtherChannelGroup", ChannelGroupType.NORMAL);
         assertEquals(24, basic.getChannelGroups().size(), "Channel group list size should match the old size");
         query.getCache().updateChannelGroupsCache();
         assertEquals(25, basic.getChannelGroups().size(), "Channel group list size should match the actual size");
+        basic.deleteChannelGroup(createdChannelGroup, true);
+        query.getCache().updateChannelGroupsCache();
+        assertEquals(24, basic.getChannelGroups().size(), "Channel group list size should match the old size");
     }
 }

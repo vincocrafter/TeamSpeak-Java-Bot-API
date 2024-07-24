@@ -1,18 +1,8 @@
-/**
- * Projekt: TEAMSPEAK - TestBot
- * <p>
- * Autor : Vincent
- * <p>
- * Jahr 2023
- * <p>
- * Datum : 05.11.2023
- * <p>
- * Uhrzeit : 14:18:37
- */
 package cache;
 
 import net.devcube.vinco.teamspeakapi.api.api.util.CacheType;
-import net.devcube.vinco.teamspeakapi.api.api.wrapper.ClientInfo;
+import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.Permission;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.query.Ts3ServerQuery;
 import org.junit.jupiter.api.AfterAll;
@@ -25,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestClientCaching {
+public class TestPermissionCaching {
     private static Ts3ServerQuery query;
     private static Ts3BasicAPI basic;
 
@@ -33,8 +23,9 @@ public class TestClientCaching {
     public static void connectQuery() {
         query = new Ts3ServerQuery();
         String password = System.getenv("TS3_SERVER_PASSWORD");
-        query.getConfig().addCacheItem(CacheType.CLIENTS);
-        assertTimeout(Duration.ofMillis(300), () -> {
+        query.getConfig().addCacheItem(CacheType.PERMISSION);
+
+        assertTimeout(Duration.ofMillis(350), () -> {
             assertDoesNotThrow(new Executable() {
                 @Override
                 public void execute() throws Throwable {
@@ -51,22 +42,18 @@ public class TestClientCaching {
     }
 
     @Test
-    public void testGetClientList() {
-        assertTimeout(Duration.ofMillis(25), () -> {
-            List<ClientInfo> clients = basic.getClients();
-            assertFalse(clients.isEmpty(), "Client list should not be empty");
-            clients.forEach(client -> assertNotNull(client, "ClientInfo should not be null"));
-        });
-    }
+    public void testGetPermissionList() {
+        assertEquals(496, basic.getPermissionList().size());
+        assertEquals(496, basic.getPermissionIDs(basic.getPermissionList()).size());
+        assertEquals(496, basic.getPermissionIDs().size());
 
-    @Test
-    public void testGetClients() {
-        assertTimeout(Duration.ofMillis(25), () -> {
-            for (ClientInfo client : basic.getClients()) {
-                ClientInfo clientInfo = basic.getClient(client.getID());
-                assertNotNull(clientInfo, "ClientInfo should not be null for client ID: " + client.getID());
-                assertEquals(client.getID(), clientInfo.getID(), "ClientInfo ID should match the client ID");
-            }
+        assertTimeout(Duration.ofMillis(40), () -> {
+            basic.getPermissionList().forEach(perm -> assertNotNull(perm, "Permission should not be null"));
         });
+
+        assertTimeout(Duration.ofMillis(40), () -> {
+            basic.getPermissionIDs().forEach(perms -> assertNotNull(perms, "Permission should not be null"));
+        });
+
     }
 }

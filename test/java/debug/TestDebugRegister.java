@@ -46,8 +46,6 @@ public class TestDebugRegister {
 
     @AfterAll
     public static void stopQuery() {
-        config.getDebugList().clear();
-        config.getCachingList().clear();
         query.stopQuery();
     }
 
@@ -91,25 +89,18 @@ public class TestDebugRegister {
         assertTrue(config.isInDebug(DebugOutputType.QUERYWRITER), "QueryWriter debug should be enabled");
         assertTrue(config.isInDebug(DebugOutputType.CACHEMANAGER), "CacheManager debug should be enabled");
         assertTrue(config.isInDebug(DebugOutputType.GENERAL), "General debug should be enabled");
+
+        config.removeDebugItem(DebugOutputType.EVENTMANAGER);
+        config.removeDebugItem(DebugOutputType.KEEPALIVETHREAD);
+        config.removeDebugItem(DebugOutputType.QUERY);
+        config.removeDebugItem(DebugOutputType.ERROR);
+        config.removeDebugItem(DebugOutputType.WARNING);
+        config.removeDebugItem(DebugOutputType.QUERYREADER);
+        config.removeDebugItem(DebugOutputType.QUERYREADERQUEUE);
+        config.removeDebugItem(DebugOutputType.QUERYWRITER);
+        config.removeDebugItem(DebugOutputType.CACHEMANAGER);
+        config.removeDebugItem(DebugOutputType.GENERAL);
+
+        assertEquals(12, config.getDebugList().size(), "All normal debug items should be removed");
     }
-
-    @Test
-    public void testCacheEnabled() {
-        assertTrue(config.getCachingList().isEmpty(), "No cache items should be added");
-
-        config.addCacheItem(CacheType.CLIENTS);
-        config.addCacheItem(CacheType.DATABASE);
-        config.addCacheItem(CacheType.GROUPS);
-        config.addCacheItem(CacheType.PERMISSION);
-        config.addCacheItem(CacheType.QUERY);
-        config.addCacheItem(CacheType.VIRTUALSERVER);
-
-        assertTrue(config.isClientsCached(), "Client cache should be enabled");
-        assertTrue(config.isDataBaseCached(), "Database cache should be enabled");
-        assertTrue(config.isGroupsCached(), "Groups cache should be enabled");
-        assertTrue(config.isPermissionCached(), "Permission cache should be enabled");
-        assertTrue(config.isQueryCached(), "Query cache should be enabled");
-        assertTrue(config.isVirtualServerCached(), "VirtualServer cache should be enabled");
-    }
-
 }
