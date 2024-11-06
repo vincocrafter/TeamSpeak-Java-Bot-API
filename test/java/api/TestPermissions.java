@@ -222,9 +222,9 @@ public class TestPermissions {
             perms.getFirstID();
             perms.getSecondID();
             perms.getTier();
-            assertThrows(NumberFormatException.class, () -> perms.getPermValue());
-            assertThrows(NumberFormatException.class, () -> perms.isNegated());
-            assertThrows(NumberFormatException.class, () -> perms.isSkip());
+            assertEquals(-2, perms.getPermValue());
+            assertFalse(perms.isNegated());
+            assertFalse(perms.isSkip());
             assertNotNull(perms.toString());
         });
 

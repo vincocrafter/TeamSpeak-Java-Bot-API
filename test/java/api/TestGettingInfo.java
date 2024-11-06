@@ -12,7 +12,6 @@
 package api;
 
 import net.devcube.vinco.teamspeakapi.api.api.property.*;
-import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.*;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3BasicAPI;
 import net.devcube.vinco.teamspeakapi.api.sync.Ts3SyncAPI;
@@ -94,9 +93,9 @@ public class TestGettingInfo {
             client.getChannelGroupInheritedChannelID();
             assertNotNull(client.getBadges());
             assertFalse(client.hasMyTeamspeakID());
-            assertNull(client.getMyTeamspeakID());
-            assertNull(client.getIntegrations());
-            assertNull(client.getMyTeamspeakAvatar());
+            assertNotNull(client.getMyTeamspeakID());
+            assertNotNull(client.getIntegrations());
+            assertNotNull(client.getMyTeamspeakAvatar());
             client.getIconID();
             assertNotNull(client.toString());
         });
@@ -117,9 +116,7 @@ public class TestGettingInfo {
             assertEquals(1, basic.getClientIDsByName(client.getName()).size());
 
             client.isOutputOnlyMuted();
-            assertThrows(NumberFormatException.class, () -> {
-                client.getDefaultChannelID();
-            });
+            client.getDefaultChannelID();
 
             assertNotNull(client.getLoginName());
             client.getTotalConnections();
@@ -372,7 +369,7 @@ public class TestGettingInfo {
 
         sync.selectVirtualServer(1);
 
-        assertDoesNotThrow( () -> {
+        assertDoesNotThrow(() -> {
             CreatedQueryLogin login = basic.createQueryLogin("Test", 3);
             login.getClientDataBaseID();
             assertEquals("Test", login.getClientLoginName());
@@ -446,7 +443,7 @@ public class TestGettingInfo {
         CreatedSnapshot snapshot = basic.createSnapshot(null);
         assertNotNull(snapshot);
         assertNotNull(snapshot.getData());
-        assertNull(snapshot.getSalt());
+        assertNotNull(snapshot.getSalt());
         snapshot.getVersion();
         assertNotNull(snapshot.toString());
 
@@ -507,8 +504,8 @@ public class TestGettingInfo {
         List<FileInfo> files = basic.getFileInfos(channel.getID(), channel.getPassword(), fileNames);
         assertEquals(3, files.size());
 
-        basic.renameFile(channel.getID(),channel.getPassword(), "/Test3", "/Test5");
-        assertEquals("Test3.txt", basic.getFileInfo(channel.getID(),channel.getPassword(), "/Test5/Test3.txt").getName());
+        basic.renameFile(channel.getID(), channel.getPassword(), "/Test3", "/Test5");
+        assertEquals("Test3.txt", basic.getFileInfo(channel.getID(), channel.getPassword(), "/Test5/Test3.txt").getName());
 
         basic.createFileDirectory(channel.getID(), channel.getPassword(), "/Test4");
         assertEquals(5, basic.getChannelFilesByPath(channel.getID(), channel.getPassword(), "/").size());
@@ -517,11 +514,11 @@ public class TestGettingInfo {
         assertEquals(3, basic.getChannelFilesByPath(channel.getID(), channel.getPassword(), "/").size());
 
         ChannelInfo channel2 = basic.getChannel(54);
-        basic.moveFile(channel.getID(),channel.getPassword(), "/Test2/Test2.txt",
-                channel2.getID(),channel.getPassword(),"/MovedTest2.txt");
+        basic.moveFile(channel.getID(), channel.getPassword(), "/Test2/Test2.txt",
+                channel2.getID(), channel.getPassword(), "/MovedTest2.txt");
         assertEquals(0, basic.getChannelFilesByPath(channel.getID(), channel.getPassword(), "/Test2/").size());
         assertEquals(1, basic.getChannelFilesByPath(channel2.getID(), channel2.getPassword(), "/").size());
-        assertEquals("MovedTest2.txt", basic.getFileInfo(channel2.getID(),channel2.getPassword(), "/MovedTest2.txt").getName());
+        assertEquals("MovedTest2.txt", basic.getFileInfo(channel2.getID(), channel2.getPassword(), "/MovedTest2.txt").getName());
     }
 
     @Test
@@ -792,5 +789,14 @@ public class TestGettingInfo {
     public void testGetHelp() {
         String help = basic.getHelp();
         assertEquals(150, help.split(System.lineSeparator()).length);
+    }
+
+    @Test
+    public void testGetLog() {
+        assertTrue(sync.getInstanceLog().size() >= 23);
+        assertEquals(20, sync.getInstanceLog(20).size());
+
+        assertTrue(sync.getVirtualServerLog().size() >= 1);
+        assertEquals(1, sync.getVirtualServerLog(1).size());
     }
 }

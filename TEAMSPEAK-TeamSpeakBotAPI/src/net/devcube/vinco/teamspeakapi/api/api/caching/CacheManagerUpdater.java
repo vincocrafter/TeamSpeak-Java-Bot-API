@@ -57,21 +57,14 @@ public class CacheManagerUpdater extends TsEventAdapter {
             Set<String> elements = e.getSplitMap().keySet();
             elements.removeAll(blackList);
 
-            new Thread(() -> {
-                String chList = cache.getChannelListChannel(channelID);
-                for (String keys : elements) {
-                    chList = cache.updateAttribute(chList, keys, e.getSplitMap().get(keys));
-                }
-                cache.updateChannelListChannelProp(channelID, chList); // only update channellist info
-            }).start();
-
-            new Thread(() -> {
-                String chInfo = cache.getChannelInfo(channelID);
-                for (String keys : elements) {
-                    chInfo = cache.updateAttribute(chInfo, keys, e.getSplitMap().get(keys));
-                }
-                cache.updateChannelCache(channelID, chInfo); // only update channelinfo of channe
-            }).start();
+            String chInfo = cache.getChannelInfo(channelID);
+            String chList = cache.getChannelListChannel(channelID);
+            for (String keys : elements) {
+                chList = cache.updateAttribute(chList, keys, e.getSplitMap().get(keys));
+                chInfo = cache.updateAttribute(chInfo, keys, e.getSplitMap().get(keys));
+            }
+            cache.updateChannelListChannelProp(channelID, chList); // only update channellist info
+            cache.updateChannelCache(channelID, chInfo); // only update channelinfo of channe
         }
     }
 
@@ -132,25 +125,21 @@ public class CacheManagerUpdater extends TsEventAdapter {
         List<Integer> movedClients = e.getClientIDs();
 
         if (e.getConfig().isClientsCached()) {
-            new Thread(() -> {
-                cache.updateClientListCache(); // only update clientlist info
-                Set<Integer> ids = new HashSet<>(movedClients); // update clientinfo of moved clients
-                int invoker = e.getInvokerID();
-                if (invoker != -1)
-                    ids.add(invoker); // update clientinfo of invoker
-                cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
-            }).start();
+            cache.updateClientListCache(); // only update clientlist info
+            Set<Integer> ids = new HashSet<>(movedClients); // update clientinfo of moved clients
+            int invoker = e.getInvokerID();
+            if (invoker != -1)
+                ids.add(invoker); // update clientinfo of invoker
+            cache.updateClientsCache(ids.stream().toList()); // only use one command for multiple clients
         }
 
         if (e.getConfig().isQueryCached()) {
-            new Thread(() -> {
-                String information = cache.getQueryProperties();
-                int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
-                if (!movedClients.contains(queryID)) // checks if the query has moved
-                    return;
-                information = cache.updateAttribute(information, "client_channel_id", String.valueOf(e.getTargetChannelID()));
-                cache.updateQueryPropsCache(information);
-            }).start();
+            String information = cache.getQueryProperties();
+            int queryID = Integer.parseInt(Formatter.get(information, "client_id="));
+            if (!movedClients.contains(queryID)) // checks if the query has moved
+                return;
+            information = cache.updateAttribute(information, "client_channel_id", String.valueOf(e.getTargetChannelID()));
+            cache.updateQueryPropsCache(information);
         }
     }
 

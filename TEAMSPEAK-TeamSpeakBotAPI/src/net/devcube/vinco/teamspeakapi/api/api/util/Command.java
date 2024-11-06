@@ -45,11 +45,14 @@ public class Command<I> {
 	/**
 	 * @param error the error to set
 	 */
-	public synchronized void setError(String error) {
+	public void setError(String error) {
 		this.error = error;
 		finished.set(true);
+	}
+	
+	public void runFinish() {
 		if (future != null && future.getOnFinish() != null) {
-			future.getOnFinish().accept(future.get());
+			future.getOnFinish().accept(future.get(), TSError.isError(error, TSError.OK));
 		}
 	}
 	

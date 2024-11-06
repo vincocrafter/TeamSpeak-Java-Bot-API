@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class CommandFuture<I> {
@@ -23,7 +24,7 @@ public class CommandFuture<I> {
 	private FutureTask<Command> task;
 	private I value;
 	private Transformator<I> transformator;
-	private Consumer<I> onFinish;
+	private BiConsumer<I, Boolean> onFinish;
 
 	public CommandFuture(Transformator<I> transformator) {
 		this.transformator = transformator;
@@ -94,12 +95,12 @@ public class CommandFuture<I> {
 		return task.get(time, unit);
 	}
 
-	public CommandFuture onFinish(Consumer<I> onFinish) {
+	public CommandFuture onFinish(BiConsumer<I, Boolean> onFinish) {
 		this.onFinish = onFinish;
 		return this;
 	}
 
-	protected Consumer<I> getOnFinish() {
+	protected BiConsumer<I, Boolean> getOnFinish() {
 		return onFinish;
 	}
 

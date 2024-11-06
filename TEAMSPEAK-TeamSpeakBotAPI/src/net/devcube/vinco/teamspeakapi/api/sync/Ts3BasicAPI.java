@@ -121,8 +121,8 @@ public class Ts3BasicAPI {
             logger.debug(DebugOutputType.QUERY, "Using Debugs: " + config.getDebugList().toString());
             logger.debug(DebugOutputType.QUERY, "Using Caches: " + config.getCachingList().toString());
         } else if (TSError.isError(res[1], TSError.QUERY_INVALID_LOGIN)) {
-            logger.debug(DebugOutputType.ERROR, "Login failed! Invalid loginname or password!");
-            throw new QueryLoginException("Invalid loginname or password!");
+            logger.debug(DebugOutputType.ERROR, "Login failed! Invalid login name or password!");
+            throw new QueryLoginException("Invalid login name or password!");
         } else if (TSError.isError(res[1], TSError.CONNECTION_FAILED_BANNED)) {
             logger.debug(DebugOutputType.ERROR, "Login failed! Queryclient is banned!");
             throw new QueryLoginException("Queryclient is banned!");
@@ -537,8 +537,8 @@ public class Ts3BasicAPI {
 
         if (channelGroups == null)
             return resultList;
-        for (String client : channelGroups.split(TS_INFO_SEPARATOR)) {
-            resultList.add(new ChannelGroupInfo(client));
+        for (String groups : channelGroups.split(TS_INFO_SEPARATOR)) {
+            resultList.add(new ChannelGroupInfo(groups));
         }
         return resultList;
     }
@@ -1036,12 +1036,12 @@ public class Ts3BasicAPI {
     }
 
     public Map<Integer, String> getChannelsByName(String channelName) {
+        Map<Integer, String> resultMap = new HashMap<>();
         String cmd = CommandBuilder.buildGetChannelsByNameCommand(channelName);
         String[] result = writer.executeReadCommand(cmd);
         if (checkError(result, cmd))
-            return null;
+            return resultMap;
 
-        Map<Integer, String> resultMap = new HashMap<>();
         for (String info : splitResult(result)) {
             int key = Integer.parseInt(Formatter.toNormalFormat(Formatter.get(info, "cid=")));
             String value = Formatter.toNormalFormat(Formatter.get(info, "channel_name="));
@@ -1668,6 +1668,14 @@ public class Ts3BasicAPI {
         writer.executeReadErrorCommand(CommandBuilder.buildUpdateQueryNameCommand(queryName));
     }
 
+    /**
+     * Adds a complaint about a specific client identified by their database ID.
+     * @param clientDBID The database ID of the client to add the complaint about.<br>
+     *                   <b>Note:</b> The client <b>must</b> be online to add a complaint,
+     *                   the database ID is only for identification. Otherwise, the command will do nothing.
+     * @param message The message of the complaint.
+     */
+
     public void addComplaint(int clientDBID, String message) {
         writer.executeReadErrorCommand(CommandBuilder.buildAddComplainCommand(clientDBID, message));
     }
@@ -1796,7 +1804,7 @@ public class Ts3BasicAPI {
      * @param lines    Amount of entries should be returned. Between [1,100] (100 Default)
      * @param reverse  if enabled the order is reversed
      * @param instance if enabled log is returned from the instance, otherwise from the virtualserver.
-     * @param beginPos amout of lines that should be skipped from the start.
+     * @param beginPos amount of lines that should be skipped from the start.
      * @return List of Log entries from the servers log.
      */
 

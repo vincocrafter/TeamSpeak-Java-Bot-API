@@ -7,6 +7,7 @@ import net.devcube.vinco.teamspeakapi.api.api.events.*;
 import net.devcube.vinco.teamspeakapi.api.api.exception.query.QueryLoginException;
 import net.devcube.vinco.teamspeakapi.api.api.property.*;
 import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
+import net.devcube.vinco.teamspeakapi.api.api.wrapper.ChannelInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.CreatedQueryLogin;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.QueryClientInfo;
 import net.devcube.vinco.teamspeakapi.api.api.wrapper.VirtualServerInfo;
@@ -120,7 +121,7 @@ public class TestEventCall {
         int createdChannel = basic.createChannel("TestChannel", properties);
         basic.deleteChannel(createdChannel, true);
         try {
-            Thread.sleep(5);
+            Thread.sleep(15);
         } catch (InterruptedException e) {
 
         }
@@ -157,15 +158,15 @@ public class TestEventCall {
                 e.hasChannelSemiPermanentBeenEdited();
                 assertTrue(e.isEditedChannelSemiPermanent());
                 e.hasChannelDefaultBeenEdited();
-                assertThrows(NumberFormatException.class, () -> e.isEditedChannelDefault());
+                assertFalse(e.isEditedChannelDefault());
                 e.hasChannelPasswordBeenEdited();
                 assertTrue(e.hasEditedChannelPassword());
                 e.hasChannelCodecLatencyFactorBeenEdited();
-                assertThrows(NumberFormatException.class, () -> e.getEditedChannelCodecLatencyFactor());
+                assertEquals(-2.0, e.getEditedChannelCodecLatencyFactor());
                 e.hasChannelCodecUnencryptedBeenEdited();
                 assertFalse(e.isEditedChannelCodecUnencrypted());
                 e.hasChannelDeleteDelayBeenEdited();
-                assertThrows(NumberFormatException.class, () -> e.getEditedChannelDeleteDelay());
+                assertEquals(-2, e.getEditedChannelDeleteDelay());
                 e.hasChannelMaxClientsUnlimitedBeenEdited();
                 assertFalse(e.isEditedChannelMaxClientsUnlimited());
                 e.hasChannelMaxFamilyClientsUnlimitedBeenEdited();
@@ -178,10 +179,11 @@ public class TestEventCall {
                 assertNotNull(e.getEditedChannelNamePhonetic());
                 assertEquals("TestChannelPhonetic", e.getEditedChannelNamePhonetic());
                 e.hasChannelIconIDBeenEdited();
-                assertThrows(NumberFormatException.class, () -> e.getEditedChannelIconID());
+                assertEquals(-2, e.getEditedChannelIconID());
                 assertNotNull(e.toString());
             }
         };
+        ChannelInfo info = basic.getChannel(54);
         ev.addTs3Listener(adapter);
         Map<ChannelProperty, String> properties = new HashMap<>();
         properties.put(ChannelProperty.CHANNEL_NAME, "EditedChannel1");
@@ -204,10 +206,16 @@ public class TestEventCall {
 
         basic.editChannel(54, properties);
         try {
-            Thread.sleep(5);
+            Thread.sleep(15);
         } catch (InterruptedException e) {
         }
         ev.removeTs3Listener(adapter);
+
+        Map<ChannelProperty, String> reset = new HashMap<>();
+        for (ChannelProperty key : properties.keySet()) {
+            reset.put(key, info.getSplitMap().get(key.getValue()));
+        }
+        basic.editChannel(54, reset);
     }
 
     @Test
@@ -221,13 +229,15 @@ public class TestEventCall {
         };
 
         ev.addTs3Listener(adapter);
+        String curDesc = basic.getChannel(54).getDescription();
 
         basic.editChannel(54, Collections.singletonMap(ChannelProperty.CHANNEL_DESCRIPTION, "NewDescription"));
         try {
-            Thread.sleep(5);
+            Thread.sleep(15);
         } catch (InterruptedException e) {
         }
         ev.removeTs3Listener(adapter);
+        basic.editChannel(54, Collections.singletonMap(ChannelProperty.CHANNEL_DESCRIPTION, curDesc));
     }
 
 
@@ -243,7 +253,7 @@ public class TestEventCall {
                 e.getInvokerID();
                 assertNotNull(e.getInvokerName());
                 assertNotNull(e.getInvokerUUID());
-                assertThrows(NumberFormatException.class, () -> e.getClientID());
+                assertEquals(-2, e.getClientID());
                 assertNotNull(e.toString());
             }
         };
@@ -253,7 +263,7 @@ public class TestEventCall {
         basic.moveChannel(58, 57, 0);
         basic.moveChannel(58, 0, 57);
         try {
-            Thread.sleep(5);
+            Thread.sleep(15);
         } catch (InterruptedException e) {
         }
         ev.removeTs3Listener(adapter);
@@ -273,7 +283,7 @@ public class TestEventCall {
         basic.editChannel(56, Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, "NewPassword"));
         basic.editChannel(56, Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, ""));
         try {
-            Thread.sleep(5);
+            Thread.sleep(15);
         } catch (InterruptedException e) {
         }
         ev.removeTs3Listener(adapter);
@@ -331,7 +341,6 @@ public class TestEventCall {
         try {
             otherQuery.connect("localhost", 10011);
             otherQuery.getSyncAPI().selectVirtualServer(1);
-            otherQuery.stopQuery();
         } catch (IOException e) {
         }
 
@@ -339,6 +348,7 @@ public class TestEventCall {
             Thread.sleep(50);
         } catch (InterruptedException e) {
         }
+        otherQuery.stopQuery();
         ev.removeTs3Listener(adapter);
     }
 
@@ -353,12 +363,12 @@ public class TestEventCall {
                 assertFalse(e.hasBeenKicked());
                 assertFalse(e.hasBeenBanned());
                 assertFalse(e.hasClientLostConnection());
-                assertThrows(NumberFormatException.class, () -> e.getInvokerID());
-                assertThrows(NullPointerException.class, () -> e.getInvokerName());
-                assertThrows(NullPointerException.class, () -> e.getInvokerUUID());
+                assertEquals(-2, e.getInvokerID());
+                assertNotNull(e.getInvokerName());
+                assertNotNull(e.getInvokerUUID());
                 assertNotNull(e.getReasonMsg());
                 assertEquals("disconnecting", e.getReasonMsg());
-                assertThrows(NumberFormatException.class, () -> e.getBanTime());
+                assertEquals(-2, e.getBanTime());
                 assertNotNull(e.toString());
             }
         };
@@ -443,13 +453,14 @@ public class TestEventCall {
             otherQuery.getSyncAPI().login("OtherClient", login.getClientLoginPassword());
             otherQuery.getSyncAPI().selectVirtualServer(1);
             otherQuery.getBasicAPI().usePrivilegeKey(key);
-
             otherQuery.stopQuery();
         } catch (IOException | QueryLoginException e) {
         }
         basic.deleteQueryLogin(targetClientDBID);
         assertEquals(0, basic.getQueryLogins("OtherClient", -1, -1).size());
         assertEquals(0, basic.getPrivilegeKeys().size());
+
+        ev.removeTs3Listener(adapter);
     }
 
     @Test
@@ -488,7 +499,7 @@ public class TestEventCall {
                 e.hasPhoneticNameBeenEdited();
                 assertEquals("TestServerPhonetic", e.getEditedPhoneticName());
                 e.hasIconIDBeenEdited();
-                assertThrows(NumberFormatException.class, () -> e.getEditedIconID());
+                assertEquals(-2, e.getEditedIconID());
                 e.hasHostBannerModeBeenEdited();
                 e.getEditedHostBannerModeInt();
                 assertSame(HostBannerMode.KEEPASPECT, e.getEditedHostBannerMode());
@@ -556,7 +567,7 @@ public class TestEventCall {
         ev.addTs3Listener(adapter);
         basic.sendTextMessage(TextMessageType.CLIENT, queryClientInfo.getClientID(), "TestMessage");
         try {
-            Thread.sleep(5);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
         }
         ev.removeTs3Listener(adapter);

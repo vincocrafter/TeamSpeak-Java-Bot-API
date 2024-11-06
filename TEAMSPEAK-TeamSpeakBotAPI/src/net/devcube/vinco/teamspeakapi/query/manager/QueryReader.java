@@ -11,23 +11,23 @@
  */
 package net.devcube.vinco.teamspeakapi.query.manager;
 
+import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManagerUpdater;
+import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
+import net.devcube.vinco.teamspeakapi.api.api.util.*;
+import net.devcube.vinco.teamspeakapi.query.connection.QueryConnection;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import net.devcube.vinco.teamspeakapi.api.api.caching.CacheManagerUpdater;
-import net.devcube.vinco.teamspeakapi.api.api.event.EventManager;
-import net.devcube.vinco.teamspeakapi.api.api.util.Command;
-import net.devcube.vinco.teamspeakapi.api.api.util.DebugOutputType;
-import net.devcube.vinco.teamspeakapi.api.api.util.EventCallType;
-import net.devcube.vinco.teamspeakapi.api.api.util.FloodRate;
-import net.devcube.vinco.teamspeakapi.api.api.util.Logger;
-import net.devcube.vinco.teamspeakapi.query.connection.QueryConnection;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class QueryReader {
 
@@ -38,6 +38,7 @@ public class QueryReader {
     private Queue<Command> commands = new LinkedList<>();
     private Queue<Command> hover = new LinkedList<>();
     private boolean allowed = true;
+    private AtomicBoolean shutdown = new AtomicBoolean(false);
     private Thread readerThread;
     private ExecutorService userThreadPool;
 
@@ -88,7 +89,10 @@ public class QueryReader {
             logger.debug(DebugOutputType.QUERYREADER, "Added to Errors: " + msg);
             logger.debug(DebugOutputType.QUERYREADERQUEUE, "Added to Errors: " + msg);
             if (!hover.isEmpty()) {
-                createTask("ASYN", () -> hover.poll().setError(msg));
+                Command cmd = hover.peek();
+                cmd.setError(msg);
+                createTask("ASYN", cmd::runFinish);
+                hover.poll();
             }
             return;
         }
@@ -163,23 +167,35 @@ public class QueryReader {
     }
 
     public synchronized void stopThreads() {
+        shutdown.set(true);
+        userThreadPool.shutdown();
+        try {
+            if(!userThreadPool.awaitTermination(3, TimeUnit.SECONDS))
+                userThreadPool.shutdownNow();
+        } catch (InterruptedException e) {
+        }
+        allowed = false;
         commands.forEach(cmd -> cmd.setError("Stopped"));
         commands.clear();
         hover.forEach(cmd -> cmd.setError("Stopped"));
         hover.clear();
-        userThreadPool.shutdown();
         readerThread.interrupt();
     }
 
     private void createTask(String name, Runnable task) {
-        userThreadPool.submit(() -> {
-            try {
-                Thread.currentThread().setName(name);
-                task.run();
-            } catch (Throwable throwable) {
-                logger.debug(DebugOutputType.ERROR,name + " threw an exception:" + throwable.getMessage());
-            }
-        });
+        try {
+            userThreadPool.execute(() -> {
+                try {
+                    Thread.currentThread().setName(name);
+                    task.run();
+                } catch (Throwable throwable) {
+                    logger.debug(DebugOutputType.ERROR, "Thread: " + name
+                            + " threw an exception: " + throwable.getMessage());
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            logger.debug(DebugOutputType.ERROR, "Could not submit task to userThreadPool: " + e.getMessage());
+        }
     }
 
     private boolean isError(String rs) {
@@ -209,6 +225,10 @@ public class QueryReader {
     }
 
     protected synchronized void addCommand(Command command) {
+        if (shutdown.get()) {
+            command.setError("Stopped");
+            return;
+        }
         commands.add(command);
     }
 }

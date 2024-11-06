@@ -74,7 +74,7 @@ public class QueryWriter {
 		long start = System.currentTimeMillis();
 		while (!cmd.isFinished()) {
 			if ((System.currentTimeMillis() - start) > timeout) {
-				return null;
+				return new String[] { "", "Timeout" };
 			}
 		}
 		List<String> packets = cmd.getPackets();
@@ -109,12 +109,12 @@ public class QueryWriter {
 	public <T> CommandFuture<T> executeAsyncCommand(String command, Transformator<T> transformator) {
     CommandFuture<T> future = new CommandFuture<>(transformator);
 	Command cmd = new Command(command, future);
-	reader.addCommand(cmd);
 	FutureTask<Command> task = new FutureTask<>(new Callable<Command>() {
 
         @Override
         public Command call() {
-            logger.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
+        	logger.debug(DebugOutputType.QUERYWRITER, "Executing AsyncCommand > (" + cmd.getCommand() + ")");
+            reader.addCommand(cmd);
 			while (!cmd.isFinished());
             logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Packets: " + cmd.getPackets().size());
             logger.debug(DebugOutputType.QUERYREADERQUEUE, "Removed from Errors: 1");

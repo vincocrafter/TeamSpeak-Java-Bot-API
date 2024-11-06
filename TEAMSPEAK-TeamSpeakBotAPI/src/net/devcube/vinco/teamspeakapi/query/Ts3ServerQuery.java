@@ -116,6 +116,7 @@ public class Ts3ServerQuery {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		logger.debug(DebugOutputType.QUERY, "Stopping Query successful");
 	}
 
 	public void checkQueryPermissions() {
